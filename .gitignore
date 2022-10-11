@@ -3,7 +3,6 @@ account.config.json
 test.account.config.json
 dump.rdb
 servercommands.md 
-pool.config.json
 
 dist/*
 

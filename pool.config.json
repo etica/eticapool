@@ -1,0 +1,97 @@
+
+ {
+ 
+
+  "staging":{
+    "poolName": "TestServer",
+    "poolUrl": "http://yourpoolhereexample.com or your ip like http:48.103.74.89 or http:48.101.76.89:expressport",
+    "poolEnv":"staging",
+    "MainPeerPoolUrl": "http://eticapool.com",
+    "apiConfig":{
+      "coinGeckoApiURL": "https://api.coingecko.com/api/v3/coins/oxbitcoin?localization=en&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false",
+      "defiPulseApiKey": ""
+    }, 
+    
+    "miningConfig":{
+      "minimumShareDifficulty": 53,
+      "minimumShareDifficultyHard": 60,
+      "allowCustomVardiff": false 
+    },
+  
+    "mintingConfig":{
+      "overrideSuspension": true, 
+      "maxGasPriceGwei": 200, 
+      "gasPriceBoost":10,
+      "poolTokenFee": 5,
+    
+      "publicAddress": "",
+      "privateKey":"",
+
+      "networkName":"etica",
+      "web3Provider": "https://eticamainnet.eticascan.org"
+    },
+  
+    "paymentsConfig":{
+      "enablePPS":true,
+      "maxGasPriceGwei": 5,
+      "minBalanceForTransfer": 1500000000000000000,  
+      "rebroadcastPaymentWaitBlocks": 10,
+      "minPaymentsInBatch": 1,
+      "publicAddress": "",
+      "privateKey":"",
+
+      "networkName":"etica",
+      "web3Provider": "https://eticamainnet.eticascan.org"
+    }
+  },
+  "production":{
+    "poolName": "TestServer",
+    "poolUrl": "http://yourpoolhereexample.com or your ip like http:48.103.74.89 or http:48.101.76.89:expressport",
+    "MainPeerPoolUrl": "http://eticapool.com",
+    "poolEnv":"production",
+    "apiConfig":{
+      "coinGeckoApiURL": "https://api.coingecko.com/api/v3/coins/oxbitcoin?localization=en&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false",
+      "defiPulseApiKey": ""
+    }, 
+    
+    "miningConfig":{
+      "minimumShareDifficulty": 64,
+      "minimumShareDifficultyHard": 128,
+      "allowCustomVardiff": false 
+    },
+  
+    "mintingConfig":{
+      "overrideSuspension": true, 
+      "maxGasPriceGwei": 200000, 
+      "gasPriceBoost":10,
+      "poolTokenFee": 5,
+
+      "publicAddress": "",
+      "privateKey":"",
+      
+      "networkName":"etica",
+      "web3Provider": "https://eticamainnet.eticascan.org"
+    },
+  
+    "paymentsConfig":{
+      "enablePPS":true,
+      "maxGasPriceGwei": 5,
+      "minBalanceForTransfer": 1500000000000000000,  
+      "rebroadcastPaymentWaitBlocks": 10,
+      "minPaymentsInBatch": 1,
+      "PoolSecurityBalance": 15000000000000000000000,
+
+      
+      "publicAddress": "",
+      "privateKey":"",
+
+      "networkName":"etica",
+      "web3Provider": "https://eticamainnet.eticascan.org"
+    }
+  }
+  
+  
+  
+ 
+}
+ 
