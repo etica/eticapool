@@ -114,14 +114,19 @@ Run pool with pm2:
   
 You're ETI pool is running  
   
-  
+
   
 ## MAIN SCRIPTS PROCESS:
-index.js is the main process of the  pool, it handles everything necessary on its own
-indexcleanercoordinator.js perdiodically deletes old shares for optimisation
-indexpoolsnetwork.js handles everything related to sharing data and receiving stats from other Etica mining pools
+index.js is the main process of the  pool, it handles everything necessary on its own  
+indexcleanercoordinator.js perdiodically deletes old shares for optimisation  
+indexpoolsnetwork.js handles everything related to sharing data and receiving stats from other Etica mining pools  
 
 
+
+
+
+
+  
 --------------------------------    FUNCTION MAPPING  -----------------------------------
 
 
