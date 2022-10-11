@@ -79,7 +79,7 @@
       "minBalanceForTransfer": 1500000000000000000,  
       "rebroadcastPaymentWaitBlocks": 10,
       "minPaymentsInBatch": 1,
-      "PoolSecurityBalance": 15000000000000000000000,
+      "PoolSecurityBalance": 10000000000000000,
 
       
       "publicAddress": "",
