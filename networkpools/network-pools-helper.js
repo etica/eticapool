@@ -32,9 +32,9 @@ export default class NetworkPools  {
 
    update(){
 
-    setInterval(function(){NetworkPools.scanNetworkNewPools(this.poolConfig,this.mongoInterface)}.bind(this),120000) // 7 200 000 every 2 hours (12 times a day)
-    setInterval(function(){NetworkPools.scanNetworkPoolsInfo(this.poolConfig,this.mongoInterface)}.bind(this),65000) // 300000   5 minutes
-    setInterval(function(){NetworkPools.resetPools(this.mongoInterface)}.bind(this),65000) // 300000   10 minutes
+    setInterval(function(){NetworkPools.scanNetworkNewPools(this.poolConfig,this.mongoInterface)}.bind(this),7200000) // 7 200 000 every 2 hours (12 times a day)
+    setInterval(function(){NetworkPools.scanNetworkPoolsInfo(this.poolConfig,this.mongoInterface)}.bind(this),300000) // 300000   5 minutes
+    setInterval(function(){NetworkPools.resetPools(this.mongoInterface)}.bind(this),600000) // 300000   10 minutes
 
 
     // every hour at 09 mins:
