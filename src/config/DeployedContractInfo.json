@@ -1,0 +1,43 @@
+
+{
+  "networks": {
+      "mainnet": {
+              "contracts": {
+                "EticaRelease": {"name":"EticaRelease", "blockchain_address":"0xb6ed7644c69416d67b522e20bc294a9a9b405b31"},
+                "batchedpayments": {"name":"BatchedPayments", "blockchain_address":" "} 
+               
+              }
+            },
+    "kovan": {
+        "contracts": {
+          "EticaRelease": {"name":"EticaRelease", "blockchain_address":"0x24a19ee5a5c8757acdebe542a9436d9c796d1c9e"},
+          "batchedpayments": {"name":"BatchedPayments", "blockchain_address":"0x2600c1d268a53b69f3e8488fe91f2c269dba1eb2"} 
+        }
+      },
+
+    "goerli": {
+      "contracts": {
+        "EticaRelease": {"name":"EticaRelease", "blockchain_address":"0x24a19ee5a5c8757acdebe542a9436d9c796d1c9e"},
+        "batchedpayments": {"name":"BatchedPayments", "blockchain_address":"0xb491574844b84dcbaef821990df27122a178a283"} 
+      }
+    },
+      "matic": {
+        "contracts": {
+          "EticaRelease": {"name":"EticaRelease", "blockchain_address":"0x71B821aa52a49F32EEd535fCA6Eb5aa130085978"},
+          "batchedpayments": {"name":"BatchedPayments", "blockchain_address":"0xCEBb8370Eb673F57e369D4FfD11912F944998911"} 
+        }
+      } ,
+      "mumbai": {
+        "contracts": {
+          "EticaRelease": {"name":"EticaRelease", "blockchain_address":"0xb491574844b84dCBAeF821990df27122a178a283"},
+          "batchedpayments": {"name":"BatchedPayments", "blockchain_address":"0x24a19eE5A5C8757ACDEBe542a9436D9C796d1c9E"} 
+        }
+      },
+      "etica": {
+        "contracts": {
+          "EticaRelease": {"name":"EticaRelease", "blockchain_address":"0x34c61EA91bAcdA647269d4e310A86b875c09946f"},
+          "batchedpayments": {"name":"BatchedPayments", "blockchain_address":"0xC4d3Eab6CB085882f85363e606daAF15bcdfC6f8"} 
+        }
+      }  
+    }
+}
