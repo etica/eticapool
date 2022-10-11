@@ -166,7 +166,7 @@
       
         <div class="text-center w-full flex flex-col">
            
-           <img style="width:400px; margin:0 auto;" src="@/assets/images/eticaprotocolpasteur.png"  />
+           <img style="width:400px; margin:0 auto;" src="@/assets/images/eticaprotocolpasteur.jpg"  />
             
            <a href="https://www.reddit.com/r/Etica" target="_blank" class="color-eticacyan"> Science knows no country because knowledge belongs to Humanity </a>
       </div>
