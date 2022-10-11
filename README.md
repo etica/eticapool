@@ -29,7 +29,7 @@ you can install both versions with: nvm install 14
 Overall process (for details check: ## EXAMPLE FRESH INSTALL ON BRAND NEW SERVER, SERVER COMMANDS):
 1. npm install
 
-2. rename 'sample.pool.config.json' to 'pool.config.json' and fill it with the pool's etica account data (make two new accounts, one for minting one for payments and fill both with a small amount of ETH)
+2. rename 'pool.config.description.json' to 'pool.config.json' and fill it with the pool's etica account data (make two new accounts, one for minting one for payments and fill both with a small amount of ETH)
 
 3. Install mongodb, make sure it is running as a service
 
