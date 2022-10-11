@@ -20,6 +20,7 @@ https://www.eticaprotocol.org/eticadocs/mining.html
 MAKE SURE TO USE NPM 6.14.17 and NODE 14.20.1
 you can install both versions with: nvm install 14
  
+BEFORE EACH NEW BUILD AND CHECK AGAIN YOUR ON NPM 6.14.17 AND NODE 14.20.1 
 
 Overall process (for details check: ## EXAMPLE FRESH INSTALL ON BRAND NEW SERVER, SERVER COMMANDS):
 1. npm install
