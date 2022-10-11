@@ -7,18 +7,13 @@ A pool for mining EIP918 Tokens
 See me running at http://eticapool.com
 
 
-Windows GPU Miner 1
-https://bitbucket.org/LieutenantTofu/cosmic-v3/downloads/COSMiC-v4.1.1-MultiGPU-TMP.zip
 
-Windows GPU Miner 2
- https://github.com/mining-visualizer/MVis-tokenminer/releases
 
- Windows GPU Miner 3
- https://github.com/lwYeo/SoliditySHA3MinerUI/releases/tag/1.0.2
+Miner:
+https://bio.hiveos.farm/repo/SoliditySHA3Miner-2.2.8.tar.gz
 
- Linux GPU Miner
- https://github.com/lwYeo/SoliditySHA3Miner/releases
-
+How to mine:
+https://www.eticaprotocol.org/eticadocs/mining.html
 
 ### BASIC SETUP  (needs Node 14) [nvm install 14]
 
