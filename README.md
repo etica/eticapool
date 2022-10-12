@@ -22,12 +22,14 @@ you can install both versions with: nvm install 14
  
 BEFORE EACH NEW BUILD AND CHECK AGAIN YOUR ON NPM 6.14.17 AND NODE 14.20.1 
 
+USE MONGODB 4.4.1
+
 Overall process (for details check: ## EXAMPLE FRESH INSTALL ON BRAND NEW SERVER, SERVER COMMANDS):
 1. npm install
 
 2. rename 'pool.config.description.json' to 'pool.config.json' and fill it with the pool's etica account data (make two new accounts, one for minting one for payments and fill both with a small amount of EGAZ)
 
-3. Install mongodb, make sure it is running as a service
+3. Install mongodb 4.4.1, make sure it is running as a service
 
 4. 'npm run build'  #(to build the website files)
 
