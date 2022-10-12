@@ -41,12 +41,14 @@ Overall process (for details check: ## EXAMPLE FRESH INSTALL ON BRAND NEW SERVER
 ### CONFIGURING  - set up  pool.config.json
 
 ##### pool.config.json
-SHARING YOUR POOL CONFIG can expose your private keys.  !!! be cautious!!!
-update pool.config.template.json with your parameters and rename it pool.config.json
+SHARING YOUR POOL CONFIG can expose your private keys.  !!! be cautious!!!  
+update pool.config.template.json with your parameters and rename it pool.config.json  
+For tests you can generate new private keys on this website: https://vanity-eth.tk/  
+For prod check online tutorials, you can get private keys using geth command line and then exporting to metamask or directly in metamask  
 
 ## Deploy a BatchedPayments.sol Contract
 Deploy BatchedPayments.sol contract (it is the contract in deploythis folder).
-Then after deploy, Enter the address of your BatchedPayments contract in src/config/DeployedContractInfo.json
+Then after deploy, Enter the address of your BatchedPayments contract in src/config/DeployedContractInfo.json  
 
 
 ## HOW TO TEST
@@ -58,6 +60,8 @@ You should see that the miner is able to successfully submit shares to the pool 
 
 
 ## Installing MongoDB
+
+USE MONGODB 4.4.1  
 
 Digitalocean guide:
 https://www.digitalocean.com/community/tutorials/how-to-install-mongodb-on-ubuntu-16-04#step-3-%E2%80%94-adjusting-the-firewall-(optional)
