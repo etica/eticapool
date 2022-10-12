@@ -41,8 +41,8 @@ Overall process (for details check: ## EXAMPLE FRESH INSTALL ON BRAND NEW SERVER
 ### CONFIGURING  - set up  pool.config.json
 
 ##### pool.config.json
-
-
+SHARING YOUR POOL CONFIG can expose your private keys.  !!! be cautious!!!
+update pool.config.template.json with your parameters and rename it pool.config.json
 
 ## Deploy a BatchedPayments.sol Contract
 Deploy BatchedPayments.sol contract (it is the contract in deploythis folder).
