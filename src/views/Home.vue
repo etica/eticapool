@@ -99,12 +99,18 @@
         
       
 
-        <a href="https://bio.hiveos.farm/repo/SoliditySHA3Miner-2.2.8.tar.gz" target="_blank">
-          <div class='bg-cyan-etica p-4 mt-4 rounded text-black inline-block  hover:bg-blue-200'>Download the Token Miner (Linux)</div>
+        <a href="https://bio.hiveos.farm/repo/SoliditySHA3Miner-2.3.4.zip" target="_blank">
+          <div class='bg-cyan-etica p-4 mt-4 rounded text-black inline-block  hover:bg-blue-200'>Download the Token Miner (Linux zip)</div>
+        </a>
+        <a href="https://bio.hiveos.farm/repo/SoliditySHA3Miner-2.3.4.tar.gz" target="_blank">
+          <div class='bg-cyan-etica p-4 mt-4 rounded text-black inline-block  hover:bg-blue-200'>Download the Token Miner (Linux tar.gz)</div>
         </a>
          <div class=""></div>
-        <a href="https://bio.hiveos.farm/repo/SoliditySHA3Miner-2.2.8.tar.gz" target="_blank">
-          <div class='bg-cyan-etica p-4 mt-4 rounded text-black inline-block hover:bg-blue-200'>Download the Token Miner (Windows)</div>
+        <a href="https://bio.hiveos.farm/repo/SoliditySHA3Miner-2.3.4.zip" target="_blank">
+          <div class='bg-cyan-etica p-4 mt-4 rounded text-black inline-block hover:bg-blue-200'>Download the Token Miner (Windows zip)</div>
+        </a>
+        <a href="https://bio.hiveos.farm/repo/SoliditySHA3Miner-2.3.4.tar.gz" target="_blank">
+          <div class='bg-cyan-etica p-4 mt-4 rounded text-black inline-block hover:bg-blue-200'>Download the Token Miner (Windows tar.gz)</div>
         </a>
 
         <div class="whitespace-sm"></div>

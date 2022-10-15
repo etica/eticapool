@@ -10,7 +10,8 @@ See me running at http://eticapool.com
 
 
 Miner:
-https://bio.hiveos.farm/repo/SoliditySHA3Miner-2.2.8.tar.gz
+https://bio.hiveos.farm/repo/SoliditySHA3Miner-2.3.4.tar.gz  
+https://bio.hiveos.farm/repo/SoliditySHA3Miner-2.3.4.zip  
 
 How to mine:
 https://www.eticaprotocol.org/eticadocs/mining.html
