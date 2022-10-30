@@ -31,8 +31,8 @@
             </div> 
 
                 <p class="text-white font-bold">Mining Pool URLs</p>
-                <p class="text-white font-bold" style="color:#76bbb1;">http://eticapool.com:8080 (for low hashrates) </p>
-                <p class="text-white font-bold" style="color:#399999;">http://eticapool.com:8081 (for high hashrates) </p>
+              <!--  <p class="text-white font-bold" style="color:#76bbb1;">http://eticapool.com:8080 (for low hashrates) </p> -->
+                <p class="text-white font-bold" style="color:#399999;">http://eticapool.com:8081</p>
                 <p class="text-white font-bold">Smart Contract Address: 0x34c61EA91bAcdA647269d4e310A86b875c09946f </p>
 
                 <div class="whitespace-md" style="margin-top: 2em;"></div>
@@ -81,8 +81,8 @@
             <div class= " inline-block bg-gray-800 p-2 text-white">
               <p>Download the mining software</p>
               <hr>
-              <p>Set pool URL to 'http://eticapool.com:8080' for low hashrates</p>
-              <hr>
+              <!-- <p>Set pool URL to 'http://eticapool.com:8080' for low hashrates</p>
+              <hr> -->
               <p>Set pool URL to 'http://eticapool.com:8081' for high hashrates</p>
               <hr>
               <p>Set address to your ETH address and begin mining!</p>

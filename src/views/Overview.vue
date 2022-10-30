@@ -69,8 +69,8 @@
 
           <br>
           <div style="text-decoration:underline;">Mining Pool difficulty:</div>
-          <div style="color:#135e56;">Low Hashrates (port 8080):</div>
-          <div>Minimum Shares Difficulty: {{poolData.minimumShareDifficulty}}</div>
+          <!-- <div style="color:#135e56;">Low Hashrates (port 8080):</div>
+          <div>Minimum Shares Difficulty: {{poolData.minimumShareDifficulty}}</div> -->
           <div>Rewards: 14% of Rewards</div>
           <div style="color:#135e56;">High Hashrates (port 8081):</div>
           <div>Minimum Shares Difficulty: {{poolData.minimumShareDifficultyHard}}</div> 
@@ -84,13 +84,13 @@
             <div v-if="poolName" style="color:green;">Pool status: {{ poolName }} is Active </div>
     
           </div>
-          <div style="text-decoration:underline;">Low Hashrates (port 8080):</div>
+        <!--  <div style="text-decoration:underline;">Low Hashrates (port 8080):</div>
           <div>Minimum Shares Difficulty: {{poolData.minimumShareDifficulty}}</div>
           <div>Rewards: 14% of Rewards</div>
-          <br>
-          <div style="text-decoration:underline;">High Hashrates (port 8081):</div>
+          <br> -->
+          <div style="text-decoration:underline;">Port 8081:</div>
           <div>Minimum Shares Difficulty: {{poolData.minimumShareDifficultyHard}}</div> 
-          <div>Rewards: 85% of Rewards</div>
+          <div>Rewards: 100% of Rewards</div>
 
 
           <div class="mb-4">avgGasPriceGWei: {{poolStatus.poolFeesMetrics.avgGasPriceGWei}}</div>
