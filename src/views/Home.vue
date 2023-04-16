@@ -241,7 +241,9 @@ export default {
      
       this.socketsListener.on('poolData', (data) => {  
              
-            this.poolAPIData = data 
+            console.log('poolData websocket reponse is: ', data);
+            console.log('this.poolAPIData websocket reponse is: ', this.poolAPIData);
+            this.poolAPIData = data; 
         });
 
           this.socketsListener.on('poolStatus', (data) => {   
