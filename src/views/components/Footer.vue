@@ -17,6 +17,7 @@
           <a href="https://github.com/etica/etica" target="_blank" class="footer-link">Run this pool: Github</a>
           <a href="https://reddit.com/r/etica" target="_blank" class="footer-link">Reddit</a>
           <a href="https://discord.gg/CrTKpETKXc" target="_blank" class="footer-link">Discord</a>
+          <a href="https://t.me/eticaprotocol" target="_blank" class="footer-link">Telegram</a>
           </div>
         <div class="column-7 w-col w-col-4 w-col-small-4 flex flex-col h-full">
 
