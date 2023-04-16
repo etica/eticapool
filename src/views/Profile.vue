@@ -235,7 +235,7 @@ export default {
     this.socketsListener = this.socketHelper.initSocket()
 
     this.socketsListener.on('poolData', (data) => {   
-        console.log('got poolData',data)
+        console.log('got poolData',data);
 
         this.poolData = data 
     }); 
