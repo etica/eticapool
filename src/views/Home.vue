@@ -229,7 +229,7 @@ export default {
   created(){
       this.socketHelper = new SocketHelper()
       
-      setInterval(this.pollSockets.bind(this),5000)
+      setInterval(this.pollSockets.bind(this),60000)
       setInterval(this.pollSocketsSlow.bind(this),60000)
 
 
