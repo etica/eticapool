@@ -240,10 +240,6 @@ export default {
         });
      
       this.socketsListener.on('poolData', (data) => {  
-             
-            console.log('poolData websocket triggered ok'); 
-            console.log('poolData websocket reponse is: ', data);
-            console.log('this.poolAPIData websocket reponse is: ', this.poolAPIData);
             this.poolAPIData = data; 
         });
 
@@ -253,8 +249,7 @@ export default {
 
 
         this.socketsListener.on('LastpoolStatsRecord', (data) => {   
-            this.LastPoolStatsRecord = data;
-            console.log('LastpoolStatsRecord',this.LastPoolStatsRecord);    
+            this.LastPoolStatsRecord = data;   
         });
 
 
