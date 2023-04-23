@@ -15,7 +15,7 @@
        
       
             <div class="text-lg md:text-2xl text-white overflow-x-auto">
-              Mining Account <i>(Data updates every 5 minutes)</i>
+              Mining Account <i style="font-size: 1rem;">(Data updates every 5 minutes)</i>
             </div>
 
              <div class="text-md md:text-xl text-white overflow-x-auto">
