@@ -15,7 +15,7 @@
        
       
             <div class="text-lg md:text-2xl text-white overflow-x-auto">
-              Mining Account 
+              Mining Account <i>(Data updates every 5 minutes)</i>
             </div>
 
              <div class="text-md md:text-xl text-white overflow-x-auto">
@@ -53,7 +53,7 @@
       <div v-if="activeSection=='Recent Shares'" class="box  background-secondary overflow-x-auto" 
          style=" min-height:480px;">
 
-        <div class='text-lg font-bold'>Recent Shares (Over last 1000 ETI mining Blocks)</div>
+        <div class='text-lg font-bold'>Recent Shares (Last 100 shares)</div>
         <table class='table w-full'>
 
           <thead>
@@ -91,7 +91,7 @@
       <div v-if="activeSection=='Payouts'" class="box  background-secondary overflow-x-auto" 
          style="  min-height:480px;">
 
-        <div class='text-lg font-bold'>Payouts</div>
+        <div class='text-lg font-bold'>Payouts (Last 100 payouts)</div>
         <table class='table w-full'>
 
           <thead>
@@ -228,8 +228,8 @@ export default {
 
     this.socketHelper = new SocketHelper()
     
-    setInterval(this.pollSockets.bind(this),60000)
-    setInterval(this.pollSocketsSlow.bind(this),120000)
+    setInterval(this.pollSockets.bind(this),300000)
+    setInterval(this.pollSocketsSlow.bind(this),300000)
 
 
     this.socketsListener = this.socketHelper.initSocket()

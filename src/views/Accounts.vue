@@ -11,7 +11,7 @@
    <div class="section bg-slate-etica   ">
      <div class="w-container pt-8 text-gray-100">      
             <h1 class="title text-lg text-gray-100">
-              Mining Account List
+              Mining Account List (Data updates every 5 minutes)
             </h1>
             <h2 class=" ">
              
@@ -117,7 +117,7 @@ export default {
     
      this.socketHelper = new SocketHelper()
     
-     setInterval(this.pollSockets.bind(this),120000)
+     setInterval(this.pollSockets.bind(this),300000)
 
 
     this.socketsListener = this.socketHelper.initSocket()
