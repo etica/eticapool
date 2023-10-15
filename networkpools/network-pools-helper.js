@@ -347,15 +347,12 @@ export default class NetworkPools  {
     {
 
         let poolStatsRecord = await PoolStatsHelper.getLastPoolStatsRecord( poolConfig, mongoInterface )
-        console.log('getNetworkPoolInfo poolStatsRecord I');
-        console.log('getNetworkPoolInfo poolStatsRecord is ', poolStatsRecord);
         let _hashrate = 0;
         let _numberminers = 0;
         if(poolStatsRecord && poolStatsRecord.length > 0){
           _hashrate = poolStatsRecord[0].Hashrate;
           _numberminers = poolStatsRecord[0].Numberminers;
         }
-        console.log('getNetworkPoolInfo poolStatsRecord II');
         // Identification though Pool Name and Pool url: if pool owner changes pool Name And keep address, the address remains associated to former pool Name
         // If pool owner changes mint Address but not name, the new address will be associated to former pool name
         var poolInfo = {
@@ -365,8 +362,6 @@ export default class NetworkPools  {
          Numberminers: _numberminers,
          mintAddress: poolConfig.mintingConfig.publicAddress,
         }
-        console.log('getNetworkPoolInfo poolStatsRecord III');
-        console.log('getNetworkPoolInfo poolInfo is: ', poolInfo);
         return poolInfo;
     }
 
@@ -397,7 +392,6 @@ export default class NetworkPools  {
           _hashrate = poolStatsRecord[0].Hashrate;
           _numberminers = poolStatsRecord[0].Numberminers;
         }
-        console.log('getNetworkPoolInfo poolStatsRecord II');
         // Identification though Pool Name and Pool Address: if pool owner changes pool Name And keep address, the address remains associated to former pool Name
         // If pool owner changes mint Address but not name, the new address will be associated to former pool name
         let _poolInfo = {
@@ -407,8 +401,6 @@ export default class NetworkPools  {
          Numberminers: _numberminers,
          mintAddress: poolConfig.mintingConfig.publicAddress,
         }
-        console.log('getNetworkPoolInfo poolStatsRecord III');
-        console.log('getNetworkPoolInfo poolInfo is: ', _poolInfo);
         return _poolInfo;
     }
 
@@ -524,7 +516,6 @@ static async axiosgetRequestURL(get_request_uri){
 
     axios.get(get_request_uri)
 .then(response => {
-  console.log('request response is: ', response);
   resolve(response.data)
   
 })
@@ -543,7 +534,6 @@ static async axiospostRequestURL(request_uri, _data){
   return new Promise(   (resolve, reject) => {
     axios.post(request_uri, _data)
 .then(response => {
-  console.log('request post response is: ', response);
   resolve(response.data)
 })
 .catch(error => {
