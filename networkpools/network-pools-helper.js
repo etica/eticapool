@@ -520,8 +520,6 @@ static  async resetPools( mongoInterface )
 
 static async axiosgetRequestURL(get_request_uri){
 
-  console.log('axios call');
-  console.log('axios request url is: ', get_request_uri);
   return new Promise(   (resolve, reject) => {
 
     axios.get(get_request_uri)
@@ -541,8 +539,7 @@ static async axiosgetRequestURL(get_request_uri){
 
 
 static async axiospostRequestURL(request_uri, _data){
-  console.log('axios post call');
-  console.log('axios post request url is: ', request_uri);
+  
   return new Promise(   (resolve, reject) => {
     axios.post(request_uri, _data)
 .then(response => {
