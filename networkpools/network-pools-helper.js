@@ -26,7 +26,8 @@ export default class NetworkPools  {
   }
   
   init(){
-    NetworkPools.initNetworkNewPools(this.poolConfig,this.mongoInterface,);
+    NetworkPools.initNetworkNewPools(this.poolConfig,this.mongoInterface);
+    NetworkPools.scanPoolsMintAddresses(this.poolConfig,this.mongoInterface);
   }
   
 
@@ -53,7 +54,7 @@ export default class NetworkPools  {
     // Every day at 12:01 am 
     cron.schedule('1 12 * * *', async function() {
       NetworkPools.reactivatePools(this.mongoInterface);
-      NetworkPools.cleanPools(this.mongoInterface);
+      NetworkPools.TurnOffSleepingPools(this.mongoInterface);
     }.bind(this));
     // Every day at 15:01 pm 
     cron.schedule('1 15 * * *', async function() {
@@ -66,6 +67,16 @@ export default class NetworkPools  {
     // Every day at 21:01 pm 
     cron.schedule('1 21 * * *', async function() {
       NetworkPools.reactivatePools(this.mongoInterface);
+    }.bind(this));
+
+    // every day at 21:24 mins:
+    cron.schedule('24 21 * * *', async function() {
+      NetworkPools.deleteDoublePools(this.mongoInterface)
+    }.bind(this));
+
+     // every day at 22:01 mins:
+     cron.schedule('1 22 * * *', async function() {
+      NetworkPools.scanPoolsMintAddresses(this.poolConfig, this.mongoInterface)
     }.bind(this));
  
   } 
@@ -81,6 +92,17 @@ export default class NetworkPools  {
       │ │ └─────────────── day of month (1 - 31)
       │ └──────────────────── hour (0 - 23)
       └───────────────────────── min (0 - 59)
+*/
+
+/*
+
+FLOW
+
+scanNetworkPoolsInfo()
+Runs every 10 minutes. 
+It increases nb fails. If there is an error during function execution fails nb stayed with increased nb. If function reaches end successfully pool nb fails is set back to 0.
+It tries to fetch information from pool.url to update pool hashrate and nb of miners
+It checks if mining pool bockchain address retrieved from fetch url is already registered in network_pools_addresses, insert if not
 */
 
 
@@ -166,7 +188,7 @@ export default class NetworkPools  {
 
 
 
-  // run twice a day:
+  
   static async CheckAndInsertNewPool(candidatepool, _poolUrl,mongoInterface){
 
     // only insert if candiate pool is not same name and url of server pool:
@@ -246,7 +268,7 @@ export default class NetworkPools  {
     
    }
 
-   // select pool to update based on its combination name, url:
+   // updates pool nb miners, hashrate and mintingaddress, based on pool url:
     static async CheckAndUpdatePool2( _poolname, _poolurl , _Hashrate, _Numberminers, _address, mongoInterface){
   // Add filters and checkers for hashrate and nbminers
   // _address already checked by CheckandIsert and scanNetworkPoolsInfo
@@ -268,6 +290,51 @@ export default class NetworkPools  {
   
   }
 
+  static async CheckAndUpdatePoolAddressAndName(candidatepool, _poolUrl,mongoInterface){
+
+    // only update if candiate pool is not same name and url of server pool:
+    if( (candidatepool.url != _poolUrl) )
+    {
+      
+      // check url is an eticapool and that the name, url and mintAddress are valid:
+      let queryurl = ''+candidatepool.url+'/api/v1/networkpoolinfo';
+      let inforesponse = await NetworkPools.axiosgetRequestURL(queryurl);
+      let askedpool = inforesponse.PoolInfo;
+     if( askedpool && candidatepool.name == askedpool.name && candidatepool.url == askedpool.url && candidatepool.mintAddress == askedpool.mintAddress){
+
+
+      // Add filters and checkers
+      let checkedname = 0;
+      let checkedurl = 0;
+      let checkedaddress = 0;
+
+
+      if(candidatepool.name != null && candidatepool.name != '' && typeof candidatepool.name === 'string' && candidatepool.name.length < 60){
+      checkedname = 1;
+      }
+      if(candidatepool.url != null && candidatepool.url != '' && typeof candidatepool.url === 'string' && candidatepool.url.length < 200){
+        checkedurl = 1;
+      }
+
+      if(candidatepool.mintAddress != null && candidatepool.mintAddress != '' && typeof candidatepool.mintAddress === 'string' && web3utils.isAddress(candidatepool.mintAddress)){
+        checkedaddress = 1;
+      }
+
+      if(checkedname == 1 && checkedurl == 1 && checkedaddress == 1){
+        let lastupdate = PeerHelper.getTimeNowSeconds();
+        candidatepool.lastupdate = lastupdate; // last update of pool's metric
+        candidatepool.lastupdatetry = lastupdate; // last try update of pool's metric, updated even when pool url doesnt reply
+        candidatepool.fails = 0; // metric that keeptrack of many failed connections to this pool in a raw, delete pool if too much
+        await mongoInterface.updateOne('network_pools',{url: candidatepool.url}, { name: candidatepool.name, mintAddress: candidatepool.mintAddress, status:1, fails:0 } );
+      }
+
+     }
+
+    }   
+
+  }
+
+
   // run every 10 minutes
   static async scanNetworkPoolsInfo(poolConfig,mongoInterface){
     let time_trigger_updates = 600; // all network_pools with more than 10 minutes since last update will be updated
@@ -284,51 +351,37 @@ export default class NetworkPools  {
       if(onepool.url){
       let queryurl = ''+onepool.url+'/api/v1/poolinfo';
       let onepoolinforesponse = await NetworkPools.axiospostRequestURL(queryurl, thisPoolInfo) // https://www.onepool.com/poolinfo return objects with just pool Hashrate
-      let onepool_poolinfo = onepoolinforesponse.PoolInfo;
-      let newaddress = onepool.mintAddress; // current address
+      
+      if(onepoolinforesponse && onepoolinforesponse.PoolInfo){
 
-      // if new address detected, check and update mint address:
-      if( (onepool.mintAddress != onepool_poolinfo.mintAddress) && web3utils.isAddress(onepool_poolinfo.mintAddress)){
-        let existingAddress = await mongoInterface.findOne('network_pools_addresses', {mintAddress: onepool_poolinfo.mintAddress});
-        if(!existingAddress){
-          await mongoInterface.insertOne('network_pools_addresses', { name: onepool.name, url: onepool.url, mintAddress: onepool_poolinfo.mintAddress});
-          newaddress = onepool_poolinfo.mintAddress;
-          }
+        let askedpool = onepoolinforesponse.PoolInfo;
+        let currentaddress = onepool.mintAddress; // current address
+  
+        // if new address detected, check and update mint address:
+        if( (onepool.mintAddress != askedpool.mintAddress) && web3utils.isAddress(askedpool.mintAddress)){
+
+          currentaddress = askedpool.mintAddress;
+          
+          let existingAddress = await mongoInterface.findOne('network_pools_addresses', {mintAddress: askedpool.mintAddress});
+          if(!existingAddress){
+            await mongoInterface.insertOne('network_pools_addresses', { name: onepool.name, url: onepool.url, mintAddress: askedpool.mintAddress});
+            }
+        }
+  
+        if( askedpool && onepool.url == askedpool.url && (onepool.mintAddress != askedpool.mintAddress || onepool.name != askedpool.name)){
+          // updates pool mintAddress and pool name
+          await NetworkPools.CheckAndUpdatePoolAddressAndName(askedpool, poolConfig.poolUrl, mongoInterface);
+        }
+  
+        else if(askedpool && onepool.url == askedpool.url) {
+          // updates pool nb miners and pool hashrate
+          await NetworkPools.CheckAndUpdatePool2(askedpool.name, askedpool.url, askedpool.Hashrate, askedpool.Numberminers, currentaddress, mongoInterface);
+        }
+
       }
-
-      // updates network_pool
-      await NetworkPools.CheckAndUpdatePool2(onepool_poolinfo.name, onepool_poolinfo.url, onepool_poolinfo.Hashrate, onepool_poolinfo.Numberminers, newaddress, mongoInterface);
 
       }
     }
-  }
-
-  // not operational yet, to be updated:
-  static async scanNetworkPoolsMintAddresses(poolConfig,mongoInterface){
- 
-    let network_pools = await  mongoInterface.findAllSortedWithLimit('network_pools', {}, {lastupdate:1}, 20  );
-
-    for(let onepool of network_pools)
-    {
-
-      let queryurl = ''+onepool.url+'/api/v1/networkmintaddresses';
-      let onepool_axiosrequest = await NetworkPools.axiosgetRequestURL(queryurl) // https://www.onepool.com/networkmintaddresses return objects with just pool Hashrate
-      let onepool_networkmintaddresses = onepool_axiosrequest.NetworkMintAddresses;
-
-      // transform onepool.mintAddresses into an array of max 5 addresses
-
-      for(let oneaddress of onepool_networkmintaddresses)
-    {
-      let existingAddress = await mongoInterface.findOne('network_pools_addresses', {mintAddress: oneaddress})
-
-      if(!existingAddress){
-        await mongoInterface.insertOne('network_pools_addresses', { name: onepool.name, mintAddress: oneaddress, url: onepool.url});
-      }
-
-    }
-
-    }
-
   }
 
 
@@ -430,8 +483,23 @@ export default class NetworkPools  {
  
     }
 
+    // remove pool metrics if too much time since last update but let pool in status 1:
+    static  async resetPools( mongoInterface )
+    {
 
-    // pass all reachable pools to networking zone (pool status: 1):
+      let time_trigger_reset = 60 * 60; // 3600 secs = 1 hour since last update
+      let minTimeUpdate = (PeerHelper.getTimeNowSeconds() - time_trigger_reset);
+      let unreachablePools = await  mongoInterface.findAllSortedWithLimit('network_pools', {status:1,lastupdate: {$lte:minTimeUpdate}}, {lastupdate:1}, 10  );
+
+        for(let onepool of unreachablePools)
+    {
+      await mongoInterface.updateOne('network_pools',{_id:onepool._id}, { Hashrate:0, Numberminers:0 } )
+    }
+
+    }
+
+
+    // check all unreachable pools, pass reachable pools from status 2 -> to networking zone (pool status: 1):
     static  async reactivatePools( mongoInterface )
     {
 
@@ -441,27 +509,32 @@ export default class NetworkPools  {
     {
       let queryurl = ''+onepool.url+'/api/v1/networkpoolinfo';
       let inforesponse = await NetworkPools.axiosgetRequestURL(queryurl);
+
+      if(inforesponse && inforesponse.PoolInfo){
+
       let askedpool = inforesponse.PoolInfo;
-     if( askedpool && onepool.name == askedpool.name && onepool.url == askedpool.url && onepool.mintAddress == askedpool.mintAddress){
-      await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {status: 1 , fails: 0, reactivatefails: 0} )
-    }
-    else if(onepool.reactivatefails > 10){
+      if( askedpool && askedpool.name && askedpool.url && askedpool.mintAddress){
+        await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {status: 1 , fails: 0, reactivatefails: 0} )
+      }
+
+      }
+
+      // if too much failures to reactivate pool, pass pool from status 2 to status 3 (stop trials to reactivate):
+      else if(onepool.reactivatefails > 10){
       let _incfails = onepool.reactivatefails + 1;
       await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {status: 3, reactivatefails: _incfails} )
-    }
-    else {
+      }
+      else {
       let incfails = onepool.reactivatefails + 1;
       await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {reactivatefails: incfails} )
-    }
+      }
  
     }
 
-  }
+   }
 
-
-
-  // delete pool that stay too long in status 3:
-  static  async cleanPools( mongoInterface )
+  // TurnOff pools that stay too long in status 3, pass them from status 3 to status 4:
+  static  async TurnOffSleepingPools( mongoInterface )
   {
 
       let unreachablePools = await mongoInterface.findAll('network_pools',{status: 3});
@@ -470,43 +543,67 @@ export default class NetworkPools  {
   {
     let queryurl = ''+onepool.url+'/api/v1/networkpoolinfo';
     let inforesponse = await NetworkPools.axiosgetRequestURL(queryurl);
+
+    if(inforesponse){
+
     let askedpool = inforesponse.PoolInfo;
-   if( askedpool && onepool.name == askedpool.name && onepool.url == askedpool.url && onepool.mintAddress == askedpool.mintAddress){
+   if( askedpool && askedpool.name && askedpool.url && askedpool.mintAddress){
     await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {status: 1 , fails: 0, reactivatefails: 0} )
   }
   else if(onepool.reactivatefails > 15){
-    // delete pool, > 15 means 5 days in status 3 (1 attempts a day for 5 days):
-    await mongoInterface.deleteOne('network_pools',{_id:onepool._id})
+    // > 15 means 5 days in status 3 (1 attempts a day for 5 days), pass pool in status 4 stop trying and delete if double pool entry:
+    let incfails = onepool.reactivatefails + 1;
+    await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {status: 4, reactivatefails: 0} )
   }
   else {
     let incfails = onepool.reactivatefails + 1;
     await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {reactivatefails: incfails} )
   }
 
+    }
+
   }
 
-}
+  }
 
 
+   // insert unregistered pool addresses in network_pools_addresses:
+   static async scanPoolsMintAddresses(poolConfig,mongoInterface){
+ 
+    let network_pools = await  mongoInterface.findAllSortedWithLimit('network_pools', {}, {lastupdate:1}, 20  );
 
-// remove pool metrics if too much time since last update:
-static  async resetPools( mongoInterface )
-{
+    for(let onepool of network_pools)
+    {
 
-  let time_trigger_reset = 60 * 60; // 3600 secs = 1 hour since last update
-  let minTimeUpdate = (PeerHelper.getTimeNowSeconds() - time_trigger_reset);
-  let unreachablePools = await  mongoInterface.findAllSortedWithLimit('network_pools', {status:1,lastupdate: {$lte:minTimeUpdate}}, {lastupdate:1}, 10  );
+      let existingAddress = await mongoInterface.findOne('network_pools_addresses', {mintAddress: onepool.mintAddress})
 
-    for(let onepool of unreachablePools)
-{
-  await mongoInterface.updateOne('network_pools',{_id:onepool._id}, { Hashrate:0, Numberminers:0 } )
-}
+      if(!existingAddress){
+        await mongoInterface.insertOne('network_pools_addresses', { poolId: onepool._id, name: onepool.name, mintAddress: oneaddress, url: onepool.url});
+      }
 
-}
+    }
 
+  }
 
-
-
+    // Deletes pools in status 4, that have double entry (other pool with same name, or mintAddress):
+    static  async deleteDoublePools( mongoInterface )
+    {
+  
+        let unreachablePools = await mongoInterface.findAll('network_pools',{status: 4});
+  
+        for(let onepool of unreachablePools)
+    {
+      let doublePools = await mongoInterface.findAll('network_pools', {$or: [
+        { url: onepool.url },
+        { mintAddress: onepool.mintAddress }
+      ]
+    });
+      if(doublePools && doublePools[0] && doublePools[0].url ){
+        await mongoInterface.deleteOne('network_pools', {_id:onepool._id})
+      }
+    }
+  
+    }
 
 // REQUESTS //
 
