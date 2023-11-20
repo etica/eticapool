@@ -139,7 +139,7 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
 
       }
     catch(error) {
-      console.log('A network pool endpoint responded with error: ', error)
+     // console.log('A network pool endpoint responded with error: ', error)
     }
 
   }
@@ -194,7 +194,7 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
 
     }
     catch(error){
-       console.log('A network pool endpoint responded with error: ', error)
+      // console.log('A network pool endpoint responded with error: ', error)
     }
      }
 
@@ -261,7 +261,7 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
 
     }
     catch(error) {
-      console.log('A network pool endpoint responded with error: ', error)
+    //  console.log('A network pool endpoint responded with error: ', error)
     }
 
     }   
@@ -358,7 +358,7 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
 
     }
     catch(error) {
-      console.log('A network pool endpoint responded with error: ', error)
+     // console.log('A network pool endpoint responded with error: ', error)
     }
 
     }   
@@ -416,7 +416,7 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
 
       }
       catch(error) {
-        console.log('A network pool endpoint responded with error: ', error)
+       // console.log('A network pool endpoint responded with error: ', error)
       }
 
       }
@@ -573,7 +573,7 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
  
       }
       catch(error) {
-        console.log('A network pool endpoint responded with error: ', error)
+       // console.log('A network pool endpoint responded with error: ', error)
       }
 
     }
@@ -614,7 +614,7 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
 
   }
   catch(error) {
-    console.log('A network pool endpoint responded with error: ', error)
+   // console.log('A network pool endpoint responded with error: ', error)
   }
 
   }
