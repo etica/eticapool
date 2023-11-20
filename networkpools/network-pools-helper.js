@@ -560,20 +560,21 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
       }
 
       }
-
-      // if too much failures to reactivate pool, pass pool from status 2 to status 3 (stop trials to reactivate):
-      else if(onepool.reactivatefails > 10){
-      let _incfails = onepool.reactivatefails + 1;
-      await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {status: 3, reactivatefails: _incfails} )
-      }
-      else {
-      let incfails = onepool.reactivatefails + 1;
-      await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {reactivatefails: incfails} )
-      }
  
       }
       catch(error) {
        // console.log('A network pool endpoint responded with error: ', error)
+       
+       // if too much failures to reactivate pool, pass pool from status 2 to status 3 (stop trials to reactivate):
+       if(onepool.reactivatefails > 10){
+        let _incfails = onepool.reactivatefails + 1;
+        await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {status: 3, reactivatefails: _incfails} )
+        }
+        else {
+        let incfails = onepool.reactivatefails + 1;
+        await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {reactivatefails: incfails} )
+        }
+
       }
 
     }
