@@ -110,6 +110,9 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
 
       let thisPoolInfo = await NetworkPools.getNetworkPoolInfo(poolConfig, mongoInterface);
       let mainpeerpoolurl = poolConfig.MainPeerPoolUrl;
+
+      try {
+
       let queryurl = ''+mainpeerpoolurl+'/api/v1/poolinfo';
       let mainpeerpoolinforesponse = await NetworkPools.axiospostRequestURL(queryurl, thisPoolInfo);
       let mainpeerpoolinfo = mainpeerpoolinforesponse.PoolInfo;
@@ -134,6 +137,11 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
         await NetworkPools.scanNetworkNewPools(poolConfig,mongoInterface);
         await NetworkPools.scanNetworkPoolsInfo(poolConfig,mongoInterface);
 
+      }
+    catch(error) {
+      console.log('A network pool endpoint responded with error: ', error)
+    }
+
   }
 
 
@@ -150,6 +158,9 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
        await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {lastscannewpools: _lastscannewpools } )
 
      if(onepool.url){
+
+      try {
+
       let queryurl = ''+onepool.url+'/api/v1/networkpools'
       let onepool_poolsresponse = await NetworkPools.axiosgetRequestURL(queryurl) // https://www.onepool.com/networkpools return objects with just pool name, pool address and pool url fields
       let onepool_pools = onepool_poolsresponse.Pools;
@@ -180,6 +191,11 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
 
       }
 
+
+    }
+    catch(error){
+       console.log('A network pool endpoint responded with error: ', error)
+    }
      }
 
     }
@@ -194,6 +210,8 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
     // only insert if candiate pool is not same name and url of server pool:
     if( (candidatepool.url != _poolUrl) )
     {
+
+      try {
       
       // check url is an eticapool and that the name, url and mintAddress are valid:
       let queryurl = ''+candidatepool.url+'/api/v1/networkpoolinfo';
@@ -240,6 +258,11 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
       }
 
      }
+
+    }
+    catch(error) {
+      console.log('A network pool endpoint responded with error: ', error)
+    }
 
     }   
 
@@ -295,6 +318,9 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
     // only update if candiate pool is not same name and url of server pool:
     if( (candidatepool.url != _poolUrl) )
     {
+
+      try {
+
       
       // check url is an eticapool and that the name, url and mintAddress are valid:
       let queryurl = ''+candidatepool.url+'/api/v1/networkpoolinfo';
@@ -325,10 +351,15 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
         candidatepool.lastupdate = lastupdate; // last update of pool's metric
         candidatepool.lastupdatetry = lastupdate; // last try update of pool's metric, updated even when pool url doesnt reply
         candidatepool.fails = 0; // metric that keeptrack of many failed connections to this pool in a raw, delete pool if too much
-        await mongoInterface.updateOne('network_pools',{url: candidatepool.url}, { name: candidatepool.name, mintAddress: candidatepool.mintAddress, status:1, fails:0 } );
+        await mongoInterface.updateOne('network_pools',{url: candidatepool.url}, { poolId: onepool._id, name: candidatepool.name, mintAddress: candidatepool.mintAddress, status:1, fails:0 } );
       }
 
      }
+
+    }
+    catch(error) {
+      console.log('A network pool endpoint responded with error: ', error)
+    }
 
     }   
 
@@ -349,6 +380,9 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
       await mongoInterface.updateOneCustom('network_pools',{_id:onepool._id}, { $inc: {fails: 1}, $set: { lastupdatetry: _lastupdatetry } })
 
       if(onepool.url){
+
+       try {
+
       let queryurl = ''+onepool.url+'/api/v1/poolinfo';
       let onepoolinforesponse = await NetworkPools.axiospostRequestURL(queryurl, thisPoolInfo) // https://www.onepool.com/poolinfo return objects with just pool Hashrate
       
@@ -378,6 +412,11 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
           await NetworkPools.CheckAndUpdatePool2(askedpool.name, askedpool.url, askedpool.Hashrate, askedpool.Numberminers, currentaddress, mongoInterface);
         }
 
+      }
+
+      }
+      catch(error) {
+        console.log('A network pool endpoint responded with error: ', error)
       }
 
       }
@@ -507,6 +546,9 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
 
         for(let onepool of unreachablePools)
     {
+
+      try {
+
       let queryurl = ''+onepool.url+'/api/v1/networkpoolinfo';
       let inforesponse = await NetworkPools.axiosgetRequestURL(queryurl);
 
@@ -529,6 +571,11 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
       await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {reactivatefails: incfails} )
       }
  
+      }
+      catch(error) {
+        console.log('A network pool endpoint responded with error: ', error)
+      }
+
     }
 
    }
@@ -541,6 +588,9 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
 
       for(let onepool of unreachablePools)
   {
+
+  try {
+
     let queryurl = ''+onepool.url+'/api/v1/networkpoolinfo';
     let inforesponse = await NetworkPools.axiosgetRequestURL(queryurl);
 
@@ -561,6 +611,11 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
   }
 
     }
+
+  }
+  catch(error) {
+    console.log('A network pool endpoint responded with error: ', error)
+  }
 
   }
 
