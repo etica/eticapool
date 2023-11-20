@@ -559,7 +559,25 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
         await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {status: 1 , fails: 0, reactivatefails: 0} )
       }
 
+        else if(onepool.reactivatefails > 10){
+        let _incfails = onepool.reactivatefails + 1;
+        await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {status: 3, reactivatefails: _incfails} )
+        }
+        else {
+        let incfails = onepool.reactivatefails + 1;
+        await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {reactivatefails: incfails} )
+        }
+
       }
+
+      else if(onepool.reactivatefails > 10){
+        let _incfails = onepool.reactivatefails + 1;
+        await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {status: 3, reactivatefails: _incfails} )
+        }
+        else {
+        let incfails = onepool.reactivatefails + 1;
+        await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {reactivatefails: incfails} )
+        }
  
       }
       catch(error) {
@@ -595,13 +613,40 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
     let queryurl = ''+onepool.url+'/api/v1/networkpoolinfo';
     let inforesponse = await NetworkPools.axiosgetRequestURL(queryurl);
 
-    if(inforesponse){
+    if(inforesponse && inforesponse.PoolInfo){
 
     let askedpool = inforesponse.PoolInfo;
-   if( askedpool && askedpool.name && askedpool.url && askedpool.mintAddress){
+    if( askedpool && askedpool.name && askedpool.url && askedpool.mintAddress){
     await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {status: 1 , fails: 0, reactivatefails: 0} )
+    }
+
+    else if(onepool.reactivatefails > 15){
+      // > 15 means 5 days in status 3 (1 attempts a day for 5 days), pass pool in status 4 stop trying and delete if double pool entry:
+      let incfails = onepool.reactivatefails + 1;
+      await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {status: 4, reactivatefails: 0} )
+    }
+    else {
+      let incfails = onepool.reactivatefails + 1;
+      await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {reactivatefails: incfails} )
+    }
+
+    }
+
+    else if(onepool.reactivatefails > 15){
+      // > 15 means 5 days in status 3 (1 attempts a day for 5 days), pass pool in status 4 stop trying and delete if double pool entry:
+      let incfails = onepool.reactivatefails + 1;
+      await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {status: 4, reactivatefails: 0} )
+    }
+    else {
+      let incfails = onepool.reactivatefails + 1;
+      await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {reactivatefails: incfails} )
+    }
+
   }
-  else if(onepool.reactivatefails > 15){
+  catch(error) {
+
+   // console.log('A network pool endpoint responded with error: ', error)
+   if(onepool.reactivatefails > 15){
     // > 15 means 5 days in status 3 (1 attempts a day for 5 days), pass pool in status 4 stop trying and delete if double pool entry:
     let incfails = onepool.reactivatefails + 1;
     await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {status: 4, reactivatefails: 0} )
@@ -611,11 +656,6 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
     await mongoInterface.updateOne('network_pools',{_id:onepool._id}, {reactivatefails: incfails} )
   }
 
-    }
-
-  }
-  catch(error) {
-   // console.log('A network pool endpoint responded with error: ', error)
   }
 
   }
@@ -634,7 +674,7 @@ It checks if mining pool bockchain address retrieved from fetch url is already r
       let existingAddress = await mongoInterface.findOne('network_pools_addresses', {mintAddress: onepool.mintAddress})
 
       if(!existingAddress){
-        await mongoInterface.insertOne('network_pools_addresses', { poolId: onepool._id, name: onepool.name, mintAddress: oneaddress, url: onepool.url});
+        await mongoInterface.insertOne('network_pools_addresses', { poolId: onepool._id, name: onepool.name, mintAddress: onepool.mintAddress, url: onepool.url});
       }
 
     }
