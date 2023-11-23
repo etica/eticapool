@@ -131,15 +131,11 @@ export default {
 
           this.poolList.sort((a,b) => {return b.Hashrate - a.Hashrate})
 
-          console.log('Pool list is', newList);
-
           this.PoolsmintAddresses = this.poolList.map(o => o.mintAddress);
         
       },
             async updateMintList(newList){
-          console.log('Mint list is', newList);
            this.mintList = newList;
-        
       },
       pollSockets(){
           this.socketHelper.emitEvent( 'getPoolList'),
@@ -170,21 +166,27 @@ export default {
   computed: {
   epochsLeftBeforeAdjustment() {
     const epochsPerAdjustment = 2016; // ETI difficulty adjusts every 2016 ETI blocks (epochs)
-
+    console.log(' II .. II')
     if(this.mintList && this.mintList.length > 0){
-
+console.log(' III ... III')
     const lastEpoch = this.mintList[this.mintList.length - 1];
 
+console.log(' lastEpoch: ', lastEpoch)
+console.log(' III ... III')
     if (lastEpoch && lastEpoch.epochCount) {
+      console.log(' IV ... IV')
       const currentBlockNumber = lastEpoch.currentBlockNumber;
       const epochsLeft = epochsPerAdjustment - (currentBlockNumber % epochsPerAdjustment);
+      console.log(' V ... V')
+      console.log(' V ... V epCOunt: ', epochCount)
       return epochsLeft;
     }
 
+console.log(' null I')
     return null;
 
     }
-    
+    console.log(' null II')
     return null;
   }
  }
