@@ -14,7 +14,7 @@
             </h2>
 
 <p style="color:green;">Etica pools Network</p>
-<p style="color:white;">Pools running with Eticapool software don't represent the whole network</p>
+<p style="color:white;font-size:0.80rem;">Pools running with Eticapool software don't represent the whole network</p>
 <p v-if="mintList && mintList.length > 0">Last miner address: {{ mintList[0].from }}</p>
 <!-- <p v-if="mintList && mintList.length > 0 && epochsLeftBeforeAdjustment">Next difficulty adjustment at Epoch {{ mintList[this.mintList.length - 1].epochCount + epochsLeftBeforeAdjustment }} ({{ epochsLeftBeforeAdjustment }} epochs)</p> -->
              <div class="whitespace-sm"></div> 
