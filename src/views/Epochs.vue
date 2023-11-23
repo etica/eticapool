@@ -15,8 +15,8 @@
 
 <p style="color:green;">Etica pools Network</p>
 <p style="color:white;">Pools running with Eticapool don't represent the whole network</p>
-<p v-if="mintList">Last miner address: {{ mintList[0].from }}</p>
-<p v-if="mintList">Next difficulty adjustment in {{ epochsLeftBeforeAdjustment }} epochs</p>
+<p v-if="mintList && mintList.length > 0">Last miner address: {{ mintList[0].from }}</p>
+<p v-if="epochsLeftBeforeAdjustment">Next difficulty adjustment in {{ epochsLeftBeforeAdjustment }} epochs</p>
              <div class="whitespace-sm"></div> 
 
       <div   class="box  background-secondary overflow-x-auto" style="  min-height:480px;">
@@ -32,7 +32,7 @@
           </thead>
 
           <tbody>
-            <tr v-for="(item, index) in mintList">
+            <tr v-for="(item, index) in mintList" v-bind:key="index">
                 <td>
                   <a v-bind:href='item.url' >
                         <span style="color: #ffffff;">  {{ item.epochCount }} </span>
