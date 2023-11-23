@@ -14,9 +14,10 @@
             </h2>
 
 <p style="color:green;">Etica pools Network</p>
-<p style="color:white;">Pools running with Eticapool don't represent the whole network</p>
+<p style="color:white;">Pools running with Eticapool software don't represent the whole network</p>
 <p v-if="mintList && mintList.length > 0">Last miner address: {{ mintList[0].from }}</p>
-<p v-if="epochsLeftBeforeAdjustment">Next difficulty adjustment in {{ epochsLeftBeforeAdjustment }} epochs</p>
+<p v-if="mintList && mintList.length > 0 && epochsLeftBeforeAdjustment">Next difficulty adjustment at Epoch {{ mintList[this.mintList.length - 1].epochCount + epochsLeftBeforeAdjustment }} ({{ epochsLeftBeforeAdjustment }} epochs)</p>
+<p v-if="epochsLeftBeforeAdjustment"> {{ epochsLeftBeforeAdjustment }} epochs left before next difficulty adjustment</p>
              <div class="whitespace-sm"></div> 
 
       <div   class="box  background-secondary overflow-x-auto" style="  min-height:480px;">
@@ -166,27 +167,17 @@ export default {
   computed: {
   epochsLeftBeforeAdjustment() {
     const epochsPerAdjustment = 2016; // ETI difficulty adjusts every 2016 ETI blocks (epochs)
-    console.log(' II .. II')
     if(this.mintList && this.mintList.length > 0){
-console.log(' III ... III')
     const lastEpoch = this.mintList[this.mintList.length - 1];
 
-console.log(' lastEpoch: ', lastEpoch)
-console.log(' III ... III')
     if (lastEpoch && lastEpoch.epochCount) {
-      console.log(' IV ... IV')
       const currentBlockNumber = lastEpoch.epochCount;
       const epochsLeft = epochsPerAdjustment - (currentBlockNumber % epochsPerAdjustment);
-      console.log(' V ... V')
-      console.log(' V ... V epCOunt: ', epochsLeft)
       return epochsLeft;
     }
-
-console.log(' null I')
     return null;
 
     }
-    console.log(' null II')
     return null;
   }
  }
