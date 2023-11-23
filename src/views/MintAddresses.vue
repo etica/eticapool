@@ -110,7 +110,8 @@ export default {
     this.socketsListener = this.socketHelper.initSocket()
 
         this.socketsListener.on('mintAddressesList', (data) => {               
-       
+          console.log('mintAddressesList received')
+          console.log('mintAddressesList data', data)
          
           this.updateMintAddressList(data)
 
@@ -126,6 +127,9 @@ export default {
   methods: {
 
       async updateMintAddressList(newList){
+
+        console.log('newList received')
+          console.log('newList data', newList)
  
            this.mintaddressList = newList 
 
@@ -134,7 +138,7 @@ export default {
       },
 
       pollSockets(){
-          this.socketHelper.emitEvent('getMintAddresses')
+          this.socketHelper.emitEvent( 'getMintAddresses')
       },
       hashrateToMH(hashrate){
          return MathHelper.rawAmountToFormatted( hashrate , 6 )
