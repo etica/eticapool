@@ -9,7 +9,6 @@
             <tr >
               <td> Block </td>
               <td> TxHash </td>
-              <td>   </td>
               <td> Status </td>
             </tr>
           </thead>
