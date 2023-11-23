@@ -175,10 +175,10 @@ console.log(' lastEpoch: ', lastEpoch)
 console.log(' III ... III')
     if (lastEpoch && lastEpoch.epochCount) {
       console.log(' IV ... IV')
-      const currentBlockNumber = lastEpoch.currentBlockNumber;
+      const currentBlockNumber = lastEpoch.epochCount;
       const epochsLeft = epochsPerAdjustment - (currentBlockNumber % epochsPerAdjustment);
       console.log(' V ... V')
-      console.log(' V ... V epCOunt: ', epochCount)
+      console.log(' V ... V epCOunt: ', epochsLeft)
       return epochsLeft;
     }
 
