@@ -82,7 +82,8 @@
               <hr>
               <!-- <p>Set pool URL to 'http://eticapool.com:8080' for low hashrates</p>
               <hr> -->
-              <p>Set pool URL to 'http://eticapool.com:8081' for high hashrates</p>
+              <p v-if="poolUrl">Set pool URL to '{{ poolUrl }}:8081'</p>
+              <p v-else>Set pool URL in your miner config</p>
               <hr>
               <p>Set address to your ETH address and begin mining!</p>
               <hr>
@@ -98,23 +99,23 @@
         
       
 
-        <a href="https://bio.hiveos.farm/repo/SoliditySHA3Miner-2.3.4.zip" target="_blank">
+        <a href="https://bio.hiveos.farm/repo/SoliditySHA3Miner-2.3.4.zip" target="_blank" style="margin-right:1%;">
           <div class='bg-cyan-etica p-4 mt-4 rounded text-black inline-block  hover:bg-blue-200'>Download the Token Miner (Linux zip)</div>
         </a>
         <a href="https://bio.hiveos.farm/repo/SoliditySHA3Miner-2.3.4.tar.gz" target="_blank">
           <div class='bg-cyan-etica p-4 mt-4 rounded text-black inline-block  hover:bg-blue-200'>Download the Token Miner (Linux tar.gz)</div>
         </a>
          <div class=""></div>
-        <a href="https://bio.hiveos.farm/repo/SoliditySHA3Miner-2.3.4.zip" target="_blank">
+        <a href="https://github.com/etica/SoliditySHA3MinerEticaOptimised/releases/tag/v.2.3.4" target="_blank" style="margin-right:1%;">
           <div class='bg-cyan-etica p-4 mt-4 rounded text-black inline-block hover:bg-blue-200'>Download the Token Miner (Windows zip)</div>
         </a>
-        <a href="https://bio.hiveos.farm/repo/SoliditySHA3Miner-2.3.4.tar.gz" target="_blank">
+        <a href="https://github.com/etica/SoliditySHA3MinerEticaOptimised/releases/tag/v.2.3.4" target="_blank">
           <div class='bg-cyan-etica p-4 mt-4 rounded text-black inline-block hover:bg-blue-200'>Download the Token Miner (Windows tar.gz)</div>
         </a>
 
         <div class="whitespace-sm"></div>
      
-        <a href="https://www.eticaprotocol.org/eticadocs" target="_blank">
+        <a href="https://www.eticaprotocol.org/eticadocs/mining.html" target="_blank">
           <div class='button-bubble button-gradient' style="color: #dbdbdb;">How to mine Eticas</div>
         </a>
         
