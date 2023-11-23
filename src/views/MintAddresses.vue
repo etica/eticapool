@@ -134,7 +134,7 @@ export default {
       },
 
       pollSockets(){
-          this.socketHelper.emitEvent( 'getMintAddresses')
+          this.socketHelper.emitEvent('getMintAddresses')
       },
       hashrateToMH(hashrate){
          return MathHelper.rawAmountToFormatted( hashrate , 6 )
