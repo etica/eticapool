@@ -98,7 +98,7 @@ export default {
   components: {Navbar,AppPanel,VerticalNav,Footer},
   data() {
     return {
-      mintaddressList: [],
+      mintAddressList: [],
     }
   },
   created(){
@@ -131,9 +131,11 @@ export default {
         console.log('newList received')
           console.log('newList data', newList)
  
-           this.mintaddressList = newList 
+           this.mintAddressList = newList 
 
-           this.mintaddressList = this.mintaddressList.filter(x => web3utils.isAddress( x.mintAddress ) )
+           this.mintAddressList = this.mintAddressList.filter(x => web3utils.isAddress( x.mintAddress ) )
+
+           console.log('this.mintAddressList', this.mintAddressList)
         
       },
 
