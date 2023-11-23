@@ -18,6 +18,7 @@ const config={
       {"title":"Web App","url":"https://www.etica.io"},
       {"title":"Reddit","url":"https://reddit.com/r/etica"},
       {"title":"Eticanomics","url":"https://www.eticanomics.net"},
+      {"title":"Etica Intel","url":"https://eticaintel.org/"},
       {"title":"Github","url":"https://github.com/etica/etica"}
     ]}
   ]

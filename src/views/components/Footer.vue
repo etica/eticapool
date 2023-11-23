@@ -12,6 +12,7 @@
           <a href="https://www.eticaprotocol.org/exchanges" target="_blank" class="footer-link">Exchanges</a>
           <a href="https://www.youtube.com/watch?v=IaIDSLBxzjg" target="_blank" class="footer-link">Create Etica Wallet (Metamask)</a>
           <a href="https://github.com/etica/etica-gui/releases/tag/v1.0.7" target="_blank" class="footer-link">Create Etica Wallet (GUI)</a>
+          <a href="https://www.youtube.com/watch?v=tPljgu0rez0" target="_blank" class="footer-link">How to mine EGAZ</a>
       
         </div>
         <div class="column-6 w-col w-col-4 w-col-small-4">
@@ -30,7 +31,6 @@
                <img src="@/assets/images/egaz-logo.png" height="100"  alt="" class="w-6 m-2">
             <div class=" inline-block text-xl text-white-100" style="position: relative;top: 0.75vh;color: white;">Egaz pools</div>
          </a>
-         <a href="https://www.youtube.com/watch?v=tPljgu0rez0" target="_blank" class="footer-link">How to mine EGAZ</a>
         </div>
 
          </div>
