@@ -11,7 +11,7 @@
             </h1>
 
 <p style="color:green;">Etica pools Network</p>
-<p style="color:white;">Current list of Network Mint Addresses detected by this pool:</p>
+<p style="color:white;">Latest list of Network Mint Addresses detected by this pool:</p>
 <p v-if="mintList && mintList[0]" style="color:#3c6a4e;">Last mint from: {{ mintList[0].from }} ( {{ getdisplayname(mintList[0].from) }} )</p>
       <div class="whitespace-sm"></div> 
 
@@ -21,27 +21,27 @@
 
           <thead>
             <tr >
-              <td class="px-1"> Name # </td>
-              <td class="px-1"> Url </td>
-              <td class="px-1"> Mint Address </td>
+              <td class="px-1"> Mint Address #</td>
+              <td class="px-1"> Pool Name </td>
+              <td class="px-1"> Pool Url </td>
             </tr>
           </thead>
 
           <tbody>
             <tr v-for="(item, index) in mintAddressList">
+                <td class="px-1"> <a v-bind:href='"https://www.eticascan.org/address/"+item.mintAddress' >
+                        <span v-if="index % 2 === 0" style="color: rgb(213, 201, 201);">  {{ item.mintAddress }}  </span>
+                        <span v-else-if="index % 3 === 0" style="color:rgb(162, 162, 162);">  {{ item.mintAddress }}  </span>
+                        <span v-else style="color: rgb(89, 89, 89);">  {{ item.mintAddress }}  </span>
+                      </a> 
+                </td>  
                 <td><a v-bind:href='item.url' >
                         <span class="namecolors">  {{ item.name }} </span>
                       </a></td>
                 <td class="px-1"> <a v-bind:href='item.url' >
                         <span class="urlcolors">  {{ item.url }}  </span>
                       </a> 
-                </td>
-                <td class="px-1"> <a v-bind:href='"https://www.eticascan.org/address/"+item.mintAddress' >
-                        <span v-if="index % 2 === 0" style="color: rgb(213, 201, 201);">  {{ item.mintAddress | truncate(10, '...') }}  </span>
-                        <span v-else-if="index % 3 === 0" style="color:rgb(162, 162, 162);">  {{ item.mintAddress | truncate(10, '...') }}  </span>
-                        <span v-else style="color: rgb(89, 89, 89);">  {{ item.mintAddress | truncate(10, '...') }}  </span>
-                      </a> 
-                </td>           
+                </td>         
             </tr> 
           </tbody>
         </table>
@@ -110,8 +110,6 @@ export default {
     this.socketsListener = this.socketHelper.initSocket()
 
         this.socketsListener.on('mintAddressesList', (data) => {               
-          console.log('mintAddressesList received')
-          console.log('mintAddressesList data', data)
          
           this.updateMintAddressList(data)
 
@@ -127,15 +125,10 @@ export default {
   methods: {
 
       async updateMintAddressList(newList){
-
-        console.log('newList received')
-          console.log('newList data', newList)
  
            this.mintAddressList = newList 
 
            this.mintAddressList = this.mintAddressList.filter(x => web3utils.isAddress( x.mintAddress ) )
-
-           console.log('this.mintAddressList', this.mintAddressList)
         
       },
 
