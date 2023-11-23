@@ -28,7 +28,20 @@
           </thead>
 
           <tbody>
-            <tr v-for="(item, index) in mintAddressList">
+            <tr v-if="poolAPIData && poolAPIData.mintingAddress">
+                <td class="px-1"> <a v-bind:href='"https://www.eticascan.org/address/"+poolAPIData.mintingAddress' >
+                        <span style="color:rgb(162, 162, 162);">  {{ poolAPIData.mintingAddress }}  </span>
+                      </a> 
+                </td>  
+                <td><a v-bind:href='poolName' >
+                        <span class="namecolors">  {{ poolName }} </span>
+                      </a></td>
+                <td class="px-1"> <a v-bind:href='poolUrl' >
+                        <span class="urlcolors">  {{ poolUrl }}  </span>
+                      </a> 
+                </td>         
+            </tr>
+            <tr v-for="(item, index) in mintAddressList" v-bind:key="index">
                 <td class="px-1"> <a v-bind:href='"https://www.eticascan.org/address/"+item.mintAddress' >
                         <span v-if="index % 2 === 0" style="color: rgb(213, 201, 201);">  {{ item.mintAddress }}  </span>
                         <span v-else-if="index % 3 === 0" style="color:rgb(162, 162, 162);">  {{ item.mintAddress }}  </span>
@@ -99,6 +112,9 @@ export default {
   data() {
     return {
       mintAddressList: [],
+      poolName: null,
+      poolUrl: null,
+      poolAPIData: {},
     }
   },
   created(){
@@ -114,6 +130,17 @@ export default {
           this.updateMintAddressList(data)
 
     });
+
+        this.socketsListener.on('poolNameAndUrl', (pool) => {   
+            this.poolName = pool.poolName;
+            this.poolUrl= pool.poolUrl;
+        });
+
+        this.socketsListener.on('poolData', (data) => {  
+            this.poolAPIData = data; 
+        });
+
+
 
 
    this.pollSockets()
@@ -134,6 +161,8 @@ export default {
 
       pollSockets(){
           this.socketHelper.emitEvent( 'getMintAddresses')
+          this.socketHelper.emitEvent('getPoolNameAndUrl')
+          this.socketHelper.emitEvent('getPoolData')
       },
       hashrateToMH(hashrate){
          return MathHelper.rawAmountToFormatted( hashrate , 6 )
