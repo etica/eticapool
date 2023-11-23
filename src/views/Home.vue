@@ -31,8 +31,7 @@
             </div> 
 
                 <p class="text-white font-bold">Mining Pool URLs</p>
-              <!--  <p class="text-white font-bold" style="color:#76bbb1;">http://eticapool.com:8080 (for low hashrates) </p> -->
-                <p class="text-white font-bold" style="color:#399999;">http://eticapool.com:8081</p>
+                <p v-if="poolUrl" class="text-white font-bold" style="color:#399999;">{{ poolUrl }}:8081</p>
                 <p class="text-white font-bold">Smart Contract Address: 0x34c61EA91bAcdA647269d4e310A86b875c09946f </p>
 
                 <div class="whitespace-md" style="margin-top: 2em;"></div>
@@ -217,6 +216,7 @@ export default {
   data() {
     return {
       poolName: null,
+      poolUrl: null,
       poolAPIData: {}, //read this from sockets
       poolStatus: null,
       LastPoolStatsRecord: null,
@@ -235,8 +235,9 @@ export default {
 
       this.socketsListener = this.socketHelper.initSocket()
      
-     this.socketsListener.on('poolName', (name) => {   
-            this.poolName = name;
+     this.socketsListener.on('poolNameAndUrl', (pool) => {   
+            this.poolName = pool.poolName;
+            this.poolUrl= pool.poolUrl;
         });
      
       this.socketsListener.on('poolData', (data) => {  
@@ -271,7 +272,7 @@ export default {
     },
 
     pollSockets(){
-      this.socketHelper.emitEvent('getPoolName')
+      this.socketHelper.emitEvent('getPoolNameAndUrl')
       this.socketHelper.emitEvent('getPoolData')
        this.socketHelper.emitEvent('getPoolStatus')
       
