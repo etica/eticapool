@@ -16,6 +16,7 @@
 <p style="color:green;">Etica pools Network</p>
 <p style="color:white;">Pools running with Eticapool don't represent the whole network</p>
 <p v-if="mintList">Last mint: {{ mintList[0].from }}</p>
+<p v-if="mintList">Next difficulty adjustment in: {{ epochsLeftBeforeAdjustment }} epochs</p>
              <div class="whitespace-sm"></div> 
 
       <div   class="box  background-secondary overflow-x-auto" style="  min-height:480px;">
@@ -165,6 +166,27 @@ export default {
 
       }
 
+  },
+  computed: {
+  epochsLeftBeforeAdjustment() {
+    const epochsPerAdjustment = 2016; // ETI difficulty adjusts every 2016 ETI blocks (epochs)
+
+    if(this.mintList && this.mintList.length > 0){
+
+    const lastEpoch = this.mintList[this.mintList.length - 1];
+
+    if (lastEpoch && lastEpoch.epochCount) {
+      const currentBlockNumber = lastEpoch.currentBlockNumber;
+      const epochsLeft = epochsPerAdjustment - (currentBlockNumber % epochsPerAdjustment);
+      return epochsLeft;
+    }
+
+    return null;
+
+    }
+    
+    return null;
   }
+ }
 }
 </script>
