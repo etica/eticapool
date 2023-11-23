@@ -90,7 +90,7 @@
           <br> -->
           <div style="text-decoration:underline;">Port 8081:</div>
           <div>Minimum Shares Difficulty: {{poolData.minimumShareDifficultyHard}}</div> 
-          <div>Rewards: 100% of Rewards o port 8081</div>
+          <div>Rewards: 100% of Rewards on port 8081</div>
 
 
           <div class="mb-4">avgGasPriceGWei: {{poolStatus.poolFeesMetrics.avgGasPriceGWei}}</div>
@@ -100,7 +100,7 @@
 
          <!-- <div>miningRewardInEth: {{poolStatus.poolFeesMetrics.miningRewardInEth}}</div> -->
 
-          <div>Current ETI/EGAZ ratio: {{poolStatus.poolFeesMetrics.token_Eth_Price_Ratio}}</div>
+          <div>Current ETI/EGAZ ratio: {{poolStatus.poolFeesMetrics.token_Eth_Price_Ratio}} (1 <img src="@/assets/images/etica-logo.png" height="100"  alt="" class="w-6 m-2"> for {{ 1 / poolStatus.poolFeesMetrics.token_Eth_Price_Ratio }} <img src="@/assets/images/egaz-logo.png" height="100"  alt="" class="w-6 m-2">)</div>
 
            <div>poolBaseFeeFactor: {{poolStatus.poolFeesMetrics.poolBaseFee}}</div>
           
