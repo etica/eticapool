@@ -33,7 +33,7 @@
          </a>
         </div>
         <div style="display: inline-flex;">
-        <img src="@/assets/images/github-logo.svg" height="100"  alt="" class="w-6 m-2">
+        <img src="@/assets/images/github-icon.svg" height="100"  alt="" class="w-6 m-2">
         <a href="https://github.com/etica/eticapool" target="_blank" class="footer-link">Eticapool v 1.0.7</a>
         </div>
 
