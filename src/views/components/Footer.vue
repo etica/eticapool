@@ -11,13 +11,13 @@
           <a href="https://www.eticaprotocol.org/eticadocs/howitworks.html" target="_blank" class="footer-link">How it works</a>
           <a href="https://www.eticaprotocol.org/exchanges" target="_blank" class="footer-link">Exchanges</a>
           <a href="https://www.youtube.com/watch?v=IaIDSLBxzjg" target="_blank" class="footer-link">Create Etica Wallet (Metamask)</a>
-          <a href="https://github.com/etica/etica-gui/releases/tag/v1.0.7" target="_blank" class="footer-link">Create Etica Wallet (GUI)</a>
+          <a href="https://github.com/etica/etica-gui/releases" target="_blank" class="footer-link">Create Etica Wallet (GUI)</a>
           <a href="https://www.youtube.com/watch?v=tPljgu0rez0" target="_blank" class="footer-link">How to mine EGAZ</a>
       
         </div>
         <div class="column-6 w-col w-col-4 w-col-small-4">
           <h3 class="heading-3 footer">Community &amp; Social</h3>
-          <a href="https://github.com/etica/etica" target="_blank" class="footer-link">Run this pool: Github</a>
+          <a href="https://github.com/etica/eticapool" target="_blank" class="footer-link">Run this pool: Github</a>
           <a href="https://reddit.com/r/etica" target="_blank" class="footer-link">Reddit</a>
           <a href="https://discord.gg/CrTKpETKXc" target="_blank" class="footer-link">Discord</a>
           <a href="https://t.me/eticaprotocol" target="_blank" class="footer-link">Telegram</a>
@@ -31,6 +31,10 @@
                <img src="@/assets/images/egaz-logo.png" height="100"  alt="" class="w-6 m-2">
             <div class=" inline-block text-xl text-white-100" style="position: relative;top: 0.75vh;color: white;">Egaz pools</div>
          </a>
+        </div>
+        <div style="display: inline-flex;">
+        <img src="@/assets/images/github-logo.svg" height="100"  alt="" class="w-6 m-2">
+        <a href="https://github.com/etica/eticapool" target="_blank" class="footer-link">Eticapool v 1.0.7</a>
         </div>
 
          </div>
