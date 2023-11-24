@@ -26,14 +26,14 @@
         <h3 class="heading-3 footer">Explorers</h3>
         <a href="https://www.eticascan.org" target="_blank" class="footer-link">https://www.eticascan.org</a>
         <a href="http://explorer.etica-stats.org/" target="_blank" class="footer-link">http://explorer.etica-stats.org</a>
-        <div class="flex-grow h-32">
+        <div class="flex-grow h-20">
          <a href="https://miningpoolstats.stream/etica" target="_blank" class="brand w-nav-brand w--current">
                <img src="@/assets/images/egaz-logo.png" height="100"  alt="" class="w-6 m-2">
             <div class=" inline-block text-xl text-white-100" style="position: relative;top: 0.75vh;color: white;">Egaz pools</div>
          </a>
         </div>
         <div style="display: inline-flex;">
-        <img src="@/assets/images/github-icon.svg" height="100"  alt="" class="w-6 m-2">
+        <img src="@/assets/images/github-mark-white.svg" height="100"  alt="" class="w-6 m-2">
         <a href="https://github.com/etica/eticapool" target="_blank" class="footer-link">Eticapool v 1.0.7</a>
         </div>
 
