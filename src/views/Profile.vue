@@ -127,7 +127,7 @@
          style="  min-height:480px;">
 
         <!--<div class='text-lg font-bold'>Details <i>most recent challenge numbers</i></div>-->
-        <div class='text-lg font-bold'>Details (Only loads last 10 ETI blocks, due to server overload. Will be possible to load 1000 more blocks once server overload issue is resolved)</div>
+        <div class='text-lg font-bold'>Details (Only loads last 2 ETI blocks, due to server overload. Will be possible to load 1000 more blocks once server overload issue is resolved)</div>
         <table class='table w-full'>
 
           <thead>
