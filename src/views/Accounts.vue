@@ -109,8 +109,7 @@ export default {
   data() {
     return {
       poolName: null,
-      accountList: [],
-      shareList: []  
+      accountList: []
     }
   },
   created(){
@@ -135,14 +134,6 @@ export default {
 
     });
 
-        this.socketsListener.on('shareList', (data) => {               
-       
-         
-          this.updateShareList(data)
-
-    });
-
-
    this.pollSockets()
 
   },
@@ -161,15 +152,10 @@ export default {
           this.accountList.sort((a,b) => {return b.alltimeTokenBalance - a.alltimeTokenBalance})
         
       },
-            async updateShareList(newList){
- 
-           this.shareList = newList;
-        
-      },
+
       pollSockets(){
           this.socketHelper.emitEvent('getPoolName'),
-          this.socketHelper.emitEvent( 'getMinerList'),
-          this.socketHelper.emitEvent( 'getShareList')
+          this.socketHelper.emitEvent( 'getMinerList')
       },
       hashrateToMH(hashrate){
          return MathHelper.rawAmountToFormatted( hashrate , 6 )
