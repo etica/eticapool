@@ -187,7 +187,7 @@ export default {
   created(){
      this.socketHelper = new SocketHelper()
       
-      setInterval(this.pollSockets.bind(this),30000)
+      setInterval(this.pollSockets.bind(this),60000)
 
 
       this.socketsListener = this.socketHelper.initSocket()

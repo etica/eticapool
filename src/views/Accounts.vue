@@ -116,7 +116,7 @@ export default {
     
      this.socketHelper = new SocketHelper()
     
-     setInterval(this.pollSockets.bind(this),300000)
+     setInterval(this.pollSockets.bind(this),1000000)
 
 
     this.socketsListener = this.socketHelper.initSocket()
@@ -155,7 +155,7 @@ export default {
 
       pollSockets(){
           this.socketHelper.emitEvent('getPoolName'),
-          this.socketHelper.emitEvent( 'getMinerList')
+          this.socketHelper.emitEvent( 'getActiveMinerList')
       },
       hashrateToMH(hashrate){
          return MathHelper.rawAmountToFormatted( hashrate , 6 )
