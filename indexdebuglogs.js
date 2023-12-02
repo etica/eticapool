@@ -38,6 +38,7 @@ async function init( )
 
         await _DevelopmentDebugs.check_miner_diff_challenge_rewards('0xc6b59a8082f0d35fdcf9e1e67828850bb52c3249e08938f0885f76bdb9e57300');
         await _DevelopmentDebugs.check_miner_diff_challenge_rewardfactors('0xc6b59a8082f0d35fdcf9e1e67828850bb52c3249e08938f0885f76bdb9e57300');
-        await _DevelopmentDebugs.get_miner_challengediffs('0xc6b59a8082f0d35fdcf9e1e67828850bb52c3249e08938f0885f76bdb9e57300');
-
+        //await _DevelopmentDebugs.get_miner_challengediffs('0xc6b59a8082f0d35fdcf9e1e67828850bb52c3249e08938f0885f76bdb9e57300');
+        await _DevelopmentDebugs.calculate_current_owed_coins();
+      
 }
