@@ -39,11 +39,10 @@
               <div>Minting Network Name: {{poolData.mintingNetwork}}</div>
               
               <div v-if="statsPayment">Total ETI owed: {{rawAmountToFormatted(statsPayment.total_coins_owed , 18 ) }} ETI</div>
-               <div v-if="statsPayment">Total ETI in next Batch: {{rawAmountToFormatted(statsPayment.total_next_coins_batchs , 18 ) }} ETI</div>
-               <div v-if="statsPayment">Total ETI in next Batch: {{rawAmountToFormatted(statsPayment.total_next_coins_batchs , 18 ) }} ETI</div>
+               <div v-if="statsPayment">Total ETI in next Batch: {{rawAmountToFormatted(statsPayment.total_next_coins_batchs , 18 ) }} ETI [total coins reached minimum payout, included next batchs]</div>
 
-               <div v-if="statsPayment">Total ETI in next Batch: {{rawAmountToFormatted(statsPayment.actual_total_next_coins_batchs , 18 ) }} ETI</div>
-               <div v-if="statsPayment">Total ETI in next Batch: {{rawAmountToFormatted(statsPayment.actual_total_next_coins_batchs , 18 ) }} ETI</div>
+               <div style="color: #d0691f;" v-if="statsPayment">Actual Total ETI owed: {{rawAmountToFormatted(statsPayment.actual_total_coins_owed, 18 ) }} ETI [removing invalid addresses]</div>
+               <div style="color: #d0691f;" v-if="statsPayment">Actual Total ETI in next Batch: {{rawAmountToFormatted(statsPayment.actual_total_next_coins_batchs , 18 ) }} ETI [removing invalid addresses]</div>
 
                <span v-if="statsPayment.createdAt">Last update: {{ statsPayment.createdAt }} </span>
               
