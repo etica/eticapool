@@ -183,7 +183,9 @@ export default {
 
         this.socketsListener.on('statsPayment', (data) => {   
            console.log('statsPayment', data)
-            this.statsPayment = data 
+            if(data && data.length > 0){
+                this.statsPayment = data[0]
+            }        
             
         });
 
