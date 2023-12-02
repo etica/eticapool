@@ -88,10 +88,6 @@ async function init( )
 
         let peerInterface = new PeerInterface(mongoInterface, poolConfig) 
            peerInterface.update();
-           peerInterface.listenForJSONRPC();
-
-           let StatsInterface = new StatsInterface(mongoInterface, poolConfig)
-           await StatsInterface.init();      
-           StatsInterface.update();  
+           peerInterface.listenForJSONRPC(); 
 
 }
