@@ -37,17 +37,14 @@
             <div v-if="poolName" style="color:green;"> {{ poolName }} is Active </div>
               <div>Minting Account Address: <a class="color-eticacyan" v-if="getExplorerBaseURLFromType('solutions')" target="_blank" v-bind:href="getExplorerBaseURLFromType('solutions') + 'address/' + poolData.mintingAddress  "> {{poolData.mintingAddress}}  </a> </div>
               <div>Minting Network Name: {{poolData.mintingNetwork}}</div>
-              
-              <div v-if="statsPayment">Total ETI owed: {{rawAmountToFormatted(statsPayment.total_coins_owed , 18 ) }} ETI</div>
-               <div v-if="statsPayment">Total ETI in next Batch: {{rawAmountToFormatted(statsPayment.total_next_coins_batchs , 18 ) }} ETI [total coins reached minimum payout, included next batchs]</div>
 
-               <div style="color: #d0691f;" v-if="statsPayment">Actual Total ETI owed: {{rawAmountToFormatted(statsPayment.actual_total_coins_owed, 18 ) }} ETI [removing invalid addresses]</div>
-               <div style="color: #d0691f;" v-if="statsPayment">Actual Total ETI in next Batch: {{rawAmountToFormatted(statsPayment.actual_total_next_coins_batchs , 18 ) }} ETI [removing invalid addresses]</div>
+               <div style="color: #d0691f;" v-if="statsPayment">Total ETI owed: {{rawAmountToFormatted(statsPayment.actual_total_coins_owed, 18 ) }} ETI [removing invalid addresses]</div>
+               <div style="color: #d0691f;" v-if="statsPayment">Total ETI in next Batch: {{rawAmountToFormatted(statsPayment.actual_total_next_coins_batchs , 18 ) }} ETI [total coins reached minimum payout, included next batchs]</div>
 
                <span v-if="statsPayment.createdAt">Last update: {{ statsPayment.createdAt }} </span>
               
-              <div v-if="poolStatus.mintingAccountBalances">Minting Balance: {{rawAmountToFormatted(poolStatus.mintingAccountBalances['ETH'] , 18 ) }} EGAZ</div>
-              <div v-if="poolStatus.mintingAccountBalances">Minting Balance: {{rawAmountToFormatted(poolStatus.mintingAccountBalances['token'], 18)}} ETI</div>
+              <div v-if="poolStatus.mintingAccountBalances">Minting address Balance: {{rawAmountToFormatted(poolStatus.mintingAccountBalances['ETH'] , 18 ) }} EGAZ</div>
+              <div v-if="poolStatus.mintingAccountBalances">Minting address Balance: {{rawAmountToFormatted(poolStatus.mintingAccountBalances['token'], 18)}} ETI</div>
               <span>(Eti mined are immediately sent to reward process)</span>
             </div>
             <div class="my-4">
