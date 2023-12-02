@@ -16,11 +16,7 @@ import FileUtils from './lib/util/file-utils.js'
 let poolConfigFull = FileUtils.readJsonFileSync('/pool.config.json');
 let poolConfig = poolConfigFull[pool_env]
 
-console.log('poolConfig',poolConfig, poolConfigFull)
-
-console.log('init');
-
-
+console.log('launching indexdebuglogs script');
  
 import MongoInterface from './lib/mongo-interface.js'
 import DevelopmentDebugs from './lib/development-debugs.js';
