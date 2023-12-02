@@ -25,14 +25,14 @@
          v-bind:activeSection="activeSection" 
          v-bind:activeColor="'green'" 
          v-bind:buttonClickedCallback="onHorizontalNavClicked" 
-         v-bind:buttonNamesArray="['Balance Stats','Pool mints','Batched Payments' ]"
+         v-bind:buttonNamesArray="['Pool Balance Stats','Pool mints','Batched Payments' ]"
    
        />
         
 
 
 
-        <div v-if="poolData && poolStatus && statsPayment && activeSection=='Balance Stats'"  class="overflow-x-auto mb-4">
+        <div v-if="poolData && poolStatus && statsPayment && activeSection=='Pool Balance Stats'"  class="overflow-x-auto mb-4">
             <div class="my-4">
             <div v-if="poolName" style="color:green;"> {{ poolName }} is Active </div>
               <div>Minting Account Address: <a class="color-eticacyan" v-if="getExplorerBaseURLFromType('solutions')" target="_blank" v-bind:href="getExplorerBaseURLFromType('solutions') + 'address/' + poolData.mintingAddress  "> {{poolData.mintingAddress}}  </a> </div>
@@ -147,7 +147,7 @@ export default {
       poolStatus: null,
       statsPayment: null,
 
-      activeSection: 'Balance Stats',
+      activeSection: 'Pool Balance Stats',
 
        
       accountList: [] ,
