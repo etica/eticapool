@@ -32,6 +32,7 @@ import MongoInterface from './lib/mongo-interface.js'
  
 import PeerInterface from './lib/peer-interface.js';
 import TokenInterface from './lib/token-interface.js';
+import StatsInterface from './lib/stats-interface.js';
 
 import Web3ApiHelper from './lib/util/web3-api-helper.js';
 import PoolStatsHelper from  './lib/util/pool-stats-helper.js'  
@@ -47,6 +48,7 @@ import TokenDataHelper from './lib/util/token-data-helper.js'
 var accountConfig;
  
 import Web3 from 'web3'
+import StatsInterface from './lib/stats-interface.js';
  
  
 
@@ -87,5 +89,9 @@ async function init( )
         let peerInterface = new PeerInterface(mongoInterface, poolConfig) 
            peerInterface.update();
            peerInterface.listenForJSONRPC();
+
+           let StatsInterface = new StatsInterface(mongoInterface, poolConfig)
+           await StatsInterface.init();      
+           StatsInterface.update();  
 
 }
