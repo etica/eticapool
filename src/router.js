@@ -9,6 +9,7 @@ import MintAddresses from './views/MintAddresses.vue'
 import Epochs from './views/Epochs.vue'
 import Profile from './views/Profile.vue'
 import Overview from './views/Overview.vue'
+import Payments from './views/Payments.vue'
 import NotFound from './views/NotFound.vue'
 
 Vue.use(Router)
@@ -61,6 +62,12 @@ export default new Router({
       component: Epochs
     },
 
+
+    {
+      path: '/paymentstats',
+      name: 'paymentsstats',
+      component: Payments
+    },
    
     {
       path: '/*',
