@@ -182,6 +182,7 @@ export default {
         });
 
         this.socketsListener.on('statsPayment', (data) => {   
+           console.log('statsPayment', data)
             this.statsPayment = data 
             
         });
