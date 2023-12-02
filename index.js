@@ -48,7 +48,6 @@ import TokenDataHelper from './lib/util/token-data-helper.js'
 var accountConfig;
  
 import Web3 from 'web3'
-import StatsInterface from './lib/stats-interface.js';
  
  
 
