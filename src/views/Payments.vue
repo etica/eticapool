@@ -34,15 +34,13 @@
 
         <div v-if="poolData && poolStatus && statsPayment && activeSection=='Pool Balance Stats'"  class="overflow-x-auto mb-4">
             <div class="my-4">
-            <div v-if="poolName" style="color:green;"> {{ poolName }} is Active </div>
-              <div>Minting Account Address: <a class="color-eticacyan" v-if="getExplorerBaseURLFromType('solutions')" target="_blank" v-bind:href="getExplorerBaseURLFromType('solutions') + 'address/' + poolData.mintingAddress  "> {{poolData.mintingAddress}}  </a> </div>
-              <div>Minting Network Name: {{poolData.mintingNetwork}}</div>
-
-               <div style="color: #d0691f;" v-if="statsPayment">Total ETI owed: {{rawAmountToFormatted(statsPayment.actual_total_coins_owed, 18 ) }} ETI [removing invalid addresses]</div>
-               <div style="color: #d0691f;" v-if="statsPayment">Total ETI in next Batch: {{rawAmountToFormatted(statsPayment.actual_total_next_coins_batchs , 18 ) }} ETI [total coins reached minimum payout, included next batchs]</div>
+            <div v-if="poolName" style="color:green;"> {{ poolName }} is Active </div>              
+               <div style="color: rgb(133, 251, 15);" v-if="statsPayment">Total ETI owed: {{rawAmountToFormatted(statsPayment.actual_total_coins_owed, 18 ) }} ETI [removing invalid addresses]</div>
+               <div style="color: rgb(31, 208, 75);" v-if="statsPayment">Total ETI in next Batch: {{rawAmountToFormatted(statsPayment.actual_total_next_coins_batchs , 18 ) }} ETI [total coins reached minimum payout, included next batchs]</div>
 
                <span v-if="statsPayment.createdAt">Last update: {{ statsPayment.createdAt }} </span>
               
+              <div>Minting Account Address: <a class="color-eticacyan" v-if="getExplorerBaseURLFromType('solutions')" target="_blank" v-bind:href="getExplorerBaseURLFromType('solutions') + 'address/' + poolData.mintingAddress  "> {{poolData.mintingAddress}}  </a> </div>
               <div v-if="poolStatus.mintingAccountBalances">Minting address Balance: {{rawAmountToFormatted(poolStatus.mintingAccountBalances['ETH'] , 18 ) }} EGAZ</div>
               <div v-if="poolStatus.mintingAccountBalances">Minting address Balance: {{rawAmountToFormatted(poolStatus.mintingAccountBalances['token'], 18)}} ETI</div>
               <span>(Eti mined are immediately sent to reward process)</span>
@@ -114,19 +112,20 @@
 
 <style scoped>
 
+/*
+.cypherpunk-background {
+  background-image: linear-gradient(90deg, rgba(100, 100, 100, 0.1) 1px, transparent 1px), linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+background-size: 20px 20px;
+}
+.cypherpunk-background {
+background-image: linear-gradient(90deg, rgba(100, 100, 100, 0.09) 1px, transparent 1px), linear-gradient(rgba(111, 93, 93, 0.1) 1px, transparent 1px);
+background-size: 20px 20px;
+}
+*/
 
-.cypherpunk-background::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: -1;
-  background-image:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-  background-size: 20px 20px; /* Adjust the size of the grid */
+.cypherpunk-background {
+background-image: linear-gradient(90deg, rgba(79, 238, 22, 0.09) 1px, transparent 1px), linear-gradient(rgba(111, 93, 93, 0.1) 1px, transparent 1px);
+background-size: 20px 20px;
 }
 
 </style>
