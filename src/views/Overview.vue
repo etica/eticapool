@@ -185,10 +185,8 @@ export default {
 
       activeSection: 'Mining Data',
 
-       
       accountList: [] ,
 
-      recentSolutionTx:[],
       recentPaymentTx:[] 
     }
   },
@@ -197,7 +195,7 @@ export default {
   created(){
      this.socketHelper = new SocketHelper()
       
-      setInterval(this.pollSockets.bind(this),60000)
+      setInterval(this.pollSockets.bind(this),240000)
 
 
       this.socketsListener = this.socketHelper.initSocket()
@@ -209,7 +207,6 @@ export default {
         });
 
        this.socketsListener.on('poolData', (data) => {   
-            console.log('poolData is', data);
             this.poolData = data 
         });
 
@@ -218,20 +215,10 @@ export default {
             
         });
 
-
-         this.socketsListener.on('recentSolutions', (data) => {  
-            this.recentSolutionTx=data
-
-            this.recentSolutionTx.map( x => this.addExplorerUrl(x, 'solutions')  )
-        });
-
          this.socketsListener.on('recentPayments', (data) => {  
             this.recentPaymentTx=data
             
             this.recentPaymentTx.map( x => this.addExplorerUrl(x, 'payments')  )
-
-            console.log('recent payment tx ',this.recentPaymentTx)
-
 
         });
 
@@ -242,7 +229,6 @@ export default {
       this.socketHelper.emitEvent('getPoolName')
       this.socketHelper.emitEvent('getPoolData')
       this.socketHelper.emitEvent('getPoolStatus')
-      this.socketHelper.emitEvent('getRecentSolutions')
       this.socketHelper.emitEvent('getRecentPayments')
     },
 

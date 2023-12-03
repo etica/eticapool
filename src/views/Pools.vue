@@ -119,7 +119,7 @@ export default {
     
      this.socketHelper = new SocketHelper()
     
-     setInterval(this.pollSockets.bind(this),60000)
+     setInterval(this.pollSockets.bind(this),380000)
 
      setInterval(this.changeblinkerColor, 600);
 

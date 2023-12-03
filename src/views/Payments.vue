@@ -102,14 +102,13 @@
 
         <div v-if="activeSection =='Batched Payments'" class="mb-4">
 
-       <!-- <section>
+        <section>
           <TransactionsTable
             class="mb-4"
             label="Batched Payments" 
             v-bind:transactionsList="recentPaymentTx"
           />
-        </section> -->
-
+        </section>
 
         </div>
 
@@ -177,7 +176,8 @@ export default {
       statsPayment: null,
       activeSection: 'Pool Balance Stats',
       accountList: [] ,
-      poolMints: []
+      poolMints: [],
+      recentPaymentTx:[]
 
     }
   },
@@ -186,7 +186,7 @@ export default {
   created(){
      this.socketHelper = new SocketHelper()
       
-      setInterval(this.pollSockets.bind(this),180000)
+      setInterval(this.pollSockets.bind(this),240000)
 
 
       this.socketsListener = this.socketHelper.initSocket()
@@ -225,6 +225,13 @@ export default {
             console.log('this poolMints are:', this.poolMints)
         });
 
+        this.socketsListener.on('recentPayments', (data) => {  
+            this.recentPaymentTx=data
+            
+            this.recentPaymentTx.map( x => this.addExplorerUrl(x, 'payments')  )
+
+         });
+
       this.pollSockets()
   },
   methods: {
@@ -234,6 +241,7 @@ export default {
       this.socketHelper.emitEvent('getPoolStatus')
       this.socketHelper.emitEvent('getStatsPayment')
       this.socketHelper.emitEvent('getPoolMints', {nbpoolmints: 50})
+      this.socketHelper.emitEvent('getRecentPayments')
     },
 
     rawAmountToFormatted(amount, decimals){

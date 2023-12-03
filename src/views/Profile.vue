@@ -235,29 +235,23 @@ export default {
     this.socketsListener = this.socketHelper.initSocket()
 
     this.socketsListener.on('poolData', (data) => {   
-        console.log('got poolData',data);
-
         this.poolData = data 
     }); 
 
     
-    this.socketsListener.on('minerData', (data) => {               
-        console.log('got minerData',data)
+    this.socketsListener.on('minerData', (data) => {     
        this.minerData = data 
     });
 
-      this.socketsListener.on('minerShares', (data) => {               
-        console.log('got minerShares',data)
+      this.socketsListener.on('minerShares', (data) => {       
        this.shares = data 
     });
 
     this.socketsListener.on('minerPayments', (data) => {               
-        console.log('got payments',data)
        this.payment_tx = data 
     });
 
     this.socketsListener.on('MinerChallengeDetails', (data) => {               
-        console.log('got MinerChallengeDetails',data)
        this.challenges = data 
     });
 
