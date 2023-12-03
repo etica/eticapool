@@ -222,6 +222,7 @@ export default {
             if(data && data.length > 0){
                 this.poolMints = data
             }        
+            console.log('this poolMints are:', this.poolMints)
         });
 
       this.pollSockets()
