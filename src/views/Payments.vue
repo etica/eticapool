@@ -77,17 +77,17 @@
                   </a>
                 </td>
                 <td class="px-1"> 
-                  <a v-bind:href='"https://www.eticascan.org/tx/"+item.transactionhash' >
-                        <span style="color: #527b7a;">  {{ item.transactionhash }}  </span>
+                  <a v-bind:href='"https://www.eticascan.org/tx/"+item.transactionHash' >
+                        <span style="color: #527b7a;">  {{ item.transactionHash }}  </span>
                   </a> 
                 </td>
                 <td class="px-1"> 
                       <span style="color: rgb(54, 179, 97);">  {{ getstatusname(item.status) }}  </span>
                 </td>
                 <td class="px-1"> 
-                        <span v-if="index % 2 === 0" style="color: rgb(54, 179, 97);">  +{{ rawAmountToFormatted(item.blockreward) }} ETI </span>
-                        <span v-else-if="index % 3 === 0" style="color:rgb(75, 176, 91);">  +{{ rawAmountToFormatted(item.blockreward) }} ETI </span>
-                        <span v-else style="color: rgb(129, 221, 135);">  +{{ rawAmountToFormatted(item.blockreward) }} ETI </span>
+                        <span v-if="index % 2 === 0" style="color: rgb(54, 179, 97);">  +{{ item.blockreward }} ETI </span>
+                        <span v-else-if="index % 3 === 0" style="color:rgb(75, 176, 91);">  +{{ item.blockreward }} ETI </span>
+                        <span v-else style="color: rgb(129, 221, 135);">  +{{ item.blockreward }} ETI </span>
                 </td>
             </tr> 
           </tbody>
@@ -247,6 +247,14 @@ export default {
     },
 
     getstatusname(_status){
+
+console.log('checking status', _status)
+
+console.log('_status == 2', _status == 2)
+console.log('_status == " 2 " ', _status == '2')
+
+console.log('_status == 1', _status == 1)
+console.log('_status == " 1 " ', _status == '1')
 
       if(_status == 2){
         return 'Processed (rewards awarded)';
