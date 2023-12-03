@@ -7,14 +7,14 @@
  
         <Navbar />
 
-   <div class="section bg-slate-etica text-gray-100">
+   <div class="cypherpunk-background section bg-slate-etica text-gray-100">
      <div class="w-container pt-8">
 
        
  
        
       
-            <div class="text-lg md:text-2xl text-white overflow-x-auto">
+            <div class="text-lg md:text-2xl text-white overflow-x-auto" style="font-family: dotgothicregular;font-size: 45px;">
               Mining Account <i style="font-size: 1rem;">(Data updates every 5 minutes)</i>
             </div>
 
@@ -190,6 +190,16 @@
 
 </div>
 </template>
+
+
+<style scoped>
+
+.cypherpunk-background {
+background-image: linear-gradient(90deg, rgba(79, 238, 22, 0.09) 1px, transparent 1px), linear-gradient(rgba(111, 93, 93, 0.1) 1px, transparent 1px);
+background-size: 20px 20px;
+}
+
+</style>
 
 
 <script>

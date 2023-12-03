@@ -4,7 +4,8 @@ const config={
     {"title":"POOL","rows":[
          {"title":"Home","url":"/"},
          {"title":"Accounts","url":"/accounts"},
-         {"title":"Overview","url":"/overview"}
+         {"title":"Overview","url":"/overview"},
+         {"title":"Payment Stats","url":"/paymentstats"}
     ]},
     {"title":"ETI POOLS NETWORK","rows":[
       {"title":"Active Pools","url":"/pools"},
