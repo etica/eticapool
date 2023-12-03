@@ -82,7 +82,7 @@
                   </a> 
                 </td>
                 <td class="px-1"> 
-                      <span style="color: rgb(54, 179, 97);">  {{ getdisplayname(item.status) }}  </span>
+                      <span style="color: rgb(54, 179, 97);">  {{ getstatusname(item.status) }}  </span>
                 </td>
                 <td class="px-1"> 
                         <span v-if="index % 2 === 0" style="color: rgb(54, 179, 97);">  +{{ rawAmountToFormatted(item.blockreward) }} ETI </span>
