@@ -82,7 +82,7 @@
                   </a> 
                 </td>
                 <td class="px-1"> 
-                      <span style="color: rgb(54, 179, 97);">  {{ getstatusname(item.status) }}  </span>
+                      <span style="color: rgb(54, 179, 97);">  {{ getstatusname(item.poolstatus) }}  </span>
                 </td>
                 <td class="px-1"> 
                         <span v-if="index % 2 === 0" style="color: rgb(54, 179, 97);">  +{{ item.blockreward }} ETI </span>
@@ -247,14 +247,6 @@ export default {
     },
 
     getstatusname(_status){
-
-console.log('checking status', _status)
-
-console.log('_status == 2', _status == 2)
-console.log('_status == " 2 " ', _status == '2')
-
-console.log('_status == 1', _status == 1)
-console.log('_status == " 1 " ', _status == '1')
 
       if(_status == 2){
         return 'Processed (rewards awarded)';
