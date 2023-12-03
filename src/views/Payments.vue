@@ -220,7 +220,7 @@ export default {
 
         this.socketsListener.on('poolMints', (data) => {   
             if(data && data.length > 0){
-                this.poolMints = data[0]
+                this.poolMints = data
             }        
         });
 
