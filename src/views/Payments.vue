@@ -78,7 +78,7 @@
                 </td>
                 <td class="px-1"> 
                   <a v-bind:href='"https://www.eticascan.org/tx/"+item.transactionHash' >
-                        <span style="color: #527b7a;">  {{ shortenTransactionHash(item.transactionHash) }}  </span>
+                        <span style="color: #527b7a;">  {{ shortenTransactionHash(item.transactionhash) }}  </span>
                   </a> 
                 </td>
                 <td class="px-1"> 
@@ -222,7 +222,6 @@ export default {
             if(data && data.length > 0){
                 this.poolMints = data
             }        
-            console.log('this poolMints are:', this.poolMints)
         });
 
         this.socketsListener.on('recentPayments', (data) => {  
@@ -311,9 +310,19 @@ export default {
     },
 
     shortenTransactionHash(hash) {
-    const prefix = hash.substring(0, 6);
-    const suffix = hash.substring(hash.length - 6);
-    return prefix + "..." + suffix;
+      if(hash){
+
+       const prefix = hash.substring(0, 6);
+       const suffix = hash.substring(hash.length - 6);
+       return prefix + "..." + suffix;
+
+      }
+      else {
+
+        return '';
+
+      }
+    
     }
 
  
