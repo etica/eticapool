@@ -11,14 +11,9 @@
    <div class="cypherpunk-background section bg-slate-etica slate-min-height-65 text-white  pb-8">
      <div class="w-container pt-8">
 
-       
- 
-
-      <h1 class="title font-primary-title color-primary mb-4" style="font-family: dotgothicregular;">
+      <h1 class="title font-primary-title color-primary mb-4" style="font-family: dotgothicregular;font-size: 45px;">
         Payments Overview
       </h1>
-      
-
       
       <HorizontalNav 
           class="mb-8"
@@ -35,7 +30,7 @@
         <div v-if="poolData && poolStatus && statsPayment && activeSection=='Pool Balance Stats'"  class="overflow-x-auto mb-4">
             <div class="my-4">
             <div v-if="poolName" style="color:green;"> {{ poolName }} is Active </div>              
-               <div style="color: rgb(133, 251, 15);" v-if="statsPayment">Total ETI owed: {{rawAmountToFormatted(statsPayment.actual_total_coins_owed, 18 ) }} ETI [awwaiting to reach the minimum payout]</div>
+               <div style="color: rgb(133, 251, 15);" v-if="statsPayment">Total ETI owed: {{rawAmountToFormatted(statsPayment.actual_total_coins_owed, 18 ) }} ETI [awaiting to reach the minimum payout]</div>
                <div style="color: rgb(31, 208, 75);" v-if="statsPayment">Total ETI in next Batch: {{rawAmountToFormatted(statsPayment.actual_total_next_coins_batchs , 18 ) }} ETI [total coins reached minimum payout, included next batchs]</div>
 
                <span v-if="statsPayment.createdAt">Last update: {{ statsPayment.createdAt }} </span>
@@ -61,24 +56,44 @@
 
         <div v-if="poolStatus && activeSection=='Pool mints'" class="overflow-x-auto  mb-4">
           
-          <div class="mb-4">
-            <div v-if="poolName" style="color:green;">Pool status: {{ poolName }} is Active </div>
-          </div>
-          <div style="text-decoration:underline;">Port 8081:</div>
-          <div>Minimum Shares Difficulty: {{poolData.minimumShareDifficultyHard}}</div> 
-          <div>Rewards: 100% of Rewards on port 8081</div>
+          <div   class="box  background-secondary overflow-x-auto" style="  min-height:480px;">
+        <div class='subtitle'> </div>
+        <table class='table w-full'>
 
+          <thead>
+            <tr >
+              <td class="px-1"> EpochCount # </td>
+              <td class="px-1"> TransactionHash </td>
+              <td class="px-1"> Status </td>
+              <td class="px-1"> Block reward </td>
+            </tr>
+          </thead>
 
-          <div class="mb-4">avgGasPriceGWei: {{poolStatus.poolFeesMetrics.avgGasPriceGWei}}</div>
-          
-          
-          <div>Full Mining Reward: {{Number.parseFloat(rawAmountToFormatted(poolStatus.poolFeesMetrics.miningRewardRaw,18))}} ETI</div>
+          <tbody>
+            <tr v-for="(item, index) in poolMints" v-bind:key="index">
+                <td>
+                  <a v-bind:href='item.url' >
+                        <span style="color: #ffffff;">  {{ item.epochCount }} </span>
+                  </a>
+                </td>
+                <td class="px-1"> 
+                  <a v-bind:href='"https://www.eticascan.org/tx/"+item.transactionhash' >
+                        <span style="color: #527b7a;">  {{ item.transactionhash }}  </span>
+                  </a> 
+                </td>
+                <td class="px-1"> 
+                      <span style="color: rgb(54, 179, 97);">  {{ getdisplayname(item.status) }}  </span>
+                </td>
+                <td class="px-1"> 
+                        <span v-if="index % 2 === 0" style="color: rgb(54, 179, 97);">  +{{ rawAmountToFormatted(item.blockreward) }} ETI </span>
+                        <span v-else-if="index % 3 === 0" style="color:rgb(75, 176, 91);">  +{{ rawAmountToFormatted(item.blockreward) }} ETI </span>
+                        <span v-else style="color: rgb(129, 221, 135);">  +{{ rawAmountToFormatted(item.blockreward) }} ETI </span>
+                </td>
+            </tr> 
+          </tbody>
+        </table>
 
-         <!-- <div>miningRewardInEth: {{poolStatus.poolFeesMetrics.miningRewardInEth}}</div> -->
-
-          <div>Current ETI/EGAZ ratio: {{poolStatus.poolFeesMetrics.token_Eth_Price_Ratio}} (1 <img src="@/assets/images/etica-logo-sanstexte.png" height="100"  alt="" class="w-6 m-2" style="margin-left: 0;margin-right: 0;position: relative;top: -0.2vh;"> for {{ 1 / poolStatus.poolFeesMetrics.token_Eth_Price_Ratio }} <img src="@/assets/images/egaz-logo.png" height="100"  alt="" class="w-6 m-2" style="margin-left: 0;margin-right: 0;position: relative;top: -0.2vh;">)</div>
-
-           <div>poolBaseFeeFactor: {{poolStatus.poolFeesMetrics.poolBaseFee}}</div>
+      </div>
           
         </div> 
 
@@ -160,14 +175,10 @@ export default {
       poolData: null,
       poolStatus: null,
       statsPayment: null,
-
       activeSection: 'Pool Balance Stats',
-
-       
       accountList: [] ,
+      poolMints: []
 
-      recentSolutionTx:[],
-      recentPaymentTx:[] 
     }
   },
  
@@ -175,7 +186,7 @@ export default {
   created(){
      this.socketHelper = new SocketHelper()
       
-      setInterval(this.pollSockets.bind(this),60000)
+      setInterval(this.pollSockets.bind(this),180000)
 
 
       this.socketsListener = this.socketHelper.initSocket()
@@ -196,29 +207,21 @@ export default {
         });
 
         this.socketsListener.on('statsPayment', (data) => {   
-           console.log('statsPayment', data)
             if(data && data.length > 0){
-               console.log('statsPayment', data[0])
                 this.statsPayment = data[0]
             }        
-
         });
 
-
-         this.socketsListener.on('recentSolutions', (data) => {  
-            this.recentSolutionTx=data
-
-            this.recentSolutionTx.map( x => this.addExplorerUrl(x, 'solutions')  )
+        this.socketsListener.on('statsPayment', (data) => {   
+            if(data && data.length > 0){
+                this.statsPayment = data[0]
+            }        
         });
 
-         this.socketsListener.on('recentPayments', (data) => {  
-            this.recentPaymentTx=data
-            
-            this.recentPaymentTx.map( x => this.addExplorerUrl(x, 'payments')  )
-
-            console.log('recent payment tx ',this.recentPaymentTx)
-
-
+        this.socketsListener.on('poolMints', (data) => {   
+            if(data && data.length > 0){
+                this.poolMints = data[0]
+            }        
         });
 
       this.pollSockets()
@@ -229,6 +232,7 @@ export default {
       this.socketHelper.emitEvent('getPoolData')
       this.socketHelper.emitEvent('getPoolStatus')
       this.socketHelper.emitEvent('getStatsPayment')
+      this.socketHelper.emitEvent('getPoolMints', {nbpoolmints: 50})
     },
 
     rawAmountToFormatted(amount, decimals){
@@ -239,8 +243,21 @@ export default {
      
       this.activeSection = item
 
-
     },
+
+    getstatusname(_status){
+
+      if(_status == 2){
+        return 'Processed (rewards awarded)';
+      }
+      else if(_status == 1){
+        return 'Processed (rewards awarded)';
+      }
+      else {
+        return 'Unprocessed';
+      }
+
+      },
 
     addExplorerUrl(txData, txType){
 
