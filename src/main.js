@@ -7,6 +7,7 @@ import router from './router'
 
 import '@fortawesome/fontawesome-free/js/all.js';
 import './css/main.css'
+import './css/fonts.css'
 import './css/normalize.css'
 import './css/webflow.css'
 import './css/custom.webflow.css'
