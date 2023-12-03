@@ -14,7 +14,7 @@
        
  
 
-      <h1 class="title font-primary-title color-primary mb-4" style="font-family: dotgothicregular;font-size: 45px;">
+      <h1 class="title font-primary-title color-primary mb-4" style="font-family: dotgothicregular;font-size: 45px;color: #d0d0d0;">
         Pool Overview
       </h1>
       

@@ -11,7 +11,7 @@
    <div class="cypherpunk-background section bg-slate-etica slate-min-height-65 text-white  pb-8">
      <div class="w-container pt-8">
 
-      <h1 class="title font-primary-title color-primary mb-4" style="font-family: dotgothicregular;font-size: 45px;">
+      <h1 class="title font-primary-title color-primary mb-4" style="font-family: dotgothicregular;font-size: 45px;color: #d0d0d0;">
         Payments Overview
       </h1>
       
