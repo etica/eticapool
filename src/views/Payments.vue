@@ -14,7 +14,7 @@
        
  
 
-      <h1 class="title font-primary-title color-primary mb-4">
+      <h1 class="title font-primary-title color-primary mb-4" style="font-family: dotgothicregular;">
         Payments Overview
       </h1>
       
@@ -35,7 +35,7 @@
         <div v-if="poolData && poolStatus && statsPayment && activeSection=='Pool Balance Stats'"  class="overflow-x-auto mb-4">
             <div class="my-4">
             <div v-if="poolName" style="color:green;"> {{ poolName }} is Active </div>              
-               <div style="color: rgb(133, 251, 15);" v-if="statsPayment">Total ETI owed: {{rawAmountToFormatted(statsPayment.actual_total_coins_owed, 18 ) }} ETI [removing invalid addresses]</div>
+               <div style="color: rgb(133, 251, 15);" v-if="statsPayment">Total ETI owed: {{rawAmountToFormatted(statsPayment.actual_total_coins_owed, 18 ) }} ETI [awwaiting to reach the minimum payout]</div>
                <div style="color: rgb(31, 208, 75);" v-if="statsPayment">Total ETI in next Batch: {{rawAmountToFormatted(statsPayment.actual_total_next_coins_batchs , 18 ) }} ETI [total coins reached minimum payout, included next batchs]</div>
 
                <span v-if="statsPayment.createdAt">Last update: {{ statsPayment.createdAt }} </span>
@@ -51,7 +51,7 @@
               <div v-if="poolStatus.paymentsAccountBalances">Payments Balance EGAZ: {{rawAmountToFormatted(poolStatus.paymentsAccountBalances['ETH'],18)}} EGAZ (ETH)</div>
 
               <div v-if="poolData.batchedPaymentsContractAddress">Batched Payments Contract Address: <a class="color-eticacyan" v-if="getExplorerBaseURLFromType('payments')" target="_blank" v-bind:href="getExplorerBaseURLFromType('payments') + 'address/' + poolData.batchedPaymentsContractAddress  ">  {{poolData.batchedPaymentsContractAddress}}  </a> </div>
-              <div v-if="poolStatus.paymentsAccountBalances">Mining Pool Balance: {{rawAmountToFormatted(poolStatus.paymentsAccountBalances['token'], 18)}} ETI</div>
+              <div v-if="poolStatus.paymentsAccountBalances" style="color: #aad0aa;">Mining Pool Balance: {{rawAmountToFormatted(poolStatus.paymentsAccountBalances['token'], 18)}} ETI</div>
               
             </div>
             <div class="my-4">
