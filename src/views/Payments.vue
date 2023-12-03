@@ -8,7 +8,7 @@
         <Navbar />
      
 
-   <div class="section bg-slate-etica slate-min-height-65 text-white  pb-8">
+   <div class="cypherpunk-background section bg-slate-etica slate-min-height-65 text-white  pb-8">
      <div class="w-container pt-8">
 
        
@@ -115,7 +115,7 @@
 <style scoped>
 
 
-body::before {
+.cypherpunk-background::before {
   content: '';
   position: fixed;
   top: 0;
