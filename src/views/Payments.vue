@@ -112,6 +112,25 @@
 </div>
 </template>
 
+<style scoped>
+
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px; /* Adjust the size of the grid */
+}
+
+</style>
+
 
 <script>
 import Navbar from './components/Navbar.vue';
