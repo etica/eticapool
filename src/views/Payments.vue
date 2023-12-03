@@ -85,9 +85,9 @@
                       <span style="color: rgb(54, 179, 97);">  {{ getstatusname(item.poolstatus) }}  </span>
                 </td>
                 <td class="px-1"> 
-                        <span v-if="index % 2 === 0" style="color: rgb(54, 179, 97);">  {{ rawAmountToFormatted(item.blockreward) }} ETI </span>
-                        <span v-else-if="index % 3 === 0" style="color:rgb(75, 176, 91);">  {{ rawAmountToFormatted(item.blockreward) }} ETI </span>
-                        <span v-else style="color: rgb(129, 221, 135);">  {{ rawAmountToFormatted(item.blockreward) }} ETI </span>
+                        <span v-if="index % 2 === 0" style="color: rgb(54, 179, 97);">  {{ rawAmountToFormatted(item.blockreward, 18) }} ETI </span>
+                        <span v-else-if="index % 3 === 0" style="color:rgb(75, 176, 91);">  {{ rawAmountToFormatted(item.blockreward, 18) }} ETI </span>
+                        <span v-else style="color: rgb(129, 221, 135);">  {{ rawAmountToFormatted(item.blockreward, 18) }} ETI </span>
                 </td>
             </tr> 
           </tbody>
