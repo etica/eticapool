@@ -14,8 +14,8 @@
  
        
       
-            <div class="text-lg md:text-2xl text-white overflow-x-auto" style="font-family: dotgothicregular;font-size: 45px;">
-              Mining Account <i style="font-size: 1rem;">(Data updates every 5 minutes)</i>
+            <div class="text-lg md:text-2xl text-white overflow-x-auto">
+              <span style="font-family: dotgothicregular;font-size: 45px;">Mining Account</span> <i style="font-size: 1rem;">(Data updates every 5 minutes)</i>
             </div>
 
              <div class="text-md md:text-xl text-white overflow-x-auto">
