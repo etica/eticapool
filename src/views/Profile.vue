@@ -147,6 +147,25 @@
 
           <tbody v-if="ppnlsrewards && ppnlsrewards.length > 0">
 
+          
+          <tr v-if="currentchallenge">
+              
+              <td class="px-1"> {{ ppnlsreward.epochCount }} </td>
+              <td class="px-1"> {{ ppnlsreward.ChallengeNumber | truncate(10, '...') }} </td>
+              <td class="px-1" v-if="ppnlsreward.poolshares">  {{ ppnlsreward.poolshares }} </td>
+              <td class="px-1" v-else>  No shares </td>
+              <td class="px-1" v-if="ppnlsreward.shares">  {{ ppnlsreward.shares }} </td>
+              <td class="px-1" v-else>  No shares </td>
+
+              <td v-if="ppnlsreward.tokensAwarded" class="px-1" style="display:inline-flex;" >  {{ tokensRawToFormatted(ppnlsreward.tokensAwarded, 18) }} <img src="@/assets/images/etica-logo-sanstexte.png" height="100"  alt="" class="w-6 m-2" style="margin-left: 3px;position: relative;top: -0.65vh;width: 19px;"> </td>
+
+              <td v-if="ppnlsreward.poolshares && ppnlsreward.poolshares > 0 && ppnlsreward.shares" class="px-1" >  {{ (ppnlsreward.shares / ppnlsreward.poolshares) * 100 }} %</td>
+              <td v-else class="px-1" >  No shares </td>
+
+              <td v-if="index == 0" style="font-size: 0.52em;color: #ff7f50;">Current challenge</td>
+              <td class="px-1" style="color:orange;"> 8081 </td>
+          </tr>  
+          
           <tr v-for="(ppnlsreward, index) in ppnlsrewards">
               
               <td class="px-1"> {{ ppnlsreward.epochCount }} </td>
@@ -230,7 +249,7 @@ export default {
          poolData: {},
          shares: [],
          payment_tx: [],
-         challenges: [],
+         currentchallenge: [],
          ppnlsrewards: [],
          activeSection: 'Recent Shares' 
     }
@@ -264,8 +283,11 @@ export default {
        this.payment_tx = data 
     });
 
-    this.socketsListener.on('MinerChallengeDetails', (data) => {               
-       this.challenges = data 
+    this.socketsListener.on('MinerChallengeDetails', (data) => {    
+      if (data && data.length > 0){
+        this.currentchallenges = data;
+      }           
+       
     });
 
     this.socketsListener.on('MinerPpnlsRewards', (data) => {               
@@ -287,7 +309,7 @@ export default {
 
      // more resource full backend functions that need to be called less frequently:
     pollSocketsSlow(){
-    this.socketHelper.emitEvent( 'getMinerChallengeDetails', {ethMinerAddress: this.publicAddress})
+    this.socketHelper.emitEvent( 'getMinerChallengeDetails', {ethMinerAddress: this.publicAddress, nbchallenges: 1})
     },
 
     tokenBalanceFormatted(){
