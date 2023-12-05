@@ -129,8 +129,8 @@
 
         <!--<div class='text-lg font-bold'>Details <i>most recent challenge numbers</i></div>-->
         <!--<div class='text-lg font-bold'>Details (Only loads last 2 ETI blocks, due to server overload. Will be possible to load 1000 more blocks once server overload issue is resolved)</div> -->
-        <div class='text-lg font-bold'>PPNLS rewards, latest rewards. Each found by pool reward calculated based on shares submited last 5 blocks.</div>
-        <div class='text-lg font-bold'>This is a new feature, allow few hours to see whole metrics</div>
+        <div class='text-lg font-bold' style="color: rgb(32, 255, 0);">PPNLS rewards, For each found by pool rewards are calculated based on shares submited last 5 blocks.</div>
+        <div class='text-lg font-bold' style="color: #868686;">This is a new feature, allow few hours to see whole metrics</div>
         <table class='table w-full'>
 
           <thead>
