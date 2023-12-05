@@ -128,7 +128,8 @@
          style="  min-height:480px;">
 
         <!--<div class='text-lg font-bold'>Details <i>most recent challenge numbers</i></div>-->
-        <div class='text-lg font-bold'>Details (Only loads last 2 ETI blocks, due to server overload. Will be possible to load 1000 more blocks once server overload issue is resolved)</div>
+        <!--<div class='text-lg font-bold'>Details (Only loads last 2 ETI blocks, due to server overload. Will be possible to load 1000 more blocks once server overload issue is resolved)</div> -->
+        <div class='text-lg font-bold'>PPNLS rewards, latest rewards. Each found by pool reward calculated based on shares submited last 5 blocks.</div>
         <table class='table w-full'>
 
           <thead>
@@ -148,13 +149,13 @@
           <tr v-for="(ppnlsreward, index) in ppnlsrewards">
               
               <td class="px-1"> {{ ppnlsreward.epochCount }} </td>
-              <td class="px-1"> {{ ppnlsreward.ChallengeNumber | truncate(20, '...') }} </td>
+              <td class="px-1"> {{ ppnlsreward.ChallengeNumber | truncate(10, '...') }} </td>
               <td class="px-1" v-if="ppnlsreward.poolshares">  {{ ppnlsreward.poolshares }} </td>
               <td class="px-1" v-else>  No shares </td>
               <td class="px-1" v-if="ppnlsreward.shares">  {{ ppnlsreward.shares }} </td>
               <td class="px-1" v-else>  No shares </td>
 
-              <td v-if="ppnlsreward.tokensAwarded" class="px-1" >  {{ ppnlsreward.tokensAwarded }} <img src="@/assets/images/etica-logo-sanstexte.png" height="100"  alt="" class="w-6 m-2" style="margin-left: 0;margin-right: 0;position: relative;top: -0.2vh;"> </td>
+              <td v-if="ppnlsreward.tokensAwarded" class="px-1" >  {{ tokensRawToFormatted(ppnlsreward.tokensAwarded, 18) }} <img src="@/assets/images/etica-logo-sanstexte.png" height="100"  alt="" class="w-6 m-2" style="margin-left: 0;margin-right: 0;position: relative;top: -0.2vh;"> </td>
 
               <td v-if="ppnlsreward.poolshares && ppnlsreward.poolshares > 0 && ppnlsreward.shares" class="px-1" >  {{ (ppnlsreward.shares / ppnlsreward.poolshares) * 100 }} %</td>
               <td v-else class="px-1" >  No shares </td>
