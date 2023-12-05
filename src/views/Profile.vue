@@ -56,7 +56,7 @@
 
           <tbody>
 
-          <tr v-if="currentchallenge">
+          <tr v-if="currentchallenge && currentchallenge.miningcontract">
             <td class="px-1"> {{ currentchallenge.miningcontract.epochCount }} </td>
               <td class="px-1"> {{ currentchallenge.miningcontract.challengeNumber | truncate(10, '...') }} </td>
             
