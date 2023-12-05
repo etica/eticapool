@@ -133,35 +133,34 @@
 
           <thead>
             <tr style="border-bottom: 1px solid #ffffff;" >   
+              <td> Epoch count </td>
               <td> challenge Number </td>
-              <td> Pool total difficulty 8081 </td>
-              <td> Pool total difficulty 8080 </td>
+              <td> Pool total difficulty </td>
               <td> Miner difficulty </td>
+              <td> Rewards </td>
               <td> Miner % on this port</td>
               <td> Miner port</td>
             </tr>
           </thead>
 
-          <tbody v-if="challenges && challenges.length > 0">
+          <tbody v-if="ppnlsrewards && ppnlsrewards.length > 0">
 
-          <tr v-for="(challenge, index) in challenges">
-              <td class="px-1"> {{ challenge.miningcontract.challengeNumber | truncate(20, '...') }} </td>
-            
-              <td class="px-1" v-if="challenge.TotalDiffHard">  {{ challenge.TotalDiffHard.totaldiff }} </td>
+          <tr v-for="(ppnlsreward, index) in ppnlsrewards">
+              
+              <td class="px-1"> {{ ppnlsreward.epochCount }} </td>
+              <td class="px-1"> {{ ppnlsreward.ChallengeNumber | truncate(20, '...') }} </td>
+              <td class="px-1" v-if="ppnlsreward.poolshares">  {{ ppnlsreward.poolshares }} </td>
               <td class="px-1" v-else>  No shares </td>
-              <td class="px-1" v-if="challenge.TotalDiffEasy">  {{ challenge.TotalDiffEasy.totaldiff }} </td>
+              <td class="px-1" v-if="ppnlsreward.shares">  {{ ppnlsreward.shares }} </td>
               <td class="px-1" v-else>  No shares </td>
 
-              <td v-if="challenge.miner_challengediff" class="px-1" >  {{ challenge.miner_challengediff.totaldiff }} </td>
-              <td v-else class="px-1" >  No shares </td>
+              <td v-if="ppnlsreward.tokensAwarded" class="px-1" >  {{ ppnlsreward.tokensAwarded }} <img src="@/assets/images/etica-logo-sanstexte.png" height="100"  alt="" class="w-6 m-2" style="margin-left: 0;margin-right: 0;position: relative;top: -0.2vh;"> </td>
 
-              <td v-if="challenge.TotalDiffHard && challenge.miner_challengediff && challenge.miner_challengediff.minerport == 8081" class="px-1" >  {{ (challenge.miner_challengediff.totaldiff / challenge.TotalDiffHard.totaldiff) * 100 }} %</td>
-              <td v-else-if="challenge.TotalDiffHard && challenge.miner_challengediff && challenge.miner_challengediff.minerport == 8080" class="px-1" >  {{ (challenge.miner_challengediff.totaldiff / challenge.TotalDiffEasy.totaldiff) * 100  }} %</td>
+              <td v-if="ppnlsreward.poolshares && ppnlsreward.poolshares > 0 && ppnlsreward.shares" class="px-1" >  {{ (ppnlsreward.shares / ppnlsreward.poolshares) * 100 }} %</td>
               <td v-else class="px-1" >  No shares </td>
 
               <td v-if="index == 0" style="font-size: 0.52em;color: #ff7f50;">Current challenge</td>
-              <td v-if="challenge.miner_challengediff && challenge.miner_challengediff.minerport == 8080" class="px-1" style="color:#9bca33;"> 8080 </td>
-              <td v-if="challenge.miner_challengediff && challenge.miner_challengediff.minerport == 8081" class="px-1" style="color:orange;"> 8081 </td>
+              <td class="px-1" style="color:orange;"> 8081 </td>
           </tr>  
 
 
@@ -230,6 +229,7 @@ export default {
          shares: [],
          payment_tx: [],
          challenges: [],
+         ppnlsrewards: [],
          activeSection: 'Recent Shares' 
     }
   },
@@ -266,6 +266,10 @@ export default {
        this.challenges = data 
     });
 
+    this.socketsListener.on('MinerPpnlsRewards', (data) => {               
+       this.ppnlsrewards = data 
+    });
+
     this.pollSockets();
     this.pollSocketsSlow()
 
@@ -276,6 +280,7 @@ export default {
       this.socketHelper.emitEvent( 'getMinerData', {ethMinerAddress: this.publicAddress})
       this.socketHelper.emitEvent( 'getMinerShares', {ethMinerAddress: this.publicAddress})
       this.socketHelper.emitEvent( 'getMinerPayments', {ethMinerAddress: this.publicAddress})
+      this.socketHelper.emitEvent( 'getMinerPpnlsRewards', {ethMinerAddress: this.publicAddress, nbrewards: 50})
     },
 
      // more resource full backend functions that need to be called less frequently:
