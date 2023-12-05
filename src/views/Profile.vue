@@ -317,7 +317,7 @@ export default {
       this.socketHelper.emitEvent( 'getMinerData', {ethMinerAddress: this.publicAddress})
       this.socketHelper.emitEvent( 'getMinerShares', {ethMinerAddress: this.publicAddress})
       this.socketHelper.emitEvent( 'getMinerPayments', {ethMinerAddress: this.publicAddress})
-      this.socketHelper.emitEvent( 'getMinerPpnlsRewards', {ethMinerAddress: this.publicAddress, nbrewards: 50})
+      this.socketHelper.emitEvent( 'getMinerPpnlsRewards', {ethMinerAddress: this.publicAddress, nbrewards: 20})
     },
 
      // more resource full backend functions that need to be called less frequently:
