@@ -41,6 +41,42 @@
      
       <div class="whitespace-md"></div>
 
+<table class='table w-full'>
+
+          <thead>
+            <tr style="border-bottom: 1px solid #ffffff;" >   
+              <td> Epoch count </td>
+              <td> challenge Number </td>
+              <td> Pool total shares </td>
+              <td> Miner shares </td>
+              <td> Miner shares % on this block</td>
+              <td> Miner port</td>
+            </tr>
+          </thead>
+
+          <tbody>
+
+          <tr v-if="currentchallenge">
+            <td class="px-1"> {{ currentchallenge.miningcontract.epochCount }} </td>
+              <td class="px-1"> {{ currentchallenge.miningcontract.challengeNumber | truncate(10, '...') }} </td>
+            
+              <td class="px-1" v-if="currentchallenge.TotalDiffHard">  {{ currentchallenge.TotalDiffHard.totaldiff }} </td>
+              <td class="px-1" v-else>  No shares </td>
+
+              <td v-if="currentchallenge.miner_challengediff" class="px-1" >  {{ currentchallenge.miner_challengediff.totaldiff }} </td>
+              <td v-else class="px-1" >  No shares </td>
+
+              <td v-if="currentchallenge.TotalDiffHard && currentchallenge.miner_challengediff && currentchallenge.miner_challengediff.minerport == 8081" class="px-1" >  {{ (currentchallenge.miner_challengediff.totaldiff / currentchallenge.TotalDiffHard.totaldiff) * 100 }} %</td>
+              <td v-else class="px-1" >  No shares </td>
+
+              <td style="font-size: 0.52em;color: #ff7f50;">Current challenge</td>
+              <td v-if="currentchallenge.miner_challengediff && currentchallenge.miner_challengediff.minerport == 8081" class="px-1" style="color:orange;"> 8081 </td>
+          </tr>
+
+          </tbody>
+</table>
+
+
 <HorizontalNav 
           class="mb-8"
          v-bind:activeSection="activeSection"
@@ -137,34 +173,15 @@
             <tr style="border-bottom: 1px solid #ffffff;" >   
               <td> Epoch count </td>
               <td> challenge Number </td>
-              <td> Pool total difficulty </td>
-              <td> Miner difficulty </td>
+              <td> Pool total shares </td>
+              <td> Miner shares </td>
               <td> Rewards </td>
               <td> Miner % on this port</td>
               <td> Miner port</td>
             </tr>
           </thead>
 
-          <tbody v-if="ppnlsrewards && ppnlsrewards.length > 0">
-
-          <tr v-if="currentchallenge">
-            <td class="px-1"> {{ currentchallenge.miningcontract.epochCount }} </td>
-              <td class="px-1"> {{ currentchallenge.miningcontract.challengeNumber | truncate(10, '...') }} </td>
-            
-              <td class="px-1" v-if="currentchallenge.TotalDiffHard">  {{ currentchallenge.TotalDiffHard.totaldiff }} </td>
-              <td class="px-1" v-else>  No shares </td>
-
-              <td v-if="currentchallenge.miner_challengediff" class="px-1" >  {{ currentchallenge.miner_challengediff.totaldiff }} </td>
-              <td v-else class="px-1" >  No shares </td>
-
-              <td></td>
-
-              <td v-if="currentchallenge.TotalDiffHard && currentchallenge.miner_challengediff && currentchallenge.miner_challengediff.minerport == 8081" class="px-1" >  {{ (currentchallenge.miner_challengediff.totaldiff / currentchallenge.TotalDiffHard.totaldiff) * 100 }} %</td>
-              <td v-else class="px-1" >  No shares </td>
-
-              <td v-if="index == 0" style="font-size: 0.52em;color: #ff7f50;">Current challenge</td>
-              <td v-if="currentchallenge.miner_challengediff && currentchallenge.miner_challengediff.minerport == 8081" class="px-1" style="color:orange;"> 8081 </td>
-          </tr>  
+          <tbody v-if="ppnlsrewards && ppnlsrewards.length > 0">  
           
           <tr v-for="(ppnlsreward, index) in ppnlsrewards" v-bind:key="index">
               
