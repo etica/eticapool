@@ -284,7 +284,7 @@ export default {
 
     this.socketsListener.on('MinerChallengeDetails', (data) => {    
       if (data && data.length > 0){
-        this.currentchallenges = data;
+        this.currentchallenges = data[0];
       }           
        
     });
