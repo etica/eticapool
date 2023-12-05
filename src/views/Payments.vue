@@ -77,7 +77,7 @@
                   </a>
                 </td>
                 <td class="px-1"> 
-                  <a v-bind:href='"https://www.eticascan.org/tx/"+item.transactionHash' >
+                  <a v-bind:href='"https://www.eticascan.org/tx/"+item.transactionhash' >
                         <span style="color: #527b7a;">  {{ shortenTransactionHash(item.transactionhash) }}  </span>
                   </a> 
                 </td>
