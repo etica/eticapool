@@ -260,7 +260,7 @@ export default {
     this.socketHelper = new SocketHelper()
     
     setInterval(this.pollSockets.bind(this),300000)
-    setInterval(this.pollSocketsSlow.bind(this),300000)
+    setInterval(this.pollSocketsFast.bind(this),60000)
 
 
     this.socketsListener = this.socketHelper.initSocket()
@@ -283,11 +283,9 @@ export default {
     });
 
     this.socketsListener.on('MinerChallengeDetails', (data) => {    
-      console.log('data', data)
-      console.log('data[0]', data[0])
       
       if (data && data.length > 0){
-        this.currentchallenges = data[0];
+        this.currentchallenge = data[0];
       }           
        
     });
@@ -297,7 +295,7 @@ export default {
     });
 
     this.pollSockets();
-    this.pollSocketsSlow()
+    this.pollSocketsFast()
 
   },
   methods: {
@@ -310,7 +308,7 @@ export default {
     },
 
      // more resource full backend functions that need to be called less frequently:
-    pollSocketsSlow(){
+    pollSocketsFast(){
     this.socketHelper.emitEvent( 'getMinerChallengeDetails', {ethMinerAddress: this.publicAddress, nbchallenges: 1})
     },
 
