@@ -19,7 +19,7 @@
               <td class="px-1">  {{ item.block  }} </td>
               <td class="px-1">
 
-                <a class="color-eticacyan" target="_blank" v-bind:href='item.txURL' >
+                <a class="color-eticacyan" target="_blank" v-bind:href='"https://www.eticascan.org/tx/"+item.transactionhash' >
                  {{ item.txHash  }}
                </a>
                </td>
