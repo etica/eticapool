@@ -201,7 +201,7 @@
           </tbody>
           <tbody v-else>
 
-           <p style="color: #ff8c00;"> LOADING DATA, THANKS FOR PATIENCE </p>
+           <p style="color: rgb(157, 145, 129);"> No ppnls reward yet </p>
 
           </tbody>
 
