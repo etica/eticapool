@@ -148,15 +148,16 @@
           <tbody v-if="ppnlsrewards && ppnlsrewards.length > 0">
 
           <tr v-if="currentchallenge">
-              <td class="px-1"> {{ currentchallenge.miningcontract.challengeNumber | truncate(20, '...') }} </td>
+            <td class="px-1"> {{ currentchallenge.miningcontract.epochCount }} </td>
+              <td class="px-1"> {{ currentchallenge.miningcontract.challengeNumber | truncate(10, '...') }} </td>
             
               <td class="px-1" v-if="currentchallenge.TotalDiffHard">  {{ currentchallenge.TotalDiffHard.totaldiff }} </td>
-              <td class="px-1" v-else>  No shares </td>
-              <td class="px-1" v-if="currentchallenge.TotalDiffEasy">  {{ currentchallenge.TotalDiffEasy.totaldiff }} </td>
               <td class="px-1" v-else>  No shares </td>
 
               <td v-if="currentchallenge.miner_challengediff" class="px-1" >  {{ currentchallenge.miner_challengediff.totaldiff }} </td>
               <td v-else class="px-1" >  No shares </td>
+
+              <td></td>
 
               <td v-if="currentchallenge.TotalDiffHard && currentchallenge.miner_challengediff && currentchallenge.miner_challengediff.minerport == 8081" class="px-1" >  {{ (currentchallenge.miner_challengediff.totaldiff / currentchallenge.TotalDiffHard.totaldiff) * 100 }} %</td>
               <td v-else class="px-1" >  No shares </td>
@@ -178,8 +179,6 @@
 
               <td v-if="ppnlsreward.poolshares && ppnlsreward.poolshares > 0 && ppnlsreward.shares" class="px-1" >  {{ (ppnlsreward.shares / ppnlsreward.poolshares) * 100 }} %</td>
               <td v-else class="px-1" >  No shares </td>
-
-              <td v-if="index == 0" style="font-size: 0.52em;color: #ff7f50;">Current challenge</td>
               <td class="px-1" style="color:orange;"> 8081 </td>
           </tr>  
 
