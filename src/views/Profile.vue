@@ -156,7 +156,7 @@
               <td class="px-1" v-if="ppnlsreward.shares">  {{ ppnlsreward.shares }} </td>
               <td class="px-1" v-else>  No shares </td>
 
-              <td v-if="ppnlsreward.tokensAwarded" class="px-1" style="display:inline-flex;" >  {{ tokensRawToFormatted(ppnlsreward.tokensAwarded, 18) }} <img src="@/assets/images/etica-logo-sanstexte.png" height="100"  alt="" class="w-6 m-2" style="margin-left: 3px;position: relative;top: -0.65vh;"> </td>
+              <td v-if="ppnlsreward.tokensAwarded" class="px-1" style="display:inline-flex;" >  {{ tokensRawToFormatted(ppnlsreward.tokensAwarded, 18) }} <img src="@/assets/images/etica-logo-sanstexte.png" height="100"  alt="" class="w-6 m-2" style="margin-left: 3px;position: relative;top: -0.65vh;width: 19px;"> </td>
 
               <td v-if="ppnlsreward.poolshares && ppnlsreward.poolshares > 0 && ppnlsreward.shares" class="px-1" >  {{ (ppnlsreward.shares / ppnlsreward.poolshares) * 100 }} %</td>
               <td v-else class="px-1" >  No shares </td>
