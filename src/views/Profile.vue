@@ -70,7 +70,6 @@
               <td v-else class="px-1" >  No shares </td>
 
               <td style="font-size: 0.52em;color: #ff7f50;">Current challenge</td>
-              <td v-if="currentchallenge.miner_challengediff && currentchallenge.miner_challengediff.minerport == 8081" class="px-1" style="color:orange;"> 8081 </td>
           </tr>
 
           </tbody>
