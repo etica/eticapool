@@ -50,7 +50,7 @@
               <td> Pool total shares </td>
               <td> Miner shares </td>
               <td> Miner shares % on this block</td>
-              <td> Miner port</td>
+              <td> Live shares</td>
             </tr>
           </thead>
 
@@ -82,7 +82,7 @@
          v-bind:activeSection="activeSection"
          v-bind:activeColor="'eticacyan'" 
          v-bind:buttonClickedCallback="onHorizontalNavClicked" 
-         v-bind:buttonNamesArray="['Recent Shares','Payouts','Details' ]"
+         v-bind:buttonNamesArray="['Recent Shares','Payouts','Rewards' ]"
    
        />
 
@@ -160,12 +160,12 @@
       </div>
 
 
-      <div v-if="activeSection=='Details'"  class="box  background-secondary overflow-x-auto" 
+      <div v-if="activeSection=='Rewards'"  class="box  background-secondary overflow-x-auto" 
          style="  min-height:480px;">
 
         <!--<div class='text-lg font-bold'>Details <i>most recent challenge numbers</i></div>-->
         <!--<div class='text-lg font-bold'>Details (Only loads last 2 ETI blocks, due to server overload. Will be possible to load 1000 more blocks once server overload issue is resolved)</div> -->
-        <div class='text-lg font-bold' style="color: rgb(32, 255, 0);">PPNLS rewards, For each found by pool rewards are calculated based on shares submited last 5 blocks.</div>
+        <div class='text-lg font-bold' style="color: rgb(176, 238, 167);">PPNLS rewards, For each found by pool rewards are based on shares submited last 5 blocks (whether blocks were found or not found by pool).</div>
         <div class='text-lg font-bold' style="color: #868686;">This is a new feature, allow few hours to see whole metrics</div>
         <table class='table w-full'>
 
@@ -175,9 +175,9 @@
               <td> challenge Number </td>
               <td> Pool total shares </td>
               <td> Miner shares </td>
-              <td> Rewards </td>
               <td> Miner % on this port</td>
               <td> Miner port</td>
+              <td> Rewards </td>
             </tr>
           </thead>
 
@@ -191,12 +191,10 @@
               <td class="px-1" v-else>  No shares </td>
               <td class="px-1" v-if="ppnlsreward.shares">  {{ ppnlsreward.shares }} </td>
               <td class="px-1" v-else>  No shares </td>
-
-              <td v-if="ppnlsreward.tokensAwarded" class="px-1" style="display:inline-flex;" >  {{ tokensRawToFormatted(ppnlsreward.tokensAwarded, 18) }} <img src="@/assets/images/etica-logo-sanstexte.png" height="100"  alt="" class="w-6 m-2" style="margin-left: 3px;position: relative;top: -0.65vh;width: 19px;"> </td>
-
               <td v-if="ppnlsreward.poolshares && ppnlsreward.poolshares > 0 && ppnlsreward.shares" class="px-1" >  {{ (ppnlsreward.shares / ppnlsreward.poolshares) * 100 }} %</td>
               <td v-else class="px-1" >  No shares </td>
               <td class="px-1" style="color:orange;"> 8081 </td>
+              <td v-if="ppnlsreward.tokensAwarded" class="px-1" style="display:inline-flex;" >  {{ tokensRawToFormatted(ppnlsreward.tokensAwarded, 18) }} <img src="@/assets/images/etica-logo-sanstexte.png" height="100"  alt="" class="w-6 m-2" style="margin-left: 3px;position: relative;top: -0.65vh;width: 19px;"> </td>
           </tr>  
 
 
