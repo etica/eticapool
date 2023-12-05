@@ -41,7 +41,7 @@
      
       <div class="whitespace-md"></div>
 
-<table class='table w-full'>
+<table class='table w-full' style="margin-bottom:6vh;">
 
           <thead>
             <tr style="border-bottom: 1px solid #ffffff;" >   
