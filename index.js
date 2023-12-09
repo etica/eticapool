@@ -88,6 +88,7 @@ async function init( )
         let peerInterface = new PeerInterface(mongoInterface, poolConfig) 
            peerInterface.update();
            peerInterface.listenForJSONRPC(); 
+           peerInterface.listenForStratumServer();
 
 
            let statsInterface = new StatsInterface(mongoInterface, poolConfig)
