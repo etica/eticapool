@@ -17,9 +17,6 @@ stratumClient.on('mining.error', function (msg, socket) {
   console.log('mining.error');
   console.log('mining.error socket: ', socket);
   console.log('msg: ', msg);
-  console.log('msg JSON: ', JSON.stringify(msg)); 
-  console.log('mining.error.msg.message: ', JSON.stringify(msg.message));
-  console.log('mining.error.msg.stack: ', msg.stack);
   console.log('JSON.stringify(msg.stack): ', JSON.stringify(msg.stack));
 });
 
@@ -28,6 +25,7 @@ var submitted = false;
 // the client is a one-way communication, it receives data from the server after issuing commands
 stratumClient.on('mining', function (data, socket, type) {
   // type will be either 'broadcast' or 'result'
+  console.log('on mining');
   console.log('Mining data: ' + type + ' = ', data);
   // you can issue more commands to the socket, it's the exact same socket as "client" variable
   // in this example
