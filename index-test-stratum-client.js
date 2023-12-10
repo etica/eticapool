@@ -18,6 +18,7 @@ stratumClient.on('mining.error', function (msg, socket) {
   console.log('msg: ', msg);
   console.log('msg JSON: ', JSON.stringify(msg)); 
   console.log('mining.error.msg.message: ', msg.message);
+  console.log('mining.error.msg.stack: ', msg.stack);
 });
 
 var submitted = false;
