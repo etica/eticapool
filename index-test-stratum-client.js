@@ -1,9 +1,11 @@
-import { Client } from '../lib';
+import stratum from 'stratum';
 
 const client = new Client()
+const stratumClient = stratum.Client.create();
+console.log('stratumClient: ', stratumClient)
 
 //must be specified per EventEmitter requirements
-client.on('error', function (socket, err) {
+stratumClient.on('error', function (socket, err) {
   socket.destroy();
   console.log('Connection closed with error: ', err);
   process.exit(1);
@@ -12,14 +14,14 @@ client.on('error', function (socket, err) {
 // this usually happens when we are not authorized to send commands (the server didn't allow us)
 // or share was rejected
 // Stratum errors are usually an array with 3 items [int, string, null]
-client.on('mining.error', function (msg, socket) {
+stratumClient.on('mining.error', function (msg, socket) {
   console.log(msg);
 });
 
 var submitted = false;
 
 // the client is a one-way communication, it receives data from the server after issuing commands
-client.on('mining', function (data, socket, type) {
+stratumClient.on('mining', function (data, socket, type) {
   // type will be either 'broadcast' or 'result'
   console.log('Mining data: ' + type + ' = ', data);
   // you can issue more commands to the socket, it's the exact same socket as "client" variable
@@ -54,7 +56,7 @@ client.on('mining', function (data, socket, type) {
   }
 });
 
-client.connect({
+stratumClient.connect({
   host: 'localhost',
   port: 3333
 }).then(function (socket) {
