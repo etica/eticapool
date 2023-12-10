@@ -85,4 +85,49 @@ stratumClient.connect({
       console.log('Error.message: ', error.message);
     }
   );
+
+
+  socket.stratumSubmit('getPoolStatus2').then(
+    // This isn't needed, it's handled automatically inside the Client class
+    // but if you want to deal with anything special after subscribing and such.
+    function (socket) {
+      console.log('Sent2!');
+    },
+    function (error) {
+      console.log('Error');
+      console.log('Error', error);
+      console.log('Error.message: ', error.message);
+    }
+  );
+
+
+  socket.stratumSend('getPoolStatus3').then(
+    // This isn't needed, it's handled automatically inside the Client class
+    // but if you want to deal with anything special after subscribing and such.
+    function (socket) {
+      console.log('Sent3!');
+    },
+    function (error) {
+      console.log('Error');
+      console.log('Error', error);
+      console.log('Error.message: ', error.message);
+    }
+  );
+
+  socket.send('getPoolStatus4').then(
+    // This isn't needed, it's handled automatically inside the Client class
+    // but if you want to deal with anything special after subscribing and such.
+    function (socket) {
+      console.log('Sent4!');
+    },
+    function (error) {
+      console.log('Error');
+      console.log('Error', error);
+      console.log('Error.message: ', error.message);
+    }
+  );
+
+
+
+
 });
