@@ -1,6 +1,5 @@
 import stratum from 'stratum';
 
-const client = new Client()
 const stratumClient = stratum.Client.create();
 console.log('stratumClient: ', stratumClient)
 
