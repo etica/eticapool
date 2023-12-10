@@ -65,6 +65,16 @@ client.connect(options, () => {
     });
     console.log("Sending:",authorizeMessage)
     client.write(authorizeMessage + '\n');
+
+
+    const shareMessage = JSON.stringify({
+        id: 1,
+        method: 'mining.submitShare',
+        params: ["0x81bc5497dcb74cf28763a85de13b6ada06020000094f7a55f1990266bf197544", "0x5B74d35caAC00460EdFaC45d6Ea4D773625735AE","0x0000000000ab5eaf1c369166c2aa69028ab09bcdcc394c8d5667684d7493a819", "9", "0x47d21215ae13b2aa785b7c7cb87853132c495cad0f5261fd311ebcc9c3e72688", ""]
+    });
+    console.log("Sending:",shareMessage)
+    client.write(shareMessage + '\n');
+
 });
 
 // Listen for data from the server
