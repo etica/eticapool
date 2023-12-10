@@ -15,6 +15,7 @@ stratumClient.on('error', function (socket, err) {
 // Stratum errors are usually an array with 3 items [int, string, null]
 stratumClient.on('mining.error', function (msg, socket) {
   console.log('mining.error');
+  console.log('mining.error socket: ', socket);
   console.log('msg: ', msg);
   console.log('msg JSON: ', JSON.stringify(msg)); 
   console.log('mining.error.msg.message: ', JSON.stringify(msg.message));
