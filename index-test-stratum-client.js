@@ -14,6 +14,8 @@ stratumClient.on('error', function (socket, err) {
 // or share was rejected
 // Stratum errors are usually an array with 3 items [int, string, null]
 stratumClient.on('mining.error', function (msg, socket) {
+  console.log('mining.error');
+  console.log('mining.error: ', msg);
   console.log(msg);
 });
 
