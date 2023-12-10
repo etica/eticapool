@@ -13,11 +13,11 @@ stratumClient.on('error', function (socket, err) {
 // this usually happens when we are not authorized to send commands (the server didn't allow us)
 // or share was rejected
 // Stratum errors are usually an array with 3 items [int, string, null]
-stratumClient.on('mining.error', function (error, socket) {
+stratumClient.on('mining.error', function (msg, socket) {
   console.log('mining.error');
-  console.log('mining.error: ', error);
-  console.log('mining.error JSON: ', JSON.stringify(error)); 
-  console.log('mining.error.message: ', error.message);
+  console.log('msg: ', msg);
+  console.log('msg JSON: ', JSON.stringify(msg)); 
+  console.log('mining.error.msg.message: ', msg.message);
 });
 
 var submitted = false;
