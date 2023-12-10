@@ -32,7 +32,7 @@ stratumClient.on('mining', function (data, socket, type) {
   // client.id = an UUID ([U]niversal [U]nique [ID]entifier) that you can safely rely on it's uniqueness
   // client.subscription = the subscription data from the server
   switch (data.method) {
-    case 'set_difficulty':
+    case 'getPoolStatus':
       // server sent the new difficulty
       break;
     case 'notify':
@@ -77,6 +77,8 @@ stratumClient.connect({
     },
     function (error) {
       console.log('Error');
+      console.log('Error', error);
+      console.log('Error.message: ', error.message);
     }
   );
 });
