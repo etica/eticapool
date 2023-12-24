@@ -61,7 +61,7 @@ client.connect(options, () => {
     const authorizeMessage = JSON.stringify({
         id: 1,
         method: 'mining.authorize',
-        params: ["0xE6104e20743871e9b6056aff2f2242CF8728c439.TT-Dev",""]
+        params: ["0x2e0a1251ae36932fe6B4F5f290f1B9c61A0ABfE9.TT-Dev","c=ETICA"]
     });
     console.log("Sending:",authorizeMessage)
     client.write(authorizeMessage + '\n');
@@ -79,6 +79,7 @@ client.connect(options, () => {
 
 // Listen for data from the server
 client.on('data', (data) => {
+    console.log('Client Received data!');
     console.log('Received:', data.toString());
     // Once you receive data, you can close the connection if you don't need it anymore
     //client.destroy();
