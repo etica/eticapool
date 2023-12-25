@@ -49,15 +49,11 @@ async function runTask( )
 
     let tokenContract = await ContractHelper.getTokenContract(  web3 ,  poolConfig  )  
     
-      await TokenDataHelper.collectTokenParameters( tokenContract,  web3, mongoInterface) 
-
-     
+    await TokenDataHelper.collectTokenParameters( tokenContract,  web3, mongoInterface) 
     
     console.log('finished task: collect token params')
 
     process.exit(0);
 }
-
-
 
 runTask( );
