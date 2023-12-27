@@ -61,7 +61,7 @@ client.connect(options, () => {
     const authorizeMessage = JSON.stringify({
         id: 1,
         method: 'mining.authorize',
-        params: ["0x5B74d35caAC00460EdFaC45d6Ea4D773625735AE.TT-Dev","c=ETICA"]
+        params: ["0xE0B8525729E4b49eb68903A2d02E8CD8Cf7cBc1C.TT-Dev","c=ETICA"]
     });
     console.log("Sending:",authorizeMessage)
     client.write(authorizeMessage + '\n');
@@ -70,7 +70,7 @@ client.connect(options, () => {
     const shareMessage = JSON.stringify({
         id: 1,
         method: 'mining.submit',
-        params: [1, "0x81bc5497dcb74cf28763a85de13b6ada06020000094f7a55f1990266bf197544"]
+        params: [1, "0xb2c70129658c4e9ed9003a2617d6f6195f73e16b1eada5fa4d0dc5e5d43b87fb"]
     });
     console.log("Sending:",shareMessage)
     client.write(shareMessage + '\n');
