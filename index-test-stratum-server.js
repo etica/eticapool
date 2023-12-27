@@ -70,7 +70,7 @@ client.connect(options, () => {
     const shareMessage = JSON.stringify({
         id: 1,
         method: 'mining.submit',
-        params: [1, "0xb2c70129658c4e9ed9003a2617d6f6195f73e16b1eada5fa4d0dc5e5d43b87fb"]
+        params: [1, "0xcca17e8a658c5c75aa8365b61cd33ebbb6e17e421cfd4c1879e474f47988b7a1"]
     });
     console.log("Sending:",shareMessage)
     client.write(shareMessage + '\n');
