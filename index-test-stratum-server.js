@@ -69,7 +69,7 @@ client.connect(options, () => {
 
     const shareMessage = JSON.stringify({
         id: 1,
-        method: 'mining.submitShare',
+        method: 'mining.submit',
         params: [1, "0x81bc5497dcb74cf28763a85de13b6ada06020000094f7a55f1990266bf197544"]
     });
     console.log("Sending:",shareMessage)
