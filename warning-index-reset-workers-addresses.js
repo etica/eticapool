@@ -20,11 +20,8 @@ import  cron from 'node-cron'
 let poolConfigFull = FileUtils.readJsonFileSync('/pool.config.json');
 let poolConfig = poolConfigFull[pool_env]
 
-
-
-console.log('poolConfig',poolConfig, poolConfigFull)
-
-console.log('init');
+console.log('warning script will reset balances of addresses using workers names');
+console.log('Will ask you to confirm to continue on next step.');
 
 
  
