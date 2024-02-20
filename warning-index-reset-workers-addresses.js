@@ -51,6 +51,6 @@ async function init( )
 
         // Warning will reset addresses using worker names to 0 balance.
         // Script asks user confirmation
-        ResetWorkers.ResetWorkersBalances();
+        ResetWorkers.ResetWorkersBalances(mongoInterface);
 
 }
