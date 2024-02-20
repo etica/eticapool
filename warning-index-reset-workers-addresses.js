@@ -26,7 +26,7 @@ console.log('Will ask you to confirm to continue on next step.');
 
  
 import MongoInterface from './lib/mongo-interface.js'
-import ResetWorkersAddresses from './lib/reset-workers-addresses.js';
+import ResetWorkersAddresses from './lib/warning-reset-workers-addresses.js';
 
  
 import Web3 from 'web3'
