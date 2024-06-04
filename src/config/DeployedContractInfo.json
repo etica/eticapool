@@ -1,18 +1,17 @@
 
 {
   "networks": {
-      "crucible": {
-              "contracts": {
-                "EticaRelease": {"name":"EticaRelease", "blockchain_address":"0x558593Bc92E6F242a604c615d93902fc98efcA82"},
-                "batchedpayments": {"name":"BatchedPayments", "blockchain_address":" "} 
-               
-              }
-            },
-      "etica": {
-        "contracts": {
-          "EticaRelease": {"name":"EticaRelease", "blockchain_address":"0x34c61EA91bAcdA647269d4e310A86b875c09946f"},
-          "batchedpayments": {"name":"BatchedPayments", "blockchain_address":"0xC4d3Eab6CB085882f85363e606daAF15bcdfC6f8"} 
-        }
+    "etica": {
+      "contracts": {
+        "EticaRelease": {"name":"EticaRelease", "blockchain_address":"0x34c61EA91bAcdA647269d4e310A86b875c09946f"},
+        "batchedpayments": {"name":"BatchedPayments", "blockchain_address":"0xC4d3Eab6CB085882f85363e606daAF15bcdfC6f8"} 
+      }
+    },
+    "crucible": {
+      "contracts": {
+        "EticaRelease": {"name":"EticaRelease", "blockchain_address":"0x558593Bc92E6F242a604c615d93902fc98efcA82"},
+        "batchedpayments": {"name":"BatchedPayments", "blockchain_address":"0xC4d3Eab6CB085882f85363e606daAF15bcdfC6f8"}     
+      }
       }  
     }
 }
