@@ -45,8 +45,8 @@ client.connect(options, () => {
         params: {
             "id": "login-id",
             "job_id": "job-id",
-            "nonce": "12848617903317052952",
-            "result": "0x003efd723d58b40226f85542c6cb76a7a87090435c949b4f966abd7cd89437b7"
+            "nonce": "8327630484437577358",
+            "result": "0x00aa4e8ea566799e9f43cda12f67c6e6172d761fa3823be0667285bae372e5e1"
         }
     });
     console.log("Sending:",shareMessage)
