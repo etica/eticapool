@@ -26,7 +26,7 @@ client.connect(options, () => {
     // Send the login message
     client.write(loginMessage + '\n');
 
-    const jobMessage = JSON.stringify({
+  /*  const jobMessage = JSON.stringify({
         id: 1,
         method: 'job',
         params: {
@@ -36,7 +36,7 @@ client.connect(options, () => {
         }
     });
     console.log("Sending:",jobMessage)
-    client.write(jobMessage + '\n');
+    client.write(jobMessage + '\n'); */
 
 
     const shareMessage = JSON.stringify({
@@ -45,8 +45,8 @@ client.connect(options, () => {
         params: {
             "id": "login-id",
             "job_id": "job-id",
-            "nonce": "deadbeef",
-            "result": "0xcca17e8a658c5c75aa8365b61cd33ebbb6e17e421cfd4c1879e474f47988b7a1"
+            "nonce": "12848617903317052952",
+            "result": "0x003efd723d58b40226f85542c6cb76a7a87090435c949b4f966abd7cd89437b7"
         }
     });
     console.log("Sending:",shareMessage)
