@@ -42,7 +42,7 @@
     "moment": "^2.29.4",
     "mongodb": "^3.6.4",
     "node-cron": "^2.0.3",
-    "randomx-etica-nodejs": "^1.0.3",
+    "randomx-etica-nodejs": "^1.0.4",
     "segfault-handler": "^1.3.0",
     "socket.io": "^3.1.2",
     "socket.io-client": "^3.1.2",
