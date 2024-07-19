@@ -3,7 +3,7 @@
   "networks": {
     "etica": {
       "contracts": {
-        "EticaRelease": {"name":"EticaRelease", "blockchain_address":"0x34c61EA91bAcdA647269d4e310A86b875c09946f"},
+        "EticaRelease": {"name":"EticaRelease", "blockchain_address":"0x63AD62E0b729CA6ee54700E09b501955132E0373"},
         "batchedpayments": {"name":"BatchedPayments", "blockchain_address":"0xC4d3Eab6CB085882f85363e606daAF15bcdfC6f8"} 
       }
     },
