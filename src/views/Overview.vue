@@ -63,8 +63,8 @@
             <div><span style="text-decoration:underline;">Current Randomx Blob:</span> 
               <br><span style="font-size:11px;color: rgb(255, 71, 3);">{{poolData.miningContract.randomxBlob}}</span>
             </div>
-            <div>Current Randomx Seedhash: <span style="color: rgb(108, 108, 108);">{{poolData.miningContract.randomxSeedhash}}</span></div>
-            <div>Current Challenge Number: {{poolData.miningContract.challengeNumber}}</div>
+            <div>Current Network Randomx Seedhash: <span style="color: rgb(108, 108, 108);">{{poolData.miningContract.randomxSeedhash}}</span></div>
+            <div>Current Challenge Number: <span>{{poolData.miningContract.challengeNumber}}</span></div>
 
             <div>epochCount: {{poolData.miningContract.epochCount}}</div> 
 
@@ -89,7 +89,7 @@
             Connection Details
           </h1>
 
-          <div><span style="text-decoration:underline;">Mining Pool address: </span><span style="color:rgb(179, 179, 179);">{{ poolUrl }}</span></div>
+          <div><span style="text-decoration:underline;">Mining Pool address:</span><span style="color:rgb(179, 179, 179);"> {{ poolUrl }}</span></div>
           
           <br>
           <div style="text-decoration:underline;">Mining Ports</div>
