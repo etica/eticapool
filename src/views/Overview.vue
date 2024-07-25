@@ -61,9 +61,9 @@
          <div v-if="poolData && poolData.miningContract && activeSection=='Mining Data'"  class="overflow-x-auto  mb-4">
            
             <div><span style="text-decoration:underline;">Current Randomx Blob:</span> 
-              <br><span style="font-size:11px;color: #ff4703;">{{poolData.miningContract.randomxBlob}}</span>
+              <br><span style="font-size:11px;color: rgb(255, 71, 3);">{{poolData.miningContract.randomxBlob}}</span>
             </div>
-            <div>Current Randomx Seedhash: <span style="color: #93908e;">{{poolData.miningContract.randomxSeedhash}}</span></div>
+            <div>Current Randomx Seedhash: <span style="color: rgb(191, 131, 15);">{{poolData.miningContract.randomxSeedhash}}</span></div>
             <div>Current Challenge Number: {{poolData.miningContract.challengeNumber}}</div>
 
             <div>epochCount: {{poolData.miningContract.epochCount}}</div> 
@@ -77,9 +77,10 @@
 
 
           <div>Miners</div>
-          <div>XMRig: <a target="_blank" style="color:#135e56;">https://xmrig.com/</a></div>
-          <div>SRBMiner: <a target="_blank" style="color:#135e56;">https://github.com/doktor83/SRBMiner-Multi/releases</a></div>
+          <div>XMRig: <a target="_blank" href="https://xmrig.com/" style="color:#135e56;">https://xmrig.com/</a></div>
+          <div>SRBMiner: <a target="_blank" href="https://github.com/doktor83/SRBMiner-Multi/releases" style="color:#135e56;">https://github.com/doktor83/SRBMiner-Multi/releases</a></div>
 
+          <br>
           <i>Instructions:</i>
           <i>Use same settings as monero. Replace address with Etica address. Enter pool url with mining port. Example: {{ poolUrl }}:3333</i>
 
