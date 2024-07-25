@@ -60,9 +60,11 @@
 
          <div v-if="poolData && poolData.miningContract && activeSection=='Mining Data'"  class="overflow-x-auto  mb-4">
            
-            <div>Current Challenge Number: {{poolData.miningContract.challengeNumber}}</div>
-            <div>Current Randomx Blob: {{poolData.miningContract.randomxBlob}}</div>
+            <div><span style="text-decoration:underline;">Current Randomx Blob:</span> 
+              <br><span style="font-size:11px;">{{poolData.miningContract.randomxBlob}}</span>
+            </div>
             <div>Current Randomx Seedhash: {{poolData.miningContract.randomxSeedhash}}</div>
+            <div>Current Challenge Number: {{poolData.miningContract.challengeNumber}}</div>
 
             <div>epochCount: {{poolData.miningContract.epochCount}}</div> 
 
