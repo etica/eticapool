@@ -79,29 +79,32 @@
             Connection Details
           </h1>
 
-          <div>Mining Pool address: <span style="color:#135e56;">{{ poolUrl }}</span></div>
+          <div>Mining Pool address: <span style="color:rgb(179, 179, 179);">{{ poolUrl }}</span></div>
           
           <br>
-          <div>Mining Ports:</div>
+          <div>Mining Ports</div>
           <br>
           
-          <div>
-          <div>Port <span style="color:#135e56;">3333:</span></div>
+
+        <div style="display:inline-flex">
+          <div style="margin-right: 5%;border-right: solid 1px white;">
+          <div>Port: <span style="color:#135e56;">3333</span></div>
           <div>Starting Difficulty: <span style="color:#135e56;">{{poolData.minimumShareDifficultyHard}}</span></div> 
           <div>Low-end CPU</div> 
           </div>
 
-          <div>
-          <div style="color:#135e56;">Port <span style="color:#135e56;">55555:</span></div>
+          <div style="margin-right: 5%;border-right: solid 1px white;">
+          <div style="color:#135e56;">Port: <span style="color:#135e56;">55555</span></div>
           <div>Starting Difficulty: <span style="color:#135e56;">{{poolData.minimumShareDifficultyHard}}</span></div> 
           <div>Low-end CPU</div> 
           </div>
 
-          <div>
-          <div>Port <span style="color:#135e56;">7777:</span></div>
+          <div style="margin-left: 5%">
+          <div>Port: <span style="color:#135e56;">7777</span></div>
           <div>Starting Difficulty: <span style="color:#135e56;">{{poolData.minimumShareDifficultyHard}}</span></div> 
           <div>High-end CPU</div>
           </div>
+        </div>
 
 
         </div>
