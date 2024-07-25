@@ -25,7 +25,7 @@
          v-bind:activeSection="activeSection" 
          v-bind:activeColor="'green'" 
          v-bind:buttonClickedCallback="onHorizontalNavClicked" 
-         v-bind:buttonNamesArray="['Mining Data','Pool Status','Recent Transactions' ]"
+         v-bind:buttonNamesArray="['Mining Data', 'Getting Started', 'Pool Status','Recent Transactions' ]"
    
        />
         
@@ -61,9 +61,9 @@
          <div v-if="poolData && poolData.miningContract && activeSection=='Mining Data'"  class="overflow-x-auto  mb-4">
            
             <div><span style="text-decoration:underline;">Current Randomx Blob:</span> 
-              <br><span style="font-size:11px;">{{poolData.miningContract.randomxBlob}}</span>
+              <br><span style="font-size:11px;color: #ff4703;">{{poolData.miningContract.randomxBlob}}</span>
             </div>
-            <div>Current Randomx Seedhash: {{poolData.miningContract.randomxSeedhash}}</div>
+            <div>Current Randomx Seedhash: <span style="color: #93908e;">{{poolData.miningContract.randomxSeedhash}}</span></div>
             <div>Current Challenge Number: {{poolData.miningContract.challengeNumber}}</div>
 
             <div>epochCount: {{poolData.miningContract.epochCount}}</div> 
@@ -71,15 +71,32 @@
             <div style="text-decoration:underline;">Blockchain difficulty:</div>
             <div>Current ETI Mining Difficulty: {{poolData.miningContract.miningDifficulty}}</div>
 
-          <br>
-          <div style="text-decoration:underline;">Mining Pool difficulty:</div>
-          <!-- <div style="color:#135e56;">Low Hashrates (port 8080):</div>
-          <div>Minimum Shares Difficulty: {{poolData.minimumShareDifficulty}}</div> -->
-          <!--<div>Rewards: 14% of Rewards</div>-->
-          <div style="color:#135e56;">Port 8081:</div>
-          <div>Minimum Shares Difficulty: {{poolData.minimumShareDifficultyHard}}</div> 
-          <div>Rewards: 100% of Rewards on port 8081</div> 
         </div> 
+
+        <div v-if="poolData && poolStatus && activeSection=='Getting Started'"  class="overflow-x-auto mb-4">
+
+          <h1 class="title font-primary-title color-primary mb-4" style="font-family: dotgothicregular;font-size: 45px;color: #d0d0d0;">
+            Connection Details
+          </h1>
+
+          <div>Mining Pool address: <span>{{ poolUrl }}</span></div>
+          
+          <div>Mining Ports:</div>
+
+          <div style="color:#135e56;">Port 3333:</div>
+          <div>Starting Difficulty: {{poolData.minimumShareDifficultyHard}}</div> 
+          <div>Low-end CPU</div> 
+
+          <div style="color:#135e56;">Port 55555:</div>
+          <div>Starting Difficulty: {{poolData.minimumShareDifficultyHard}}</div> 
+          <div>Low-end CPU</div> 
+
+          <div style="color:#135e56;">Port 7777:</div>
+          <div>Starting Difficulty: {{poolData.minimumShareDifficultyHard}}</div> 
+          <div>High-end CPU</div>
+
+
+        </div>
 
 
         <div v-if="poolStatus && activeSection=='Pool Status'" class="overflow-x-auto  mb-4">
@@ -184,6 +201,7 @@ export default {
   data() {
     return {
       poolName: null,
+      poolUrl: null,
       poolData: null,
       poolStatus: null,
 
@@ -206,8 +224,9 @@ export default {
      
      
 
-        this.socketsListener.on('poolName', (name) => {   
-            this.poolName = name;
+        this.socketsListener.on('poolNameAndUrl', (data) => {   
+            this.poolName = data.poolName;
+            this.poolUrl = data.poolUrl;
         });
 
        this.socketsListener.on('poolData', (data) => {   
@@ -230,7 +249,7 @@ export default {
   },
   methods: {
     pollSockets(){
-      this.socketHelper.emitEvent('getPoolName')
+      this.socketHelper.emitEvent('getPoolNameAndUrl')
       this.socketHelper.emitEvent('getPoolData')
       this.socketHelper.emitEvent('getPoolStatus')
       this.socketHelper.emitEvent('getRecentPayments')
