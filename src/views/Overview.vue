@@ -61,9 +61,9 @@
          <div v-if="poolData && poolData.miningContract && activeSection=='Mining Data'"  class="overflow-x-auto  mb-4">
            
             <div><span style="text-decoration:underline;">Current Randomx Blob:</span> 
-              <br><span style="font-size:11px;color: rgb(255, 71, 3);">{{poolData.miningContract.randomxBlob}}</span>
+              <br><span style="font-size:11px;color: rgb(164, 255, 3);">{{poolData.miningContract.randomxBlob}}</span>
             </div>
-            <div>Current Network Randomx Seedhash: <span style="color: rgb(108, 108, 108);">{{poolData.miningContract.randomxSeedhash}}</span></div>
+            <div>Current Network Randomx Seedhash: <span style="color: rgb(6, 119, 55);">{{poolData.miningContract.randomxSeedhash}}</span></div>
             <div>Current Challenge Number: <span>{{poolData.miningContract.challengeNumber}}</span></div>
 
             <div>epochCount: {{poolData.miningContract.epochCount}}</div> 
