@@ -75,6 +75,15 @@
 
         <div v-if="poolData && poolStatus && activeSection=='Getting Started'"  class="overflow-x-auto mb-4">
 
+
+          <div>Miners</div>
+          <div>XMRig: <a target="_blank" style="color:#135e56;">https://xmrig.com/</a></div>
+          <div>SRBMiner: <a target="_blank" style="color:#135e56;">https://github.com/doktor83/SRBMiner-Multi/releases</a></div>
+
+          <i>Instructions:</i>
+          <i>Use same settings as monero. Replace address with Etica address. Enter pool url with mining port. Example: {{ poolUrl }}:3333</i>
+
+
           <h1 class="title font-primary-title color-primary mb-4" style="font-family: dotgothicregular;font-size: 45px;color: #d0d0d0;">
             Connection Details
           </h1>
@@ -87,19 +96,19 @@
           
 
         <div style="display:inline-flex">
-          <div style="margin-right: 5%;border-right: solid 1px white;">
+          <div style="margin-right: 5%;border-right: solid 1px white;width: 50%;">
           <div>Port: <span style="color:#135e56;">3333</span></div>
           <div>Starting Difficulty: <span style="color:#135e56;">{{poolData.minimumShareDifficultyHard}}</span></div> 
           <div>Low-end CPU</div> 
           </div>
 
-          <div style="margin-right: 5%;border-right: solid 1px white;">
+          <div style="margin-right: 5%;border-right: solid 1px white;width: 50%;">
           <div style="color:#135e56;">Port: <span style="color:#135e56;">55555</span></div>
           <div>Starting Difficulty: <span style="color:#135e56;">{{poolData.minimumShareDifficultyHard}}</span></div> 
           <div>Low-end CPU</div> 
           </div>
 
-          <div style="margin-left: 5%">
+          <div style="margin-left: 5%;width: 50%;">
           <div>Port: <span style="color:#135e56;">7777</span></div>
           <div>Starting Difficulty: <span style="color:#135e56;">{{poolData.minimumShareDifficultyHard}}</span></div> 
           <div>High-end CPU</div>
