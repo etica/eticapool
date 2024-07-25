@@ -85,31 +85,31 @@
           <i>Use same settings as monero. Replace address with Etica address. Enter pool url with mining port. Example: {{ poolUrl }}:3333</i>
 
 
-          <h1 class="title font-primary-title color-primary mb-4" style="font-family: dotgothicregular;font-size: 45px;color: #d0d0d0;">
+          <h1 class="title font-primary-title color-primary mb-4" style="font-family: dotgothicregular;font-size: 24px;color: #d0d0d0;">
             Connection Details
           </h1>
 
-          <div>Mining Pool address: <span style="color:rgb(179, 179, 179);">{{ poolUrl }}</span></div>
+          <div><span style="text-decoration:underline;">Mining Pool address: </span><span style="color:rgb(179, 179, 179);">{{ poolUrl }}</span></div>
           
           <br>
-          <div>Mining Ports</div>
+          <div style="text-decoration:underline;">Mining Ports</div>
           <br>
           
 
         <div style="display:inline-flex">
-          <div style="margin-right: 5%;border-right: solid 1px white;width: 50%;">
+          <div style="margin-right: 5%;border-right: solid 1px white;width: 100%;">
           <div>Port: <span style="color:#135e56;">3333</span></div>
           <div>Starting Difficulty: <span style="color:#135e56;">{{poolData.minimumShareDifficultyHard}}</span></div> 
           <div>Low-end CPU</div> 
           </div>
 
-          <div style="margin-right: 5%;border-right: solid 1px white;width: 50%;">
+          <div style="margin-right: 5%;border-right: solid 1px white;width: 100%;">
           <div style="color:#135e56;">Port: <span style="color:#135e56;">55555</span></div>
           <div>Starting Difficulty: <span style="color:#135e56;">{{poolData.minimumShareDifficultyHard}}</span></div> 
           <div>Low-end CPU</div> 
           </div>
 
-          <div style="margin-left: 5%;width: 50%;">
+          <div style="margin-left: 5%;width: 100%;">
           <div>Port: <span style="color:#135e56;">7777</span></div>
           <div>Starting Difficulty: <span style="color:#135e56;">{{poolData.minimumShareDifficultyHard}}</span></div> 
           <div>High-end CPU</div>
