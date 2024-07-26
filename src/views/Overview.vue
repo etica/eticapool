@@ -97,19 +97,19 @@
           
 
         <div style="display:inline-flex">
-          <div style="margin-right: 5%;border-right: solid 1px white;width: 100%;">
+          <div style="margin-right: 5%;border-right: solid 1px white;width: 296px;">
           <div>Port: <span style="color:#135e56;">3333</span></div>
           <div>Starting Difficulty: <span style="color:#135e56;">{{poolData.minimumShareDifficultyHard}}</span></div> 
           <div>Low-end CPU</div> 
           </div>
 
-          <div style="margin-right: 5%;border-right: solid 1px white;width: 100%;">
+          <div style="margin-right: 5%;border-right: solid 1px white;width: 296px;">
           <div style="color:#135e56;">Port: <span style="color:#135e56;">55555</span></div>
           <div>Starting Difficulty: <span style="color:#135e56;">{{poolData.minimumShareDifficultyHard}}</span></div> 
           <div>Low-end CPU</div> 
           </div>
 
-          <div style="margin-left: 5%;width: 100%;">
+          <div style="margin-left: 5%;width: 296px;">
           <div>Port: <span style="color:#135e56;">7777</span></div>
           <div>Starting Difficulty: <span style="color:#135e56;">{{poolData.minimumShareDifficultyHard}}</span></div> 
           <div>High-end CPU</div>
