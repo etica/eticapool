@@ -27,15 +27,17 @@
             </div> 
 
                 <p class="text-white font-bold">Mining Pool URLs</p>
-                <p v-if="poolUrl" class="text-white font-bold" style="color:#399999;">{{ poolUrl }}:8081</p>
+                <p v-if="poolUrl" class="text-white font-bold" style="color:#399999;">{{ poolUrl }}:3333 (Low-end CPU)</p>
+                <p v-if="poolUrl" class="text-white font-bold" style="color:#399999;">{{ poolUrl }}:5555 (Mid-range CPU)</p>
+                <p v-if="poolUrl" class="text-white font-bold" style="color:#399999;">{{ poolUrl }}:7777 (High-end CPU)</p>
                 <p class="text-white font-bold">Smart Contract Address: 0x34c61EA91bAcdA647269d4e310A86b875c09946f </p>
 
                 <div class="whitespace-md" style="margin-top: 2em;"></div>
 
                 <div class="account-search-container ">
                   <div class="field">
-                    <a href="/accounts" style="text-decoration:underline;color:#85b593;"> Accounts Page</a>
-                    <br>
+                    <!--<a href="/accounts" style="text-decoration:underline;color:#85b593;"> Accounts Page</a>-->
+                   <!-- <br> -->
                     <div class="label text-white font-bold">View Mining Account</div>
                     <div class="control">
                       <form v-on:submit.prevent="submitMiningAccountSearch">
