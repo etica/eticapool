@@ -83,10 +83,10 @@
               <hr>
               <!-- <p>Set pool URL to 'http://eticapool.com:8080' for low hashrates</p>
               <hr> -->
-              <p v-if="poolUrl">Set pool URL to '{{ poolUrl }}:8081'</p>
+              <p v-if="poolUrl">Set pool URL to '{{ poolUrl }}:3333'</p>
               <p v-else>Set pool URL in your miner config</p>
               <hr>
-              <p>Set address to your ETH address and begin mining!</p>
+              <p>Set address to your Etica address and begin mining!</p>
               <hr>
               <p>How to mine guide: https://www.eticaprotocol.org/eticadocs/mining.html</p>
                 
@@ -100,18 +100,11 @@
         
       
 
-        <a href="https://bio.hiveos.farm/repo/SoliditySHA3Miner-2.3.4.zip" target="_blank" style="margin-right:1%;">
-          <div class='bg-cyan-etica p-4 mt-4 rounded text-black inline-block  hover:bg-blue-200'>Download the Token Miner (Linux zip)</div>
+        <a href="https://xmrig.com/" target="_blank" style="margin-right:1%;">
+          <div class='bg-cyan-etica p-4 mt-4 rounded text-black inline-block  hover:bg-blue-200'>XMRig miner</div>
         </a>
-        <a href="https://bio.hiveos.farm/repo/SoliditySHA3Miner-2.3.4.tar.gz" target="_blank">
-          <div class='bg-cyan-etica p-4 mt-4 rounded text-black inline-block  hover:bg-blue-200'>Download the Token Miner (Linux tar.gz)</div>
-        </a>
-         <div class=""></div>
-        <a href="https://github.com/etica/SoliditySHA3MinerEticaOptimised/releases/tag/v.2.3.4" target="_blank" style="margin-right:1%;">
-          <div class='bg-cyan-etica p-4 mt-4 rounded text-black inline-block hover:bg-blue-200'>Download the Token Miner (Windows zip)</div>
-        </a>
-        <a href="https://github.com/etica/SoliditySHA3MinerEticaOptimised/releases/tag/v.2.3.4" target="_blank">
-          <div class='bg-cyan-etica p-4 mt-4 rounded text-black inline-block hover:bg-blue-200'>Download the Token Miner (Windows tar.gz)</div>
+        <a href="https://github.com/doktor83/SRBMiner-Multi/releases" target="_blank">
+          <div class='bg-cyan-etica p-4 mt-4 rounded text-black inline-block  hover:bg-blue-200'>SRBMiner</div>
         </a>
 
         <div class="whitespace-sm"></div>
