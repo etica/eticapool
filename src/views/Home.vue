@@ -19,7 +19,7 @@
 
        <section class="hero circuit-overlay  text-center ">
           <div class="flex flex-col lg:w-1/2" style="margin:0 auto">
-
+            <span><img src="@/assets/images/monero-xmr-logo.png"> ETI RandomX mining</span>
           <div class=" text-center  "  >
             <span v-if="poolName" class="title font-roboto text-white font-bold text-4xl">
                 {{ poolName }}
@@ -59,7 +59,7 @@
                    <div v-if="poolName" class="bg-green-500 w-full p-2">
                      {{ poolName }} is Active.
                     </div> 
-                    <span><img src="@/assets/images/monero-xmr-logo.png">ETI RandomX mining</span>
+              
                     <div v-if="poolName" style="color:white;"> {{ poolName }} is open and synced with Etica mainnet</div>
 
                       <p style="color:#35aa31;">{{ hashrateToGH(LastPoolStatsRecord[0].Hashrate) }} GH/s   |   {{ LastPoolStatsRecord[0].Numberminers }} active miners (last hour)</p>
