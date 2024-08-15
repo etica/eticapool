@@ -42,13 +42,13 @@ background-color: #222;
 
 
 .bg-brown-button {
-background-color: #2c2c2d;
+background-color: #424141;
 color: #8e8e8e;
 }
 
-.bg-brown-button {
-background-color: #6c6c6c;
-color: #8e8e8e;
+.bg-brown-button-hov {
+  background-color: #222;
+  color: #f7f7f7;
 }
 
 
