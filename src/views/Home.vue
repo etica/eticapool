@@ -19,7 +19,7 @@
 
        <section class="hero circuit-overlay  text-center ">
           <div class="flex flex-col lg:w-1/2" style="margin:0 auto">
-            <span><img src="@/assets/images/monero-xmr-logo.png"> ETI RandomX mining</span>
+            <span :style="{ color: blinkerColor }"><img src="@/assets/images/monero-xmr-logo.png" style="width:20px;"> ETI RandomX mining</span>
           <div class=" text-center  "  >
             <span v-if="poolName" class="title font-roboto text-white font-bold text-4xl">
                 {{ poolName }}
@@ -218,6 +218,7 @@ export default {
       miningAccountSearchQuery: null, 
       web3Plug: null,
       showInstructions: false,
+      blinkerColor:'#399999'
       
     }
   },
@@ -226,6 +227,8 @@ export default {
       
       setInterval(this.pollSockets.bind(this),240000)
       setInterval(this.pollSocketsSlow.bind(this),240000)
+
+      setInterval(this.changeblinkerColor, 600);
 
 
       this.socketsListener = this.socketHelper.initSocket()
@@ -283,7 +286,17 @@ export default {
 
     hashrateToGH(hashrate){
       return MathHelper.rawAmountToFormatted( hashrate , 9 )
-    }
+    },
+
+    changeblinkerColor(){
+        if(this.blinkerColor == '#399999'){
+           this.blinkerColor = '#83e5c4';
+        }
+        else {
+          this.blinkerColor = '#399999';
+        }
+        
+      }
 
   }
 }
