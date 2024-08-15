@@ -59,6 +59,7 @@
                    <div v-if="poolName" class="bg-green-500 w-full p-2">
                      {{ poolName }} is Active.
                     </div> 
+                    <span><img src="@/assets/images/monero-xmr-logo.png">ETI RandomX mining</span>
                     <div v-if="poolName" style="color:white;"> {{ poolName }} is open and synced with Etica mainnet</div>
 
                       <p style="color:#35aa31;">{{ hashrateToGH(LastPoolStatsRecord[0].Hashrate) }} GH/s   |   {{ LastPoolStatsRecord[0].Numberminers }} active miners (last hour)</p>
