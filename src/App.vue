@@ -40,4 +40,17 @@ background-color: #222;
   min-height: 65vh;
 }
 
+
+.bg-brown-button {
+background-color: #2c2c2d;
+color: #8e8e8e;
+}
+
+.bg-brown-button {
+background-color: #6c6c6c;
+color: #8e8e8e;
+}
+
+
+
 </style>

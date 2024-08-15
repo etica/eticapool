@@ -19,7 +19,8 @@
 
        <section class="hero circuit-overlay  text-center ">
           <div class="flex flex-col lg:w-1/2" style="margin:0 auto">
-            <span :style="{ color: blinkerColor }"><img src="@/assets/images/monero-xmr-logo.png" style="width:20px;"> ETI RandomX mining</span>
+            <span :style="{ color: blinkerColor }"><img src="@/assets/images/eti-logo.png" style="width:20px;"> ETI RandomX mining activated <img src="@/assets/images/monero-xmr-logo.png" style="width:20px;"></span>
+            <span :style="{ color: blinkerColor }"><img src="@/assets/images/monero-xmr-logo.png" style="width:20px;"> ETI RandomX mining activated <img src="@/assets/images/eti-logo.png" style="width:20px;"></span>
           <div class=" text-center  "  >
             <span v-if="poolName" class="title font-roboto text-white font-bold text-4xl">
                 {{ poolName }}
@@ -101,10 +102,10 @@
       
 
         <a href="https://xmrig.com/" target="_blank" style="margin-right:1%;">
-          <div class='bg-cyan-etica p-4 mt-4 rounded text-black inline-block  hover:bg-blue-200'>XMRig miner</div>
+          <div class='bg-brown-button p-4 mt-4 rounded inline-block hover:bg-brown-button-hov'>XMRig miner</div>
         </a>
         <a href="https://github.com/doktor83/SRBMiner-Multi/releases" target="_blank">
-          <div class='bg-cyan-etica p-4 mt-4 rounded text-black inline-block  hover:bg-blue-200'>SRBMiner</div>
+          <div class='bg-brown-button p-4 mt-4 rounded inline-block  hover:bg-brown-button-hov'>SRBMiner</div>
         </a>
 
         <div class="whitespace-sm"></div>
