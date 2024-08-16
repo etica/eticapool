@@ -40,9 +40,7 @@
                    <!-- <br> -->
                     <div class="label text-white font-bold">ethMinerAddress Mining Address</div>
                     <div class="control">
-                      <form v-on:submit.prevent="submitMiningAccountSearch">
-   
-
+                      <form v-on:submit.prevent="submitMiningAccountSearch" style="display: inline-flex; width:100%;">
                        <input v-model="miningAccountSearchQuery" class="input dark-input" style="outline: none;" type="text" placeholder="0x...">
                        <button type="submit" class="submit-button">Search</button>
                       </form>
@@ -313,6 +311,8 @@ export default {
   cursor: pointer;
   font-size: 16px;
   margin-left: 10px;
+  padding-top: 1px;
+  padding-bottom: 1px;
 }
 
 .submit-button:hover {
