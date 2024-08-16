@@ -38,12 +38,13 @@
                   <div class="field">
                     <!--<a href="/accounts" style="text-decoration:underline;color:#85b593;"> Accounts Page</a>-->
                    <!-- <br> -->
-                    <div class="label text-white font-bold">View Mining Account</div>
+                    <div class="label text-white font-bold">ethMinerAddress Mining Address</div>
                     <div class="control">
                       <form v-on:submit.prevent="submitMiningAccountSearch">
    
 
-                       <input v-model="miningAccountSearchQuery" class="input dark-input  " type="text" placeholder="0x...">
+                       <input v-model="miningAccountSearchQuery" class="input dark-input" style="outline: none;" type="text" placeholder="0x...">
+                       <button type="submit" class="submit-button">Search</button>
                       </form>
                    
                     </div>
@@ -302,3 +303,19 @@ export default {
   }
 }
 </script>
+
+<style>
+.submit-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 10px;
+}
+
+.submit-button:hover {
+  background-color: #45a049;
+}
+</style>
