@@ -100,10 +100,10 @@
       
 
         <a href="https://xmrig.com/" target="_blank" style="margin-right:1%;">
-          <div class='bg-brown-button p-4 mt-4 rounded inline-block hover:bg-brown-button-hov'>XMRig miner</div>
+          <div class='bg-brown-button p-4 mt-4 rounded inline-block'>XMRig miner</div>
         </a>
         <a href="https://github.com/doktor83/SRBMiner-Multi/releases" target="_blank">
-          <div class='bg-brown-button p-4 mt-4 rounded inline-block  hover:bg-brown-button-hov'>SRBMiner</div>
+          <div class='bg-brown-button p-4 mt-4 rounded inline-block'>SRBMiner</div>
         </a>
 
         <div class="whitespace-sm"></div>
@@ -301,21 +301,3 @@ export default {
   }
 }
 </script>
-
-<style>
-.submit-button {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  margin-left: 10px;
-  padding-top: 1px;
-  padding-bottom: 1px;
-}
-
-.submit-button:hover {
-  background-color: #45a049;
-}
-</style>

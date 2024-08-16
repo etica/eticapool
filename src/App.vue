@@ -46,11 +46,25 @@ background-color: #424141;
 color: #8e8e8e;
 }
 
-.bg-brown-button-hov {
+.bg-brown-button:hover {
   background-color: #222;
   color: #f7f7f7;
 }
 
+.submit-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 10px;
+  padding-top: 1px;
+  padding-bottom: 1px;
+}
 
+.submit-button:hover {
+  background-color: #45a049;
+}
 
 </style>
