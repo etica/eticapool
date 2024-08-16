@@ -27,7 +27,7 @@
             </div> 
 
                 <p class="text-white font-bold">Mining Pool URLs</p>
-                <p v-if="poolUrl" class="text-white font-bold" style="color:rgb(105, 136, 136);">{{ poolUrl }}:3333 (Low-end CPU)</p>
+                <p v-if="poolUrl" class="text-white font-bold" style="color:rgb(115, 233, 233);">{{ poolUrl }}:3333 (Low-end CPU)</p>
                 <p v-if="poolUrl" class="text-white font-bold" style="color:rgb(167, 191, 191);">{{ poolUrl }}:5555 (Mid-range CPU)</p>
                 <p v-if="poolUrl" class="text-white font-bold" style="color:rgb(48, 153, 164);">{{ poolUrl }}:7777 (High-end CPU)</p>
                 <p class="text-white font-bold">Smart Contract Address: 0x34c61EA91bAcdA647269d4e310A86b875c09946f </p>
@@ -54,7 +54,7 @@
             <div class="w-full p-4 m-4">
                <div v-if="poolStatus" class="m-2 text-lg text-white">Pool Status</div>
              <div v-if="poolStatus && poolStatus.poolStatus == 'active'" >
-                   <div v-if="poolName" class="bg-green-500 w-full p-2">
+                   <div v-if="poolName" class="bg-green-500 p-2">
                      {{ poolName }} is Active.
                     </div> 
               
