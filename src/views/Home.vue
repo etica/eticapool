@@ -53,7 +53,7 @@
             <div class="w-full p-4 m-4">
                <div v-if="poolStatus" class="m-2 text-lg text-white">Pool Status</div>
              <div v-if="poolStatus && poolStatus.poolStatus == 'active'" >
-                   <div v-if="poolName" class="bg-green-500 p-2">
+                   <div v-if="poolName" class="bg-green-500 p-2" style="background-color: rgb(22, 176, 0); color: #e6f7d6; width: 98%;">
                      {{ poolName }} is Active.
                     </div> 
               
@@ -63,6 +63,7 @@
 
 
               </div>
+            </div>
           
       </section>
 
