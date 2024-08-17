@@ -59,7 +59,7 @@
               
                     <div v-if="poolName" style="color:white;"> {{ poolName }} is open and synced with Etica mainnet</div>
 
-                      <p style="color:#35aa31;">{{ hashrateToGH(LastPoolStatsRecord[0].Hashrate) }} GH/s   |   {{ LastPoolStatsRecord[0].Numberminers }} active miners (last hour)</p>
+                      <p style="color:#35aa31;">{{ hashrateToKH(LastPoolStatsRecord[0].Hashrate) }} KH/s   |   {{ LastPoolStatsRecord[0].Numberminers }} active miners (last hour)</p>
 
 
               </div>
@@ -279,6 +279,10 @@ export default {
 
     pollSocketsSlow(){
       this.socketHelper.emitEvent('getLastPoolStatsRecord')
+    },
+
+    hashrateToKH(hashrate){
+      return MathHelper.rawAmountToFormatted( hashrate , 3 )
     },
 
     hashrateToMH(hashrate){
