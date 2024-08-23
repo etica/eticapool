@@ -10,7 +10,7 @@
     "crucible": {
       "contracts": {
         "EticaRelease": {"name":"EticaRelease", "blockchain_address":"0x558593Bc92E6F242a604c615d93902fc98efcA82"},
-        "batchedpayments": {"name":"BatchedPayments", "blockchain_address":"0x13640edaF896E8A18a344aE2Beb02E4Ab34C3d18"}     
+        "batchedpayments": {"name":"BatchedPayments", "blockchain_address":"0x00Ae027c04b5c4E952476aA65E609802762D06CD"}     
       }
       }  
     }
