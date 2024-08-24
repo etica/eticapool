@@ -150,14 +150,7 @@ export default {
           return web3utils.isAddress(minerAddress) && !isNaN(item.avgHashrate);
         });
 
-          this.accountList.sort((a,b) => {return parseFloat(b.avgHashrate) - parseFloat(a.avgHashrate)})
-
-
-          this.accountList.forEach((item, index) => {
-  console.log(`Row ${index}:`);
-  console.log(`  avgHashrate: ${typeof item.avgHashrate} = ${item.avgHashrate}`);
-  console.log('------------------------');
-});
+          this.accountList.sort((a,b) => {return parseFloat(b.avgHashrate) - parseFloat(a.avgHashrate)});
         
       },
 
