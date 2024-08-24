@@ -145,12 +145,19 @@ export default {
 
       async updateAccountList(newList){
 
-           this.accountList = newList.filter(item => {
-              const minerAddress = item.minerEthAddress.substr(0, 42);
-              return web3utils.isAddress(minerAddress);
-            });
+        this.accountList = newList.filter(item => {
+          const minerAddress = item.minerEthAddress.substr(0, 42);
+          return web3utils.isAddress(minerAddress) && !isNaN(item.avgHashrate);
+        });
 
-          this.accountList.sort((a,b) => {return b.avgHashrate - a.avgHashrate})
+          this.accountList.sort((a,b) => {return parseFloat(b.avgHashrate) - parseFloat(a.avgHashrate)})
+
+
+          this.accountList.forEach((item, index) => {
+  console.log(`Row ${index}:`);
+  console.log(`  avgHashrate: ${typeof item.avgHashrate} = ${item.avgHashrate}`);
+  console.log('------------------------');
+});
         
       },
 
