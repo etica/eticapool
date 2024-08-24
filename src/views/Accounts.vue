@@ -144,18 +144,20 @@ export default {
 
 
       async updateAccountList(newList){
- 
-           this.accountList = newList 
 
-           this.accountList = this.accountList.filter(x => web3utils.isAddress( x.minerEthAddress ) )
+           this.accountList = newList.filter(item => {
+              const minerAddress = item.minerEthAddress.substr(0, 42);
+              return web3utils.isAddress(minerAddress);
+            });
 
-          this.accountList.sort((a,b) => {return b.alltimeTokenBalance - a.alltimeTokenBalance})
+          this.accountList.sort((a,b) => {return b.avgHashrate - a.avgHashrate})
         
       },
 
       pollSockets(){
           this.socketHelper.emitEvent('getPoolName'),
-          this.socketHelper.emitEvent( 'getActiveMinerList')
+          //this.socketHelper.emitEvent( 'getActiveMinerList') get active miners
+          this.socketHelper.emitEvent( 'getMinerList') // get all miners
       },
       hashrateToMH(hashrate){
          return MathHelper.rawAmountToFormatted( hashrate , 6 )
