@@ -24,7 +24,7 @@ init( );
 async function init( )
 {
  
-        var randomxhash = "0f5d44e563df09e2dad9703315f775c33e6ce39cdd549e67f55984fb4f310000";
+        var randomxhash = "0x0adc1099ee827286ef00a460611d0c65af7a56f096b2d6d03e790f4fd5280000";
         var miningtarget = "178754037760106876685137708107161957748485538827582620735912645312215893";
         var miningTargetBN = web3utils.toBN(miningtarget);
 
