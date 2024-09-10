@@ -100,6 +100,7 @@
               <td> Block # </td>
               <td> Difficulty  </td>
               <td> challenge Number </td>
+              <td> port </td>
                
             </tr>
           </thead>
@@ -114,6 +115,8 @@
 
               <td class="px-1">  {{ share.difficulty }} </td>
               <td class="px-1">  {{ share.challengeNumber  }} </td>
+              <td class="px-1" style="color:orange;">  {{ share.entryport  }} </td>
+              
               
             </tr>
 
@@ -170,12 +173,12 @@
 
           <thead>
             <tr style="border-bottom: 1px solid #ffffff;" >   
-              <td> Epoch count </td>
-              <td> challenge Number </td>
-              <td> Pool total shares </td>
+              <td> Epoch </td>
+              <td> challengeNumber </td>
+              <td> Pool shares </td>
               <td> Miner shares </td>
-              <td> Miner % on this port</td>
-              <td> Miner port</td>
+              <td> % of Pool</td>
+              <td> Port</td>
               <td> Rewards </td>
             </tr>
           </thead>
