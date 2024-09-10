@@ -70,36 +70,7 @@
  <section id="guide" class="box background-primary text-center ">
         <div class='text-lg text-white'> Start Mining ETICA </div>
         <div class='button-bubble button-gradient' style="color: #dbdbdb;">ETI Miners</div>
-
-        <!-- <div @click="showInstructions=!showInstructions" class="cursor-pointer   select-none bg-gray-800 p-1 mt-1 rounded text-white text-xs inline-block hover:bg-gray-700"> Instructions (click for details)</div> -->
-
-        <!--  <br> -->
-      
-       <!-- <div class="  m-2 "  v-if="showInstructions">
-             
-            <div class= " inline-block bg-gray-800 p-2 text-white">
-              <p>Download the mining software</p>
-              <hr>
-              <!- - <p>Set pool URL to 'http://eticapool.com:8080' for low hashrates</p>
-              <hr> - ->
-              <p v-if="poolUrl">Set pool URL to '{{ poolUrl }}:3333'</p>
-              <p v-else>Set pool URL in your miner config</p>
-              <hr>
-              <p>Set address to your Etica address and begin mining!</p>
-              <hr>
-              <p>How to mine guide: https://www.eticaprotocol.org/eticadocs/mining.html</p>
-                
-             </div>
-
-
-
-            
-     </div>
-      <div class="whitespace-sm"></div>
-    -->
         
-      
-
         <a href="https://xmrig.com/" target="_blank" style="margin-right:1%;">
           <div class='bg-brown-button p-4 mt-4 rounded inline-block'>XMRig miner</div>
         </a>

@@ -126,13 +126,14 @@
             <div v-if="poolName" style="color:green;">Pool status: {{ poolName }} is Active </div>
     
           </div>
-        <!--  <div style="text-decoration:underline;">Low Hashrates (port 8080):</div>
-          <div>Minimum Shares Difficulty: {{poolData.minimumShareDifficulty}}</div>
-          <div>Rewards: 14% of Rewards</div>
-          <br> -->
-          <div style="text-decoration:underline;">Port 8081:</div>
-          <div>Minimum Shares Difficulty: {{poolData.minimumShareDifficultyHard}}</div> 
-          <div>Rewards: 100% of Rewards on port 8081</div>
+
+          <h3>Stratum ports</h3>
+          <div style="text-decoration:underline;">Port 3333:</div>
+          <div>Minimum Shares Difficulty: 50 000</div> 
+          <div style="text-decoration:underline;">Port 5555:</div>
+          <div>Minimum Shares Difficulty: 150 000</div> 
+          <div style="text-decoration:underline;">Port 7777:</div>
+          <div>Minimum Shares Difficulty: 250 000</div> 
 
 
           <div class="mb-4">avgGasPriceGWei: {{poolStatus.poolFeesMetrics.avgGasPriceGWei}}</div>

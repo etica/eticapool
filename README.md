@@ -100,7 +100,10 @@ check it's version 6.14.17
 -> sudo ufw allow 3000 (if you want to run express on this port, in pool.config.json set yourpoolurl:3000 as poolUrl)
 -> sudo ufw allow 80  (by default express will be on port 80, so in poolUrl just enter your pool url without ports)
 -> sudo ufw allow 8080  
--> sudo ufw allow 8081  
+-> sudo ufw allow 8081 
+-> sudo ufw allow 3333 
+-> sudo ufw allow 5555 
+-> sudo ufw allow 7777  
 -> sudo ufw allow ssh  
 -> sudo ufw enable   
 

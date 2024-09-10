@@ -66,7 +66,7 @@
               <td v-if="currentchallenge.miner_challengediff" class="px-1" >  {{ currentchallenge.miner_challengediff.totaldiff }} </td>
               <td v-else class="px-1" >  No shares </td>
 
-              <td v-if="currentchallenge.TotalDiffHard && currentchallenge.miner_challengediff && currentchallenge.miner_challengediff.minerport == 8081" class="px-1" >  {{ (currentchallenge.miner_challengediff.totaldiff / currentchallenge.TotalDiffHard.totaldiff) * 100 }} %</td>
+              <td v-if="currentchallenge.TotalDiffHard && currentchallenge.miner_challengediff && currentchallenge.miner_challengediff.minerport == 8888" class="px-1" >  {{ (currentchallenge.miner_challengediff.totaldiff / currentchallenge.TotalDiffHard.totaldiff) * 100 }} %</td>
               <td v-else class="px-1" >  No shares </td>
 
               <td style="font-size: 0.52em;color: #ff7f50;">Current challenge</td>
@@ -192,7 +192,7 @@
               <td class="px-1" v-else>  No shares </td>
               <td v-if="ppnlsreward.poolshares && ppnlsreward.poolshares > 0 && ppnlsreward.shares" class="px-1" >  {{ parseFloat(((ppnlsreward.shares / ppnlsreward.poolshares) * 100).toFixed(6)) }} %</td>
               <td v-else class="px-1" >  No shares </td>
-              <td class="px-1" style="color:orange;"> 8081 </td>
+              <td class="px-1" style="color:orange;"> stratum </td>
               <td v-if="ppnlsreward.tokensAwarded" class="px-1" style="display:inline-flex;" >  {{ tokensRawToFormatted(ppnlsreward.tokensAwarded, 18) }} <img src="@/assets/images/etica-logo-sanstexte.png" height="100"  alt="" class="w-6 m-2" style="margin-left: 3px;position: relative;top: -0.65vh;width: 19px;"> </td>
           </tr>  
 

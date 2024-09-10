@@ -65,8 +65,9 @@
 
                 <td class="px-1"> {{ tokensRawToFormatted( item.alltimeTokenBalance,18) }}    </td>
               <td class="px-1"> {{ tokensRawToFormatted( item.tokensReceived,18 ) }}   </td>
-              <td v-if="item.minerport == 8080" class="px-1" style="color:#9bca33;"> 8080 </td>
-              <td v-if="item.minerport == 8081" class="px-1" style="color:orange;"> 8081 </td>
+              <td v-if="item.entryport == 3333" class="px-1" style="color:#9bca33;"> 3333 </td>
+              <td v-if="item.entryport == 5555" class="px-1" style="color:orange;"> 5555 </td>
+              <td v-if="item.entryport == 7777" class="px-1" style="color:orange;"> 7777 </td>
              
             </tr> 
 
