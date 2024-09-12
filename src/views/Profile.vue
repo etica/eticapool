@@ -94,8 +94,6 @@
 
           <thead>
             <tr >
-              
-
                
               <td> Block # </td>
               <td> Difficulty  </td>
