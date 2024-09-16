@@ -114,6 +114,12 @@
           <div>Starting Difficulty: <span style="color:#135e56;">{{poolData.minimumShareDifficultyHard}}</span></div> 
           <div>High-end CPU</div>
           </div>
+
+          <div style="margin-left: 5%;width: 296px;">
+          <div>Port: <span style="color:#135e56;">9999</span></div>
+          <div>Starting Difficulty: <span style="color:#135e56;">{{poolData.minimumShareDifficultyHard}}</span></div> 
+          <div>Very-High-end CPU</div>
+          </div>
         </div>
 
 
@@ -129,11 +135,13 @@
 
           <h3>Stratum ports</h3>
           <div style="text-decoration:underline;">Port 3333:</div>
-          <div>Minimum Shares Difficulty: 200 000</div> 
+          <div>Minimum Shares Difficulty: 400 000</div> 
           <div style="text-decoration:underline;">Port 5555:</div>
-          <div>Minimum Shares Difficulty: 300 000</div> 
-          <div style="text-decoration:underline;">Port 7777:</div>
           <div>Minimum Shares Difficulty: 500 000</div> 
+          <div style="text-decoration:underline;">Port 7777:</div>
+          <div>Minimum Shares Difficulty: 1 000 000</div> 
+          <div style="text-decoration:underline;">Port 9999:</div>
+          <div>Minimum Shares Difficulty: 2 000 000</div> 
 
 
           <div class="mb-4">avgGasPriceGWei: {{poolStatus.poolFeesMetrics.avgGasPriceGWei}}</div>

@@ -68,6 +68,7 @@
               <td v-if="item.entryport == 3333" class="px-1" style="color:#9bca33;"> 3333 </td>
               <td v-if="item.entryport == 5555" class="px-1" style="color:orange;"> 5555 </td>
               <td v-if="item.entryport == 7777" class="px-1" style="color:orange;"> 7777 </td>
+              <td v-if="item.entryport == 9999" class="px-1" style="color:orange;"> 9999 </td>
              
             </tr> 
 
