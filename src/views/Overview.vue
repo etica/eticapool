@@ -129,11 +129,11 @@
 
           <h3>Stratum ports</h3>
           <div style="text-decoration:underline;">Port 3333:</div>
-          <div>Minimum Shares Difficulty: 50 000</div> 
+          <div>Minimum Shares Difficulty: 200 000</div> 
           <div style="text-decoration:underline;">Port 5555:</div>
-          <div>Minimum Shares Difficulty: 150 000</div> 
+          <div>Minimum Shares Difficulty: 300 000</div> 
           <div style="text-decoration:underline;">Port 7777:</div>
-          <div>Minimum Shares Difficulty: 250 000</div> 
+          <div>Minimum Shares Difficulty: 500 000</div> 
 
 
           <div class="mb-4">avgGasPriceGWei: {{poolStatus.poolFeesMetrics.avgGasPriceGWei}}</div>
