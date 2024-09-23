@@ -16,7 +16,8 @@
     "miningConfig":{
       "minimumShareDifficulty": 53,
       "minimumShareDifficultyHard": 60,
-      "allowCustomVardiff": false 
+      "allowCustomVardiff": false,
+      "newShareExpectedTime": "nb seconds between miner new shares (integer)"
     },
   
     "mintingConfig":{
@@ -60,7 +61,8 @@
     "miningConfig":{
       "minimumShareDifficulty": 64,
       "minimumShareDifficultyHard": 128,
-      "allowCustomVardiff": false 
+      "allowCustomVardiff": false,
+      "newShareExpectedTime": "nb seconds between miner new shares (integer)"
     },
   
     "mintingConfig":{
