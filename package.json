@@ -35,6 +35,7 @@
     "connect": "^3.7.0",
     "connect-history-api-fallback": "^1.6.0",
     "core-js": "^2.6.5",
+    "cryptonight-hashing": "git+https://github.com/MoneroOcean/node-cryptonight-hashing.git",
     "esm": "^3.2.25",
     "express-rate-limit": "^6.7.0",
     "gh-pages": "^3.1.0",
