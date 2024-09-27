@@ -20,7 +20,7 @@ export default class FrontendHelper {
     networkName = networkName.toLowerCase( )
      
     if(networkName == 'mainnet'){
-        return 'https://etherscan.io/' 
+        return 'https://eticascan.org/' 
     } 
 
     if(networkName == 'goerli'){ 
@@ -35,7 +35,7 @@ export default class FrontendHelper {
         return 'https://eticascan.org/'
     }
 
-    return 'https://etherscan.io/'
+    return 'https://eticascan.org/'
     
   } 
  
