@@ -141,7 +141,7 @@
            
            <img style="width:400px; margin:0 auto;" src="@/assets/images/eticaprotocolpasteur.jpg"  />
             
-           <div><a href="https://www.reddit.com/r/Etica" target="_blank" class="color-eticacyan"> "Science knows no country because knowledge belongs to Humanity" </a><span>L.Pasteur</span></div>
+           <div style="display: inline-flex;"><a href="https://www.reddit.com/r/Etica" target="_blank" class="color-eticacyan"> "Science knows no country because knowledge belongs to Humanity" </a><span style="color: #f0fffa;">L.Pasteur</span></div>
       </div>
      
 
