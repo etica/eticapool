@@ -53,6 +53,10 @@
             <div class="my-4">
               <div>Last Known Block Number: {{poolData.ethBlockNumber}}</div>
               <div>Minimum User Balance For Payment: {{rawAmountToFormatted(poolData.minBalanceForPayment,18)}} ETI</div>
+              <div>
+                  Low Balance Payments: The pool also sends payments every 24 hours for balances between 0.01 ETI and 
+                  {{rawAmountToFormatted(poolData.minBalanceForPayment,18)}} ETI once daily.
+              </div>
             </div>
         </div> 
 
