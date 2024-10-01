@@ -50,7 +50,11 @@
               
             </div>
             <div class="my-4">
-              <div>Minimum User Balance For Payment: {{rawAmountToFormatted(poolData.minBalanceForPayment,18)}} ETI</div>
+              <div style="color: #04ffab;">Minimum User Balance For Payment: {{rawAmountToFormatted(poolData.minBalanceForPayment,18)}} ETI</div>
+              <div style="color: #868585;">
+                  <i>Low Balance Payments:</i> <i>every 24 hours for balances between <b>0.01 ETI</b> and 
+                 <b> {{rawAmountToFormatted(poolData.minBalanceForPayment,18)}} ETI</b></i>
+              </div>
             </div>
         </div> 
 
