@@ -108,7 +108,7 @@
           </div>
 
           <div style="margin-right: 5%;border-right: solid 1px white;width: 296px;">
-          <div style="color:#135e56;">Port: <span style="color:#135e56;">55555</span></div>
+          <div style="color:#135e56;">Port: <span style="color:#135e56;">5555</span></div>
           <div>Starting Difficulty: <span style="color:#135e56;"> 500 000</span></div> 
           <div>Low-end CPU</div> 
           </div>
