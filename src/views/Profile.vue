@@ -229,6 +229,8 @@
       <div v-if="activeSection=='Workers'"  class="box  background-secondary overflow-x-auto" 
          style="  min-height:480px;">
 
+        <span class='text-lg font-bold'>{{ minerData.workers.length }} workers</span> 
+
         <div class='text-lg font-bold' style="color: #868686;">This is a new feature, restart workers to see whole metrics</div>
         <table class='table w-full'>
 
