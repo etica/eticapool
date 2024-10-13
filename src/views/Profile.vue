@@ -237,7 +237,7 @@
               <td> Name </td>
               <td> Last Share </td>
               <td> Port </td>
-              <td> Hashrate </td>
+              <td> Current Hashrate </td>
               <td> Rewards </td>
             </tr>
           </thead>

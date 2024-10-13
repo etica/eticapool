@@ -34,7 +34,7 @@
         </div>
         <div style="display: inline-flex;">
         <img src="@/assets/images/github-mark-white.png" height="100"  alt="" class="w-6 m-2">
-        <a href="https://github.com/etica/eticapool" target="_blank" class="footer-link" style="padding-top: 0.75vh;">Eticapool v 4.0.13</a>
+        <a href="https://github.com/etica/eticapool" target="_blank" class="footer-link" style="padding-top: 0.75vh;">Eticapool v 4.0.14</a>
         </div>
 
          </div>
