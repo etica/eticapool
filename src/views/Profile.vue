@@ -28,11 +28,18 @@
 
              <div class="whitespace-sm"></div>
 
-              <div v-if="minerData">
+              <div v-if="minerData && minerData.workers">
                 <div> Hashrate Average: {{ formatHashrate(minerData.totalAvgHashrate) }} </div>
                  <div> Tokens Earned: {{ tokensRawToFormatted(minerData.totalAlltimeTokenBalance, 18)  }} ETI</div>
                   <div> Tokens Awarded: {{ tokensRawToFormatted(minerData.totalTokensAwarded, 18)   }} ETI</div>
                   <div> Tokens Sent: {{ tokensRawToFormatted(minerData.totalTokensReceived, 18)   }} ETI</div>
+                  <div> Last seen (timestamp): {{ minerData.lastSubmittedSolutionTime }} </div>
+              </div>
+              <div v-else>
+                <div> Hashrate Average: {{ formatHashrate(minerData.avgHashrate) }} </div>
+                 <div> Tokens Earned: {{ tokensRawToFormatted(minerData.alltimeTokenBalance, 18)  }} ETI</div>
+                 <div> Tokens Awarded: {{ tokensRawToFormatted(minerData.tokensAwarded, 18)   }} ETI</div>
+                 <div> Tokens Sent: {{ tokensRawToFormatted(minerData.tokensReceived, 18)   }} ETI</div>
                   <div> Last seen (timestamp): {{ minerData.lastSubmittedSolutionTime }} </div>
               </div>
 
@@ -76,12 +83,21 @@
 </table>
 
 
-<HorizontalNav 
+      <HorizontalNav v-if="minerData.workers && minerData.workers.length > 0"
+                class="mb-8"
+              v-bind:activeSection="activeSection"
+              v-bind:activeColor="'eticacyan'" 
+              v-bind:buttonClickedCallback="onHorizontalNavClicked" 
+              v-bind:buttonNamesArray="['Recent Shares','Payouts','Rewards','Workers' ]"
+        
+            />
+
+       <HorizontalNav v-else
           class="mb-8"
          v-bind:activeSection="activeSection"
          v-bind:activeColor="'eticacyan'" 
          v-bind:buttonClickedCallback="onHorizontalNavClicked" 
-         v-bind:buttonNamesArray="['Recent Shares','Payouts','Rewards','Workers' ]"
+         v-bind:buttonNamesArray="['Recent Shares','Payouts','Rewards' ]"
    
        />
 
@@ -214,8 +230,7 @@
       <div v-if="activeSection=='Workers'"  class="box  background-secondary overflow-x-auto" 
          style="  min-height:480px;">
 
-        <div class='text-lg font-bold' style="color: rgb(176, 238, 167);">PPNLS rewards, For each found by pool rewards are based on shares submited last 5 blocks (whether blocks were found by pool or not).</div>
-        <div class='text-lg font-bold' style="color: #868686;">This is a new feature, allow few hours to see whole metrics</div>
+        <div class='text-lg font-bold' style="color: #868686;">This is a new feature, restart workers to see whole metrics</div>
         <table class='table w-full'>
 
           <thead>
@@ -365,10 +380,21 @@ export default {
   methods: {
     pollSockets(){
       this.socketHelper.emitEvent('getPoolData')
-      this.socketHelper.emitEvent( 'getMinerDataWithWorkers', {ethMinerAddress: this.publicAddress})
+      
+
       this.socketHelper.emitEvent( 'getMinerShares', {ethMinerAddress: this.publicAddress})
       this.socketHelper.emitEvent( 'getMinerPayments', {ethMinerAddress: this.publicAddress})
       this.socketHelper.emitEvent( 'getMinerPpnlsRewards', {ethMinerAddress: this.publicAddress, nbrewards: 20})
+
+      var _minerEthAddress = this.publicAddress.toString().substr(0, 42);
+      var extractedWorkerName = this.publicAddress.substring(42).trim();
+      if(!extractedWorkerName){
+        this.socketHelper.emitEvent( 'getMinerDataWithWorkers', {ethMinerAddress: this.publicAddress})
+      }
+      else {
+        this.socketHelper.emitEvent( 'getMinerData', {ethMinerAddress: this.publicAddress});
+      }
+
     },
 
      // more resource full backend functions that need to be called less frequently:
