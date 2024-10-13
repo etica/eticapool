@@ -81,7 +81,7 @@
          v-bind:activeSection="activeSection"
          v-bind:activeColor="'eticacyan'" 
          v-bind:buttonClickedCallback="onHorizontalNavClicked" 
-         v-bind:buttonNamesArray="['Recent Shares','Payouts','Rewards' ]"
+         v-bind:buttonNamesArray="['Recent Shares','Payouts','Rewards','Workers' ]"
    
        />
 
@@ -209,6 +209,47 @@
         </table>
 
       </div>
+
+
+      <div v-if="activeSection=='Workers'"  class="box  background-secondary overflow-x-auto" 
+         style="  min-height:480px;">
+
+        <div class='text-lg font-bold' style="color: rgb(176, 238, 167);">PPNLS rewards, For each found by pool rewards are based on shares submited last 5 blocks (whether blocks were found by pool or not).</div>
+        <div class='text-lg font-bold' style="color: #868686;">This is a new feature, allow few hours to see whole metrics</div>
+        <table class='table w-full'>
+
+          <thead>
+            <tr style="border-bottom: 1px solid #ffffff;" >   
+              <td> Name </td>
+              <td> Last Share </td>
+              <td> Port</td>
+              <td> Rewards </td>
+            </tr>
+          </thead>
+
+          <tbody v-if="minerData.workers && minerData.workers.length > 0">  
+          
+          <tr v-for="(oneworker, index) in minerData.workers" v-bind:key="index">
+              <td class="px-1"> {{ oneworker.workerName }} </td>
+              <td v-if="oneworker.lastSubmittedSolutionTime" class="px-1">  {{ oneworker.lastSubmittedSolutionTime }} </td>
+              <td v-else class="px-1">  No shares </td>
+              <td v-if="oneworker.entryport" class="px-1" style="color:orange;"> {{ oneworker.entryport }} </td>
+              <td v-else class="px-1" style="color:orange;"> no port </td>
+              <td v-if="oneworker.alltimeTokenBalance" class="px-1" style="display:inline-flex;" >  {{ tokensRawToFormatted(oneworker.alltimeTokenBalance, 18) }} <img src="@/assets/images/etica-logo-sanstexte.png" height="100"  alt="" class="w-6 m-2" style="margin-left: 3px;position: relative;top: -0.65vh;width: 19px;"> </td>
+          </tr>  
+
+
+          </tbody>
+          <tbody v-else>
+
+           <p style="color: rgb(157, 145, 129);"> No workers </p>
+
+          </tbody>
+
+
+        </table>
+
+      </div>
  
 
 
@@ -288,7 +329,8 @@ export default {
        this.minerData = data 
     });
 
-    this.socketsListener.on('minerDataWithWorkers', (data) => {     
+    this.socketsListener.on('minerDataWithWorkers', (data) => {   
+      console.log('minerDataWithWorkers data:', data);  
        this.minerData = data 
     });
 
