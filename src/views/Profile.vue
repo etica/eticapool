@@ -20,7 +20,7 @@
             </div>
 
              <div v-if="(this.$route.params.publicAddress && this.$route.params.publicAddress.substring(42).trim())" class="text-md md:text-xl text-white overflow-x-auto">
-              <i>worker:</i>{{ publicAddress }}
+              {{ publicAddress }} (<i>worker account</i>)
             </div>
             <div v-else-if="minerData.workers && minerData.workers.length > 0" class="text-md md:text-xl text-white overflow-x-auto">
               {{ publicAddress }} <i>({{ minerData.workers.length }} workers)</i>
