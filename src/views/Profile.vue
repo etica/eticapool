@@ -231,7 +231,11 @@
           <tbody v-if="minerData.workers && minerData.workers.length > 0">  
           
           <tr v-for="(oneworker, index) in minerData.workers" v-bind:key="index">
-              <td class="px-1"> {{ oneworker.workerName }} </td>
+              <td class="px-1">
+                <a v-bind:href='"/profile/"+oneworker.minerEthAddress' >
+                        <span class="color-eticacyan">  {{ oneworker.workerName }}  </span>
+                </a> 
+              </td>
               <td v-if="oneworker.lastSubmittedSolutionTime" class="px-1">  {{ oneworker.lastSubmittedSolutionTime }} </td>
               <td v-else class="px-1">  No shares </td>
               <td v-if="oneworker.entryport" class="px-1" style="color:orange;"> {{ oneworker.entryport }} </td>
@@ -243,9 +247,7 @@
 
           </tbody>
           <tbody v-else>
-
            <p style="color: rgb(157, 145, 129);"> No workers </p>
-
           </tbody>
 
 
