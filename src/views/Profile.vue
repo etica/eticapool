@@ -30,9 +30,9 @@
 
               <div v-if="minerData">
                 <div> Hashrate Average: {{ formatHashrate(minerData.totalAvgHashrate) }} </div>
-                 <div> Tokens Earned: {{ tokenBalanceFormatted(minerData.totalAlltimeTokenBalance )  }} ETI</div>
-                  <div> Tokens Awarded: {{ tokensAwardedFormatted(minerData.totalTokensAwarded)   }} ETI</div>
-                  <div> Tokens Sent: {{ tokensReceivedFormatted(minerData.totalTokensReceived)   }} ETI</div>
+                 <div> Tokens Earned: {{ tokensRawToFormatted(minerData.totalAlltimeTokenBalance, 18)  }} ETI</div>
+                  <div> Tokens Awarded: {{ tokensRawToFormatted(minerData.totalTokensAwarded, 18)   }} ETI</div>
+                  <div> Tokens Sent: {{ tokensRawToFormatted(minerData.totalTokensReceived, 18)   }} ETI</div>
                   <div> Last seen (timestamp): {{ minerData.lastSubmittedSolutionTime }} </div>
               </div>
 
@@ -241,7 +241,7 @@
               <td v-if="oneworker.entryport" class="px-1" style="color:orange;"> {{ oneworker.entryport }} </td>
               <td v-else class="px-1" style="color:orange;"> no port </td>
               <td v-if="oneworker.avgHashrate"> {{ formatHashrate(oneworker.avgHashrate) }}</td>
-              <td v-else> No shares </td>
+              <td v-else>No hahsrate yet</td>
               <td v-if="oneworker.alltimeTokenBalance" class="px-1" style="display:inline-flex;" >  {{ tokensRawToFormatted(oneworker.alltimeTokenBalance, 18) }} <img src="@/assets/images/etica-logo-sanstexte.png" height="100"  alt="" class="w-6 m-2" style="margin-left: 3px;position: relative;top: -0.65vh;width: 19px;"> </td>
           </tr>
 
