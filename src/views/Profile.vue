@@ -83,12 +83,12 @@
 </table>
 
 
-      <HorizontalNav v-if="this.$route.params.publicAddress && this.$route.params.publicAddress.substring(42).trim()"
+      <HorizontalNav v-if="!(this.$route.params.publicAddress && this.$route.params.publicAddress.substring(42).trim())"
                 class="mb-8"
               v-bind:activeSection="activeSection"
               v-bind:activeColor="'eticacyan'" 
               v-bind:buttonClickedCallback="onHorizontalNavClicked" 
-              v-bind:buttonNamesArray="['Recent Shares','Payoutss','Rewards','Workers' ]"
+              v-bind:buttonNamesArray="['Recent Shares','Payouts','Rewards','Workers' ]"
         
             />
 
@@ -97,7 +97,7 @@
          v-bind:activeSection="activeSection"
          v-bind:activeColor="'eticacyan'" 
          v-bind:buttonClickedCallback="onHorizontalNavClicked" 
-         v-bind:buttonNamesArray="['Recent Shares','Payoutsss','Rewards' ]"
+         v-bind:buttonNamesArray="['Recent Shares','Payouts','Rewards' ]"
    
        />
 
@@ -182,7 +182,6 @@
         <!--<div class='text-lg font-bold'>Details <i>most recent challenge numbers</i></div>-->
         <!--<div class='text-lg font-bold'>Details (Only loads last 2 ETI blocks, due to server overload. Will be possible to load 1000 more blocks once server overload issue is resolved)</div> -->
         <div class='text-lg font-bold' style="color: rgb(176, 238, 167);">PPNLS rewards, For each found by pool rewards are based on shares submited last 5 blocks (whether blocks were found by pool or not).</div>
-        <div class='text-lg font-bold' style="color: #868686;">This is a new feature, allow few hours to see whole metrics</div>
         <table class='table w-full'>
 
           <thead>
