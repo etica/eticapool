@@ -83,12 +83,12 @@
 </table>
 
 
-      <HorizontalNav v-if="minerData.workers && minerData.workers.length > 0"
+      <HorizontalNav v-if="minerData.workers"
                 class="mb-8"
               v-bind:activeSection="activeSection"
               v-bind:activeColor="'eticacyan'" 
               v-bind:buttonClickedCallback="onHorizontalNavClicked" 
-              v-bind:buttonNamesArray="['Recent Shares','Payouts','Rewards','Workers' ]"
+              v-bind:buttonNamesArray="['Recent Shares','Payoutss','Rewards','Workers' ]"
         
             />
 
@@ -97,7 +97,7 @@
          v-bind:activeSection="activeSection"
          v-bind:activeColor="'eticacyan'" 
          v-bind:buttonClickedCallback="onHorizontalNavClicked" 
-         v-bind:buttonNamesArray="['Recent Shares','Payouts','Rewards' ]"
+         v-bind:buttonNamesArray="['Recent Shares','Payoutsss','Rewards' ]"
    
        />
 
@@ -380,16 +380,13 @@ export default {
   methods: {
     pollSockets(){
       this.socketHelper.emitEvent('getPoolData')
-      
-
       this.socketHelper.emitEvent( 'getMinerShares', {ethMinerAddress: this.publicAddress})
       this.socketHelper.emitEvent( 'getMinerPayments', {ethMinerAddress: this.publicAddress})
       this.socketHelper.emitEvent( 'getMinerPpnlsRewards', {ethMinerAddress: this.publicAddress, nbrewards: 20})
 
-      var _minerEthAddress = this.publicAddress.toString().substr(0, 42);
       var extractedWorkerName = this.publicAddress.substring(42).trim();
       if(!extractedWorkerName){
-        this.socketHelper.emitEvent( 'getMinerDataWithWorkers', {ethMinerAddress: this.publicAddress})
+        this.socketHelper.emitEvent( 'getMinerDataWithWorkers', {ethMinerAddress: this.publicAddress});
       }
       else {
         this.socketHelper.emitEvent( 'getMinerData', {ethMinerAddress: this.publicAddress});
