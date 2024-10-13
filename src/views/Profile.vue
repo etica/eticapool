@@ -33,14 +33,14 @@
                  <div> Tokens Earned: {{ tokensRawToFormatted(minerData.totalAlltimeTokenBalance, 18)  }} ETI</div>
                   <div> Tokens Awarded: {{ tokensRawToFormatted(minerData.totalTokensAwarded, 18)   }} ETI</div>
                   <div> Tokens Sent: {{ tokensRawToFormatted(minerData.totalTokensReceived, 18)   }} ETI</div>
-                  <div> Last seen (timestamp): {{ minerData.lastSubmittedSolutionTime }} </div>
+                  <div> Last seen (timestamp): {{ getdateformat(minerData.lastSubmittedSolutionTime) }} </div>
               </div>
               <div v-else>
                 <div> Hashrate Average: {{ formatHashrate(minerData.avgHashrate) }} </div>
                  <div> Tokens Earned: {{ tokensRawToFormatted(minerData.alltimeTokenBalance, 18)  }} ETI</div>
                  <div> Tokens Awarded: {{ tokensRawToFormatted(minerData.tokensAwarded, 18)   }} ETI</div>
                  <div> Tokens Sent: {{ tokensRawToFormatted(minerData.tokensReceived, 18)   }} ETI</div>
-                  <div> Last seen (timestamp): {{ minerData.lastSubmittedSolutionTime }} </div>
+                  <div> Last seen (timestamp): {{ getdateformat(minerData.lastSubmittedSolutionTime) }} </div>
               </div>
 
 
@@ -252,7 +252,7 @@
                         <span class="color-eticacyan">  {{ oneworker.workerName }}  </span>
                 </a> 
               </td>
-              <td v-if="oneworker.lastSubmittedSolutionTime" class="px-1">  {{ oneworker.lastSubmittedSolutionTime }} </td>
+              <td v-if="oneworker.lastSubmittedSolutionTime" class="px-1">  {{ getdateformat(oneworker.lastSubmittedSolutionTime) }} </td>
               <td v-else class="px-1">  No shares </td>
               <td v-if="oneworker.entryport" class="px-1" style="color:orange;"> {{ oneworker.entryport }} </td>
               <td v-else class="px-1" style="color:orange;"> no port </td>
@@ -311,6 +311,8 @@ import MathHelper from '../js/math-helper'
 import FrontendHelper from '../js/frontend-helper'
 
 import SocketHelper from '../js/socket-helper'
+
+import moment from 'moment';
 
 export default {
   name: 'Profile',
@@ -446,10 +448,35 @@ export default {
 
     onHorizontalNavClicked(item){ 
       this.activeSection = item
-    }
-    
- 
+    },
 
+    getdateformat(_timestamp){
+        let _now = new moment();
+        let _nowUtc = _now.utc();
+        let _blocktime= moment.unix(_timestamp);
+        let _remaining  = moment.duration(_nowUtc.diff(_blocktime));
+        if(_remaining < 0){
+           _remaining = 0;
+        }
+
+        if(_remaining.isValid()){
+        return _remaining.humanize() +' ago';
+        }
+        else{
+          return "";
+        }
+      },
+
+      getutcformat(_timestamp){
+        let _utctime = new moment.unix(_timestamp).utc();
+        if(_utctime.isValid()){
+           return _utctime.format("YYYY-MM-DDTHH:mm") +' UTC';
+        }
+        else {
+          return "";
+        }
+      }
+    
   },
     filters: {
         truncate: function (text, length, suffix) {
