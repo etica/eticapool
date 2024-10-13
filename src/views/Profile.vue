@@ -222,7 +222,8 @@
             <tr style="border-bottom: 1px solid #ffffff;" >   
               <td> Name </td>
               <td> Last Share </td>
-              <td> Port</td>
+              <td> Port </td>
+              <td> Hashrate </td>
               <td> Rewards </td>
             </tr>
           </thead>
@@ -235,9 +236,10 @@
               <td v-else class="px-1">  No shares </td>
               <td v-if="oneworker.entryport" class="px-1" style="color:orange;"> {{ oneworker.entryport }} </td>
               <td v-else class="px-1" style="color:orange;"> no port </td>
+              <td v-if="oneworker.avgHashrate"> {{ formatHashrate(oneworker.avgHashrate) }}</td>
+              <td v-else> No shares </td>
               <td v-if="oneworker.alltimeTokenBalance" class="px-1" style="display:inline-flex;" >  {{ tokensRawToFormatted(oneworker.alltimeTokenBalance, 18) }} <img src="@/assets/images/etica-logo-sanstexte.png" height="100"  alt="" class="w-6 m-2" style="margin-left: 3px;position: relative;top: -0.65vh;width: 19px;"> </td>
-          </tr>  
-
+          </tr>
 
           </tbody>
           <tbody v-else>
