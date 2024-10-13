@@ -288,6 +288,10 @@ export default {
        this.minerData = data 
     });
 
+    this.socketsListener.on('minerDataWithWorkers', (data) => {     
+       this.minerData = data 
+    });
+
       this.socketsListener.on('minerShares', (data) => {       
        this.shares = data 
     });
@@ -315,7 +319,7 @@ export default {
   methods: {
     pollSockets(){
       this.socketHelper.emitEvent('getPoolData')
-      this.socketHelper.emitEvent( 'getMinerData', {ethMinerAddress: this.publicAddress})
+      this.socketHelper.emitEvent( 'getMinerDataWithWorkers', {ethMinerAddress: this.publicAddress})
       this.socketHelper.emitEvent( 'getMinerShares', {ethMinerAddress: this.publicAddress})
       this.socketHelper.emitEvent( 'getMinerPayments', {ethMinerAddress: this.publicAddress})
       this.socketHelper.emitEvent( 'getMinerPpnlsRewards', {ethMinerAddress: this.publicAddress, nbrewards: 20})
