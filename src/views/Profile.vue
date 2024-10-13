@@ -83,7 +83,7 @@
 </table>
 
 
-      <HorizontalNav v-if="minerData.workers"
+      <HorizontalNav v-if="this.$route.params.publicAddress && this.$route.params.publicAddress.substring(42).trim()"
                 class="mb-8"
               v-bind:activeSection="activeSection"
               v-bind:activeColor="'eticacyan'" 
