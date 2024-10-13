@@ -26,12 +26,6 @@ export default new Router({
     },
 
     {
-      path: '/accounts',
-      name: 'accounts',
-      component: Accounts
-    },
-
-    {
       path: '/profile/:publicAddress',
       name: 'profile',
       component: Profile

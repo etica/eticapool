@@ -3,7 +3,6 @@ const config={
   "dropdowns":[
     {"title":"POOL","rows":[
          {"title":"Home","url":"/"},
-         {"title":"Accounts","url":"/accounts"},
          {"title":"Overview","url":"/overview"},
          {"title":"Payment Stats","url":"/paymentstats"}
     ]},
