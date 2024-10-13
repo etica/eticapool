@@ -29,10 +29,10 @@
              <div class="whitespace-sm"></div>
 
               <div v-if="minerData">
-                <div> Hashrate Average: {{ formatHashrate(minerData.avgHashrate) }} </div>
-                 <div> Tokens Earned: {{ tokenBalanceFormatted()  }} ETI</div>
-                  <div> Tokens Awarded: {{ tokensAwardedFormatted()   }} ETI</div>
-                  <div> Tokens Sent: {{ tokensReceivedFormatted()   }} ETI</div>
+                <div> Hashrate Average: {{ formatHashrate(minerData.totalAvgHashrate) }} </div>
+                 <div> Tokens Earned: {{ tokenBalanceFormatted(minerData.totalAlltimeTokenBalance )  }} ETI</div>
+                  <div> Tokens Awarded: {{ tokensAwardedFormatted(minerData.totalTokensAwarded)   }} ETI</div>
+                  <div> Tokens Sent: {{ tokensReceivedFormatted(minerData.totalTokensReceived)   }} ETI</div>
                   <div> Last seen (timestamp): {{ minerData.lastSubmittedSolutionTime }} </div>
               </div>
 
