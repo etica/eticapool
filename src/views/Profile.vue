@@ -486,7 +486,7 @@ export default {
           if (totalReward <= 0) {
             return 0.0;
           }
-          const bonusRate = (bonus / totalReward) * 10000; // Calculate as four digits percentage
+          const bonusRate = (bonus / (totalReward - bonus)) * 100; // Calculate as four digits percentage
           console.log('bonusRate', bonusRate);
           return Number(bonusRate.toFixed(4));
       }
