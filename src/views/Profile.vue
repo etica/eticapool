@@ -15,7 +15,9 @@
        
       
             <div class="text-lg md:text-2xl text-white overflow-x-auto">
-              <span style="font-family: dotgothicregular;font-size: 45px;color: #7e9f8c;">Mining Account</span> <br> 
+              <span v-if="(this.$route.params.publicAddress && this.$route.params.publicAddress.substring(42).trim())" style="font-family: dotgothicregular;font-size: 45px;color: #7e9f8c;">Worker</span>
+              <span v-else style="font-family: dotgothicregular;font-size: 45px;color: #7e9f8c;">Main Mining Account</span>
+              <br> 
               <i style="font-size: 1rem;">(Data updates every 5 minutes)</i>
             </div>
 
