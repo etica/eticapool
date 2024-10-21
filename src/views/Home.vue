@@ -61,6 +61,7 @@
                     <div v-if="poolName" style="color:white;"> {{ poolName }} is open and synced with Etica mainnet</div>
 
                       <p style="color:#35aa31;">{{ hashrateToKH(LastPoolStatsRecord[0].Hashrate) }} KH/s   |   {{ LastPoolStatsRecord[0].Numberminers }} active miners (last hour)</p>
+                      <span v-if="poolStatus && poolStatus.poolFeesMetrics && poolStatus.poolFeesMetrics.poolRewardsBonus > 0" style="color: #04ffab;">(Bonus Activated: +{{poolStatus.poolFeesMetrics.poolRewardsBonus * 100}}% on all mining rewards)</span>
 
 
               </div>

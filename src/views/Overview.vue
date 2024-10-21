@@ -34,7 +34,7 @@
 
         <div v-if="poolData && poolStatus && activeSection=='Mining Data'"  class="overflow-x-auto mb-4">
             <div class="my-4">
-            <div v-if="poolName" style="color:green;"> {{ poolName }} is Active <span v-if="poolStatus.poolFeesMetrics && poolStatus.poolFeesMetrics.poolRewardsBonus > 0" style="color: #04ffab;">(Bonus Activated: +{{poolStatus.poolFeesMetrics.poolRewardsBonus}}% on all mining rewards)</span></div>
+            <div v-if="poolName" style="color:green;"> {{ poolName }} is Active <span v-if="poolStatus.poolFeesMetrics && poolStatus.poolFeesMetrics.poolRewardsBonus > 0" style="color: #04ffab;">(Bonus Activated: +{{poolStatus.poolFeesMetrics.poolRewardsBonus * 100}}% on all mining rewards)</span></div>
               <div>Minting Account Address: <a class="color-eticacyan" v-if="getExplorerBaseURLFromType('solutions')" target="_blank" v-bind:href="getExplorerBaseURLFromType('solutions') + 'address/' + poolData.mintingAddress  "> {{poolData.mintingAddress}}  </a> </div>
               <div>Minting Network Name: {{poolData.mintingNetwork}}</div>
               <div v-if="poolStatus.mintingAccountBalances">Minting Balance: {{rawAmountToFormatted(poolStatus.mintingAccountBalances['ETH'] , 18 ) }} EGAZ</div>
