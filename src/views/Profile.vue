@@ -481,13 +481,10 @@ export default {
       },
 
       getBonusRate(totalReward, bonus) {
-        console.log('getBonusRate totalReward', totalReward);
-        console.log('getBonusRate bonus', bonus);
           if (totalReward <= 0) {
             return 0.0;
           }
           const bonusRate = (bonus / (totalReward - bonus)) * 100; // Calculate as four digits percentage
-          console.log('bonusRate', bonusRate);
           return Number(bonusRate.toFixed(4));
       }
     
