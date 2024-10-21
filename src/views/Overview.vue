@@ -34,7 +34,7 @@
 
         <div v-if="poolData && poolStatus && activeSection=='Mining Data'"  class="overflow-x-auto mb-4">
             <div class="my-4">
-            <div v-if="poolName" style="color:green;"> {{ poolName }} is Active </div>
+            <div v-if="poolName" style="color:green;"> {{ poolName }} is Active <span v-if="poolStatus.poolFeesMetrics && poolStatus.poolFeesMetrics.poolRewardsBonus > 0" style="color: #04ffab;">(Bonus Activated: +{{poolStatus.poolFeesMetrics.poolRewardsBonus}}% on all mining rewards)</span></div>
               <div>Minting Account Address: <a class="color-eticacyan" v-if="getExplorerBaseURLFromType('solutions')" target="_blank" v-bind:href="getExplorerBaseURLFromType('solutions') + 'address/' + poolData.mintingAddress  "> {{poolData.mintingAddress}}  </a> </div>
               <div>Minting Network Name: {{poolData.mintingNetwork}}</div>
               <div v-if="poolStatus.mintingAccountBalances">Minting Balance: {{rawAmountToFormatted(poolStatus.mintingAccountBalances['ETH'] , 18 ) }} EGAZ</div>
@@ -162,6 +162,8 @@
           <div>Current ETI/EGAZ ratio: {{poolStatus.poolFeesMetrics.token_Eth_Price_Ratio}} (1 <img src="@/assets/images/etica-logo-sanstexte.png" height="100"  alt="" class="w-6 m-2" style="margin-left: 0;margin-right: 0;position: relative;top: -0.2vh;"> for {{ 1 / poolStatus.poolFeesMetrics.token_Eth_Price_Ratio }} <img src="@/assets/images/egaz-logo.png" height="100"  alt="" class="w-6 m-2" style="margin-left: 0;margin-right: 0;position: relative;top: -0.2vh;">)</div>
 
            <div>poolBaseFeeFactor: {{poolStatus.poolFeesMetrics.poolBaseFee}}</div>
+
+           <div v-if="poolStatus.poolFeesMetrics && poolStatus.poolFeesMetrics.poolRewardsBonus > 0">pool Rewards Bonus: {{poolStatus.poolFeesMetrics.poolRewardsBonus}}</div>
           
         </div> 
 

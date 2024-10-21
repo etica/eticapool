@@ -40,6 +40,7 @@
       "rebroadcastPaymentWaitBlocks": 10,
       "minPaymentsInBatch": 1,
       "PoolSecurityBalance": 10000000000000000,
+      "poolRewardsBonus": 20,
       "publicAddress": "0x9A04C58f0d629db736e33CAAA059368be47b5646",
       "privateKey":"",
 
