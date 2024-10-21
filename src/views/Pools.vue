@@ -198,21 +198,16 @@ export default {
           return MathHelper.rawAmountToFormatted( rawAmount , decimals )
       },
 
-      getdateformat(_timestamp){
-        let _now = new moment();
-        let _nowUtc = _now.utc();
-        let _blocktime= moment.unix(_timestamp);
-        let _remaining  = moment.duration(_nowUtc.diff(_blocktime));
-        if(_remaining < 0){
-           _remaining = 0;
-        }
+      getdateformat(timestamp) {
+        const now = moment.utc();
+        const blockTime = moment.unix(timestamp).utc();
+        const duration = moment.duration(now.diff(blockTime));
 
-        if(_remaining.isValid()){
-        return _remaining.humanize() +' ago';
-        }
-        else{
+        if (!duration.isValid() || duration.asSeconds() < 0) {
           return "";
         }
+
+        return duration.humanize() + ' ago';
       },
 
       getutcformat(_timestamp){
