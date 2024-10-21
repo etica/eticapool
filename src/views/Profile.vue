@@ -217,7 +217,7 @@
               <td v-if="ppnlsreward.poolshares && ppnlsreward.poolshares > 0 && ppnlsreward.shares" class="px-1" >  {{ parseFloat(((ppnlsreward.shares / ppnlsreward.poolshares) * 100).toFixed(6)) }} %</td>
               <td v-else class="px-1" >  No shares </td>
               <td class="px-1" style="color:orange;"> stratum </td>
-              <td v-if="ppnlsreward.tokensAwarded" class="px-1" style="display:inline-flex;" >  {{ tokensRawToFormatted(ppnlsreward.tokensAwarded, 18) }} <img src="@/assets/images/etica-logo-sanstexte.png" height="100"  alt="" class="w-6 m-2" style="margin-left: 3px;position: relative;top: -0.65vh;width: 19px;"> <span v-if="ppnlsreward.bonusAwarded" style="color:aquamarine;">(+{{ ppnlsreward.bonusAwarded }}% bonus)</span></td>
+              <td v-if="ppnlsreward.tokensAwarded" class="px-1" style="display:inline-flex;" >  {{ tokensRawToFormatted(ppnlsreward.tokensAwarded, 18) }} <img src="@/assets/images/etica-logo-sanstexte.png" height="100"  alt="" class="w-6 m-2" style="margin-left: 3px;position: relative;top: -0.65vh;width: 19px;"> <span v-if="ppnlsreward.bonusAwarded" style="color:aquamarine;">(+{{ getBonusRate(ppnlsreward.tokensAwarded, ppnlsreward.bonusAwarded) }}% bonus)</span></td>
           </tr>  
 
 
@@ -478,6 +478,17 @@ export default {
         else {
           return "";
         }
+      },
+
+      getBonusrate(totalReward, bonus) {
+        console.log('getBonusrate totalReward', totalReward);
+        console.log('getBonusrate bonus', bonus);
+          if (totalReward <= 0) {
+            return 0.0;
+          }
+          const bonusRate = (bonus / totalReward) * 10000; // Calculate as four digits percentage
+          console.log('bonusRate', bonusRate);
+          return Number(bonusRate.toFixed(4));
       }
     
   },
