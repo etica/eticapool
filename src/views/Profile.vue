@@ -480,9 +480,9 @@ export default {
         }
       },
 
-      getBonusrate(totalReward, bonus) {
-        console.log('getBonusrate totalReward', totalReward);
-        console.log('getBonusrate bonus', bonus);
+      getBonusRate(totalReward, bonus) {
+        console.log('getBonusRate totalReward', totalReward);
+        console.log('getBonusRate bonus', bonus);
           if (totalReward <= 0) {
             return 0.0;
           }
