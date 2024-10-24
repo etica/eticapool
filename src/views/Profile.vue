@@ -460,12 +460,16 @@ export default {
     },
 
       getdateformat(timestamp) {
+        if (!timestamp || timestamp === 0) {
+          return "Never";
+        }
+
         const now = moment.utc();
         const blockTime = moment.unix(timestamp).utc();
         const duration = moment.duration(now.diff(blockTime));
 
         if (!duration.isValid() || duration.asSeconds() < 0) {
-          return "";
+          return "Never";
         }
 
         return duration.humanize() + ' ago';
