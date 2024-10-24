@@ -38,13 +38,15 @@
 
               <div v-if="minerData && minerData.workers">
                 <div> Hashrate Average: {{ formatHashrate(minerData.totalAvgHashrate) }} </div>
-                 <div> Tokens Earned: {{ tokensRawToFormatted(minerData.totalAlltimeTokenBalance, 18)  }} ETI</div>
+                <div v-if="minerData.Last24hTokenBalance"> Last 24h Earned: {{ tokensRawToFormatted(minerData.Last24hTokenBalance, 18)  }} ETI</div> 
+                <div> Tokens Earned: {{ tokensRawToFormatted(minerData.totalAlltimeTokenBalance, 18)  }} ETI</div>
                   <div> Tokens Awarded: {{ tokensRawToFormatted(minerData.totalTokensAwarded, 18)   }} ETI</div>
                   <div> Tokens Sent: {{ tokensRawToFormatted(minerData.totalTokensReceived, 18)   }} ETI</div>
                   <div> Last seen (timestamp): {{ getdateformat(minerData.lastSubmittedSolutionTime) }} </div>
               </div>
               <div v-else>
                 <div> Hashrate Average: {{ formatHashrate(minerData.avgHashrate) }} </div>
+                 <div v-if="minerData.Last24hTokenBalance"> Last 24h Earned: {{ tokensRawToFormatted(minerData.Last24hTokenBalance, 18)  }} ETI</div>
                  <div> Tokens Earned: {{ tokensRawToFormatted(minerData.alltimeTokenBalance, 18)  }} ETI</div>
                  <div> Tokens Awarded: {{ tokensRawToFormatted(minerData.tokensAwarded, 18)   }} ETI</div>
                  <div> Tokens Sent: {{ tokensRawToFormatted(minerData.tokensReceived, 18)   }} ETI</div>
