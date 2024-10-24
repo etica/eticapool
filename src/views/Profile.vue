@@ -362,7 +362,6 @@ export default {
     });
 
     this.socketsListener.on('minerDataWithWorkers', (data) => {   
-      console.log('minerDataWithWorkers data:', data);  
        this.minerData = data 
     });
 
