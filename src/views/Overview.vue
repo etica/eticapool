@@ -86,7 +86,7 @@
 
           <br>
           <i>Instructions:</i>
-          <i>Use same settings as monero. Replace address with Etica address. Enter pool url with mining port. Example: {{ poolUrl }}:3333</i>
+          <i>Use same settings as monero. Replace address with Etica address. Enter pool url with mining port. Example: {{ removeProtocol(poolUrl) }}:3333</i>
 
 
           <h1 class="title font-primary-title color-primary mb-4" style="font-family: dotgothicregular;font-size: 24px;color: #d0d0d0;">
@@ -346,9 +346,13 @@ export default {
       }
 
  
+    },
+
+    removeProtocol(url){
+      if (!url) return ''
+      return url.replace(/^https?:\/\//, '')
     }
 
- 
 
   }
 }

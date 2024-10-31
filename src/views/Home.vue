@@ -27,10 +27,10 @@
             </div> 
 
                 <p class="text-white font-bold">Mining Pool URLs</p>
-                <p v-if="poolUrl" class="text-white font-bold" style="color:rgb(115, 233, 233);">{{ poolUrl }}:3333 (Low-end CPU)</p>
-                <p v-if="poolUrl" class="text-white font-bold" style="color:rgb(167, 191, 191);">{{ poolUrl }}:5555 (Mid-range CPU)</p>
-                <p v-if="poolUrl" class="text-white font-bold" style="color:rgb(48, 153, 164);">{{ poolUrl }}:7777 (High-end CPU)</p>
-                <p v-if="poolUrl" class="text-white font-bold" style="color:rgb(48, 153, 164);">{{ poolUrl }}:9999 (Very-High-end CPU)</p>
+                <p v-if="poolUrl" class="text-white font-bold" style="color:rgb(115, 233, 233);">{{ removeProtocol(poolUrl) }}:3333 (Low-end CPU)</p>
+                <p v-if="poolUrl" class="text-white font-bold" style="color:rgb(167, 191, 191);">{{ removeProtocol(poolUrl) }}:5555 (Mid-range CPU)</p>
+                <p v-if="poolUrl" class="text-white font-bold" style="color:rgb(48, 153, 164);">{{ removeProtocol(poolUrl) }}:7777 (High-end CPU)</p>
+                <p v-if="poolUrl" class="text-white font-bold" style="color:rgb(48, 153, 164);">{{ removeProtocol(poolUrl) }}:9999 (Very-High-end CPU)</p>
                 <p class="text-white font-bold">Smart Contract Address: 0x34c61EA91bAcdA647269d4e310A86b875c09946f </p>
 
                 <div class="whitespace-md" style="margin-top: 2em;"></div>
@@ -273,6 +273,11 @@ export default {
           this.blinkerColor = '#399999';
         }
         
+      },
+
+      removeProtocol = (url) => {
+        if (!url) return ''
+        return url.replace(/^https?:\/\//, '')
       }
 
   }
