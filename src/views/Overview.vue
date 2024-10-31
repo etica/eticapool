@@ -348,9 +348,10 @@ export default {
  
     },
 
-    removeProtocol(url){
-      if (!url) return ''
-      return url.replace(/^https?:\/\//, '')
+    // Function to remove http protocol from url
+    removeProtocol(url) {
+        if (!url) return ''
+        return url.replace(/^(https?:\/\/)/, '')
     }
 
 
