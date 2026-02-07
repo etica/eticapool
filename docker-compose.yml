@@ -8,8 +8,7 @@ services:
       --appendonly yes
       --maxmemory 512mb
       --maxmemory-policy noeviction
-    ports:
-      - "6379:6379"
+    # Redis port not exposed to host; only accessible to pool-app via internal network
     volumes:
       - redis-data:/data
     restart: unless-stopped
@@ -25,12 +24,12 @@ services:
       redis:
         condition: service_healthy
     environment:
-      - MONGODB_URI=mongodb://host.docker.internal:27017/tokenpool
+      - MONGODB_URI=mongodb://host.docker.internal:27017
       - REDIS_URL=redis://redis:6379
       - POOL_ENV=production
       - POOL_CONFIG_PATH=/app/config/pool.config.json
     ports:
-      - "80:80"
+      - "80:8080"
       - "2053:2053"
       - "3333:3333"
       - "5555:5555"

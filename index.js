@@ -84,21 +84,25 @@ async function init( )
         let diagnosticsManager = new DiagnosticsManager()
         let webServer = new WebServer()
 
-        // Initialize Redis (optional — falls back to MongoDB queue if unavailable)
+        // Initialize Redis Streams (optional — falls back to MongoDB queue if unavailable)
         let redisInterface = null;
         try {
             redisInterface = new RedisInterface();
             await redisInterface.init(process.env.REDIS_URL);
             console.log('Redis Streams share queue enabled');
+        } catch (err) {
+            console.log('Redis Streams not available, falling back to MongoDB share queue:', err.message);
+            redisInterface = null;
+        }
 
-            // Set up Redis Pub/Sub for cross-process events
+        // Initialize Redis Pub/Sub (optional — independent of Streams)
+        try {
             let redisPubSub = RedisPubSub.getInstance();
             await redisPubSub.init(process.env.REDIS_URL);
             GeneralEventEmitterHandler.getInstance().setRedisPubSub(redisPubSub);
             console.log('Redis Pub/Sub enabled');
         } catch (err) {
-            console.log('Redis not available, falling back to MongoDB share queue:', err.message);
-            redisInterface = null;
+            console.log('Redis Pub/Sub not available, using local events only:', err.message);
         }
 
         await mongoInterface.init( 'tokenpool_'.concat(pool_env))

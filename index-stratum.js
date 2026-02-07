@@ -4,6 +4,7 @@ SegfaultHandler.registerHandler('crash.log');
 import FileUtils from './lib/util/file-utils.js'
 import MongoInterface from './lib/mongo-interface.js'
 import WebServer from './lib/web-server.js'
+import PeerInterface from './lib/peer-interface.js'
 import RedisInterface from './lib/redis-interface.js'
 import RedisPubSub from './lib/util/redis-pubsub.js'
 import GeneralEventEmitterHandler from './lib/util/GeneralEventEmitterHandler.js'
@@ -30,6 +31,10 @@ async function init() {
 
     let webServer = new WebServer();
     await webServer.initStratumOnly(poolConfig, mongoInterface, redisInterface);
+
+    // Start JSONRPC server on port 8081
+    let peerInterface = new PeerInterface(mongoInterface, poolConfig, redisInterface);
+    peerInterface.listenForJSONRPC();
 
     console.log('Stratum service ready');
 }
