@@ -1,0 +1,48 @@
+version: "3.8"
+
+services:
+  redis:
+    image: redis:7-alpine
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 512mb
+      --maxmemory-policy noeviction
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  pool-app:
+    build: .
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      - MONGODB_URI=mongodb://host.docker.internal:27017/tokenpool
+      - REDIS_URL=redis://redis:6379
+      - POOL_ENV=production
+      - POOL_CONFIG_PATH=/app/config/pool.config.json
+    ports:
+      - "80:80"
+      - "2053:2053"
+      - "3333:3333"
+      - "5555:5555"
+      - "7777:7777"
+      - "9999:9999"
+      - "8081:8081"
+    volumes:
+      - ./pool.config.json:/app/config/pool.config.json:ro
+      - ./log:/app/log
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+volumes:
+  redis-data:
