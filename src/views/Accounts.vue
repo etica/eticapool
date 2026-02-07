@@ -122,7 +122,7 @@ export default {
     this.socketsListener = this.socketHelper.initSocket()
     
     
-    this.socketsListener.on('poolName', (name) => {   
+    this.socketsListener.on('poolName', (name) => {
             this.poolName = name;
         });
 
@@ -132,6 +132,12 @@ export default {
 
           this.updateAccountList(data)
 
+    });
+
+    this.socketHelper.onPoolUpdate((data) => {
+        if (data.poolNameAndUrl) {
+            this.poolName = data.poolNameAndUrl.poolName;
+        }
     });
 
    this.pollSockets()

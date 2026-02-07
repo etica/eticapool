@@ -352,9 +352,13 @@ export default {
 
     this.socketsListener = this.socketHelper.initSocket()
 
-    this.socketsListener.on('poolData', (data) => {   
-        this.poolData = data 
-    }); 
+    this.socketsListener.on('poolData', (data) => {
+        this.poolData = data
+    });
+
+    this.socketHelper.onPoolUpdate((data) => {
+        if (data.poolData) { this.poolData = data.poolData; }
+    });
 
     
     this.socketsListener.on('minerData', (data) => {     
