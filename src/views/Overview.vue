@@ -256,33 +256,41 @@ export default {
 
   created(){
      this.socketHelper = new SocketHelper()
-      
-      setInterval(this.pollSockets.bind(this),240000)
+
+      setInterval(this.pollSockets.bind(this),600000)
 
 
       this.socketsListener = this.socketHelper.initSocket()
-     
-     
 
-        this.socketsListener.on('poolNameAndUrl', (data) => {   
+
+
+        this.socketsListener.on('poolNameAndUrl', (data) => {
             this.poolName = data.poolName;
             this.poolUrl = data.poolUrl;
         });
 
-       this.socketsListener.on('poolData', (data) => {   
-            this.poolData = data 
+       this.socketsListener.on('poolData', (data) => {
+            this.poolData = data
         });
 
-         this.socketsListener.on('poolStatus', (data) => {   
-            this.poolStatus = data 
-            
+         this.socketsListener.on('poolStatus', (data) => {
+            this.poolStatus = data
         });
 
-         this.socketsListener.on('recentPayments', (data) => {  
+         this.socketsListener.on('recentPayments', (data) => {
             this.recentPaymentTx=data
-            
+
             this.recentPaymentTx.map( x => this.addExplorerUrl(x, 'payments')  )
 
+        });
+
+        this.socketHelper.onPoolUpdate((data) => {
+            if (data.poolNameAndUrl) {
+                this.poolName = data.poolNameAndUrl.poolName;
+                this.poolUrl = data.poolNameAndUrl.poolUrl;
+            }
+            if (data.poolData) { this.poolData = data.poolData; }
+            if (data.poolStatus) { this.poolStatus = data.poolStatus; }
         });
 
       this.pollSockets()
@@ -294,6 +302,7 @@ export default {
       this.socketHelper.emitEvent('getPoolStatus')
       this.socketHelper.emitEvent('getRecentPayments')
     },
+
 
     rawAmountToFormatted(amount, decimals){
       return MathHelper.rawAmountToFormatted(amount,decimals)

@@ -36,7 +36,11 @@ export default class SocketHelper{
 
     emitEvent(evt,args){
         console.log('emit',evt,args)
-        this.socket.emit(evt,args);   
+        this.socket.emit(evt,args);
+    }
+
+    onPoolUpdate(callback){
+        this.socket.on('poolUpdate', callback);
     }
  
 

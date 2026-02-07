@@ -197,40 +197,50 @@ export default {
   },
   created(){
       this.socketHelper = new SocketHelper()
-      
-      setInterval(this.pollSockets.bind(this),240000)
-      setInterval(this.pollSocketsSlow.bind(this),240000)
+
+      setInterval(this.pollSockets.bind(this),600000)
+      setInterval(this.pollSocketsSlow.bind(this),600000)
 
       setInterval(this.changeblinkerColor, 600);
 
 
       this.socketsListener = this.socketHelper.initSocket()
-     
-     this.socketsListener.on('poolNameAndUrl', (pool) => {   
+
+     this.socketsListener.on('poolNameAndUrl', (pool) => {
             this.poolName = pool.poolName;
             this.poolUrl= pool.poolUrl;
         });
-     
-      this.socketsListener.on('poolData', (data) => {  
-            this.poolAPIData = data; 
+
+      this.socketsListener.on('poolData', (data) => {
+            this.poolAPIData = data;
         });
 
-          this.socketsListener.on('poolStatus', (data) => {   
-            this.poolStatus = data    
-        });
-
-
-        this.socketsListener.on('LastpoolStatsRecord', (data) => {   
-            this.LastPoolStatsRecord = data;   
+          this.socketsListener.on('poolStatus', (data) => {
+            this.poolStatus = data
         });
 
 
-         this.socketsListener.on('recentSolutions', (data) => {  
+        this.socketsListener.on('LastpoolStatsRecord', (data) => {
+            this.LastPoolStatsRecord = data;
+        });
+
+
+         this.socketsListener.on('recentSolutions', (data) => {
             this.recentSolutionTx=data
         });
 
-         this.socketsListener.on('recentPayments', (data) => {  
+         this.socketsListener.on('recentPayments', (data) => {
             this.recentPaymentTx=data
+        });
+
+        this.socketHelper.onPoolUpdate((data) => {
+            if (data.poolNameAndUrl) {
+                this.poolName = data.poolNameAndUrl.poolName;
+                this.poolUrl = data.poolNameAndUrl.poolUrl;
+            }
+            if (data.poolData) { this.poolAPIData = data.poolData; }
+            if (data.poolStatus) { this.poolStatus = data.poolStatus; }
+            if (data.LastpoolStatsRecord) { this.LastPoolStatsRecord = data.LastpoolStatsRecord; }
         });
 
         this.pollSockets()
@@ -245,12 +255,11 @@ export default {
     pollSockets(){
       this.socketHelper.emitEvent('getPoolNameAndUrl')
       this.socketHelper.emitEvent('getPoolData')
-       this.socketHelper.emitEvent('getPoolStatus')
-      
+      this.socketHelper.emitEvent('getPoolStatus')
+      this.socketHelper.emitEvent('getLastPoolStatsRecord')
     },
 
     pollSocketsSlow(){
-      this.socketHelper.emitEvent('getLastPoolStatsRecord')
     },
 
     hashrateToKH(hashrate){

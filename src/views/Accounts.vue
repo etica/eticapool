@@ -102,8 +102,6 @@ import Footer from './components/Footer.vue';
 import SocketHelper from '../js/socket-helper'
 import MathHelper from '../js/math-helper'
 
-import web3utils from 'web3-utils'
-
 export default {
   name: 'Accounts',
   props: [],
@@ -129,9 +127,9 @@ export default {
         });
 
 
-    this.socketsListener.on('minerList', (data) => {               
-       
-         
+    this.socketsListener.on('activeMinerListDisplay', (data) => {
+
+
           this.updateAccountList(data)
 
     });
@@ -147,19 +145,13 @@ export default {
 
       async updateAccountList(newList){
 
-        this.accountList = newList.filter(item => {
-          const minerAddress = item.minerEthAddress.substr(0, 42);
-          return web3utils.isAddress(minerAddress) && !isNaN(item.avgHashrate);
-        });
+        this.accountList = newList;
 
-          this.accountList.sort((a,b) => {return parseFloat(b.avgHashrate) - parseFloat(a.avgHashrate)});
-        
       },
 
       pollSockets(){
           this.socketHelper.emitEvent('getPoolName'),
-          //this.socketHelper.emitEvent( 'getActiveMinerList') get active miners
-          this.socketHelper.emitEvent( 'getMinerList') // get all miners
+          this.socketHelper.emitEvent( 'getActiveMinerListDisplay') // get active miners for display (optimized)
       },
       hashrateToMH(hashrate){
          return MathHelper.rawAmountToFormatted( hashrate , 6 )
