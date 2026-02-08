@@ -51,6 +51,20 @@ export function rawToFormatted(raw, decimals = 18) {
   return whole + '.' + frac;
 }
 
+/**
+ * Subtract two raw token values (BigInt-safe). Returns "0" if result is negative.
+ */
+export function rawSubtract(a, b) {
+  try {
+    const bigA = BigInt(a || 0);
+    const bigB = BigInt(b || 0);
+    const diff = bigA - bigB;
+    return diff > 0n ? diff.toString() : '0';
+  } catch {
+    return '0';
+  }
+}
+
 export function mintStatusLabel(poolstatus) {
   if (poolstatus === 0) return 'unprocessed';
   if (poolstatus === 2) return 'processed + rewards';

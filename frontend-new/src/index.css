@@ -656,6 +656,13 @@ a {
 .os-metric-value.orange  { color: var(--os-orange); }
 .os-metric-value.red     { color: var(--os-red); }
 
+.os-metric-sub {
+  font-size: 11px;
+  font-weight: 400;
+  margin-top: 2px;
+  opacity: 0.6;
+}
+
 @media (max-width: 1024px) {
   .os-metrics.col-6 { grid-template-columns: repeat(3, 1fr); }
   .os-metrics.col-5 { grid-template-columns: repeat(3, 1fr); }

@@ -129,7 +129,7 @@ export default function MinerProfile() {
                 </DataCard>
                 <DataCard
                   accent="linear-gradient(90deg, #06b6d4, #34d399)"
-                  tag="24H ETI"
+                  tag="EARNED 24H"
                   tagColor="cyan"
                 >
                   <div className="os-metric-value">
@@ -138,16 +138,17 @@ export default function MinerProfile() {
                 </DataCard>
                 <DataCard
                   accent="linear-gradient(90deg, #34d399, #06b6d4)"
-                  tag="TOTAL ETI"
+                  tag="TOTAL EARNED"
                   tagColor="emerald"
                 >
                   <div className="os-metric-value">
                     {rawToFormatted(currentWorker.alltimeTokenBalance)} ETI
                   </div>
+                  <div className="os-metric-sub faded">All PPLNS rewards</div>
                 </DataCard>
                 <DataCard
                   accent="linear-gradient(90deg, #f97316, #fbbf24)"
-                  tag="AWARDED"
+                  tag="TOTAL PAID"
                   tagColor="orange"
                 >
                   <div className="os-metric-value">
@@ -156,7 +157,7 @@ export default function MinerProfile() {
                 </DataCard>
                 <DataCard
                   accent="linear-gradient(90deg, #06b6d4, #34d399)"
-                  tag="RECEIVED"
+                  tag="TOTAL RECEIVED"
                   tagColor="cyan"
                 >
                   <div className="os-metric-value">
@@ -186,7 +187,7 @@ export default function MinerProfile() {
                 </DataCard>
                 <DataCard
                   accent="linear-gradient(90deg, #06b6d4, #34d399)"
-                  tag="24H ETI"
+                  tag="EARNED 24H"
                   tagColor="cyan"
                 >
                   <div className="os-metric-value">
@@ -195,16 +196,17 @@ export default function MinerProfile() {
                 </DataCard>
                 <DataCard
                   accent="linear-gradient(90deg, #34d399, #06b6d4)"
-                  tag="TOTAL ETI"
+                  tag="TOTAL EARNED"
                   tagColor="emerald"
                 >
                   <div className="os-metric-value">
                     {rawToFormatted(minerData.totalAlltimeTokenBalance)} ETI
                   </div>
+                  <div className="os-metric-sub faded">All PPLNS rewards</div>
                 </DataCard>
                 <DataCard
                   accent="linear-gradient(90deg, #f97316, #fbbf24)"
-                  tag="AWARDED"
+                  tag="TOTAL PAID"
                   tagColor="orange"
                 >
                   <div className="os-metric-value">
@@ -213,7 +215,7 @@ export default function MinerProfile() {
                 </DataCard>
                 <DataCard
                   accent="linear-gradient(90deg, #06b6d4, #34d399)"
-                  tag="RECEIVED"
+                  tag="TOTAL RECEIVED"
                   tagColor="cyan"
                 >
                   <div className="os-metric-value">
