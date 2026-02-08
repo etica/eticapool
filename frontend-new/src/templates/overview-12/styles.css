@@ -1,0 +1,331 @@
+/* ================================================================
+   Overview 12 — "Typewriter" Overview variant
+   Same visual language as Template 12 but with 4-tab Overview layout
+   CSS prefix: tw-
+   ================================================================ */
+
+/* ---------- Base ---------- */
+.tw-root {
+  background: #0a0a0a;
+  color: #f0f0f0;
+  font-family: 'Fira Code', 'Fira Mono', 'Consolas', 'Monaco', monospace;
+  min-height: 100vh;
+}
+
+/* ---------- Cards ---------- */
+.tw-card {
+  background: #111111;
+  border: 1px solid #1c1c1c;
+  border-radius: 0.5rem;
+  transition: background-color 0.15s ease;
+}
+
+.tw-card:hover {
+  background: #141414;
+}
+
+/* ---------- Header ---------- */
+.tw-header {
+  border-bottom: 1px solid #1c1c1c;
+}
+
+.tw-search-input {
+  background: #111111;
+  border: 1px solid #2a2a2a;
+  border-radius: 0.375rem;
+  color: #f0f0f0;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.8125rem;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.tw-search-input::placeholder {
+  color: #525252;
+}
+
+.tw-search-input:focus {
+  border-color: #f97316;
+}
+
+/* ---------- Status dot ---------- */
+.tw-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4ade80;
+  display: inline-block;
+  flex-shrink: 0;
+  animation: tw-pulse 2s ease-in-out infinite;
+}
+
+@keyframes tw-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ---------- Labels ---------- */
+.tw-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #737373;
+  font-weight: 500;
+}
+
+/* ---------- Mono field (blob/hash display) ---------- */
+.tw-mono-field {
+  background: #0d0d0d;
+  border: 1px solid #1a1a1a;
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.75rem;
+  color: #737373;
+  word-break: break-all;
+  cursor: pointer;
+  transition: color 0.15s ease;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tw-mono-field.tw-expanded {
+  white-space: normal;
+  overflow: visible;
+}
+
+.tw-mono-field:hover {
+  color: #a3a3a3;
+}
+
+/* ---------- Section underline accent ---------- */
+.tw-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f0f0f0;
+  border-bottom: 2px solid #f97316;
+  display: inline-block;
+  padding-bottom: 0.25rem;
+  margin-bottom: 1.25rem;
+}
+
+/* ---------- Tab navigation (VIG-style bordered buttons) ---------- */
+.tw-tabs {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin-bottom: 2rem;
+}
+
+.tw-tab {
+  color: #a3a3a3;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 20px;
+  display: flex;
+  align-items: center;
+  border: 1px solid #a3a3a3;
+  border-radius: 0;
+  transition: color 0.15s, background-color 0.15s;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  background: transparent;
+  font-family: inherit;
+  margin-left: -1px;
+  white-space: nowrap;
+}
+
+.tw-tab:first-child {
+  margin-left: 0;
+}
+
+.tw-tab:hover {
+  color: #ffffff;
+  background-color: rgba(255,255,255,0.04);
+}
+
+.tw-tab.active {
+  color: #0a0a0a;
+  background-color: #f0f0f0;
+  border-color: #f0f0f0;
+  z-index: 1;
+}
+
+/* ---------- Table ---------- */
+.tw-table-row {
+  border-bottom: 1px solid #1a1a1a;
+  transition: background-color 0.1s ease;
+}
+
+.tw-table-row:hover {
+  background: #141414;
+}
+
+/* ---------- Data row (key-value) ---------- */
+.tw-data-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.tw-data-row:last-child {
+  border-bottom: none;
+}
+
+.tw-data-key {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #737373;
+  font-weight: 500;
+  flex-shrink: 0;
+  margin-right: 1.5rem;
+}
+
+.tw-data-val {
+  color: #f0f0f0;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: right;
+  word-break: break-all;
+}
+
+.tw-data-val.orange { color: #f97316; }
+.tw-data-val.green  { color: #4ade80; }
+.tw-data-val.muted  { color: #737373; font-size: 12px; }
+.tw-data-val.small  { font-size: 11px; color: #a3a3a3; }
+
+/* ---------- Port colors ---------- */
+.tw-port-3333 {
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.08);
+  border: 1px solid rgba(74, 222, 128, 0.15);
+}
+
+.tw-port-5555 {
+  color: #fb923c;
+  background: rgba(251, 146, 60, 0.08);
+  border: 1px solid rgba(251, 146, 60, 0.15);
+}
+
+.tw-port-7777 {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.15);
+}
+
+.tw-port-9999 {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.08);
+  border: 1px solid rgba(248, 113, 113, 0.15);
+}
+
+/* ---------- Ports grid ---------- */
+.tw-ports-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .tw-ports-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .tw-tabs {
+    flex-wrap: wrap;
+  }
+  .tw-tab {
+    flex: 1;
+    justify-content: center;
+    font-size: 11px;
+    padding: 7px 10px;
+  }
+}
+
+/* ---------- Links ---------- */
+.tw-link {
+  color: #f97316;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.tw-link:hover {
+  color: #fb923c;
+  text-decoration: underline;
+}
+
+.tw-link-cyan {
+  color: #06b6d4;
+  text-decoration: none;
+  transition: color 0.15s ease;
+  word-break: break-all;
+}
+
+.tw-link-cyan:hover {
+  color: #22d3ee;
+  text-decoration: underline;
+}
+
+/* ---------- Scrollbar ---------- */
+.tw-root ::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.tw-root ::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+.tw-root ::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 3px;
+}
+
+.tw-root ::-webkit-scrollbar-thumb:hover {
+  background: #404040;
+}
+
+/* ---------- List row ---------- */
+.tw-list-row {
+  border-bottom: 1px solid #1a1a1a;
+  padding: 0.625rem 0;
+  transition: background-color 0.1s ease;
+}
+
+.tw-list-row:last-child {
+  border-bottom: none;
+}
+
+.tw-list-row:hover {
+  background: #141414;
+}
+
+/* ---------- Back link ---------- */
+.tw-back-link {
+  color: #525252;
+  transition: color 0.15s ease;
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+
+.tw-back-link:hover {
+  color: #a3a3a3;
+}
+
+/* ---------- Footer ---------- */
+.tw-footer-line {
+  height: 1px;
+  background: linear-gradient(to right, transparent, #2a2a2a, transparent);
+}
+
+/* ---------- Info note ---------- */
+.tw-note {
+  font-size: 12px;
+  color: #525252;
+  font-style: italic;
+  line-height: 1.6;
+}

@@ -127,6 +127,7 @@ async function init( )
         diagnosticsManager.update();
 
         let peerInterface = new PeerInterface(mongoInterface, poolConfig, redisInterface)
+           if (webServer.io) peerInterface.setIO(webServer.io);
            peerInterface.update();
            peerInterface.listenForJSONRPC();
 

@@ -1,0 +1,364 @@
+/* Template 2c: Ecovise Ice — Green Hero shifting to Cyan/Ice-Blue Body */
+
+/* ---- Custom Properties ---- */
+.ice-dark {
+  --bg-primary: #040808;
+  --bg-card: rgba(8, 20, 20, 0.8);
+  --accent-green: #00ff41;
+  --accent-cyan: #22d3ee;
+  --accent-sky: #38bdf8;
+  --accent-ice: #67e8f9;
+  --border-cyan: rgba(34, 211, 238, 0.2);
+  --border-ice: rgba(103, 232, 249, 0.12);
+  --text-body: #e0f2fe;
+  --text-muted: #94a3b8;
+  --text-emphasis: #ffffff;
+}
+
+/* ---- Background ---- */
+.ice-dark {
+  background-color: var(--bg-primary);
+  background-image:
+    radial-gradient(ellipse 600px 400px at 0% 0%, rgba(0, 255, 65, 0.03) 0%, transparent 70%),
+    radial-gradient(ellipse 500px 500px at 100% 50%, rgba(34, 211, 238, 0.025) 0%, transparent 70%),
+    radial-gradient(ellipse 400px 300px at 50% 100%, rgba(56, 189, 248, 0.02) 0%, transparent 60%);
+}
+
+/* ---- Green Glow (hero area) ---- */
+.ice-glow-green {
+  text-shadow: 0 0 20px rgba(0, 255, 65, 0.15), 0 0 40px rgba(0, 255, 65, 0.05);
+}
+
+.ice-glow-green-strong {
+  text-shadow: 0 0 24px rgba(0, 255, 65, 0.25), 0 0 48px rgba(0, 255, 65, 0.08);
+}
+
+/* ---- Cyan Glow (body area) ---- */
+.ice-glow-cyan {
+  text-shadow: 0 0 20px rgba(34, 211, 238, 0.15), 0 0 40px rgba(34, 211, 238, 0.05);
+}
+
+/* ---- Logo ---- */
+.ice-logo-glow {
+  text-shadow: 0 0 12px rgba(0, 255, 65, 0.3), 0 0 30px rgba(0, 255, 65, 0.1);
+}
+
+.ice-logo-img {
+  filter: drop-shadow(0 0 10px rgba(0, 255, 65, 0.3)) drop-shadow(0 0 20px rgba(0, 255, 65, 0.1));
+}
+
+/* ---- Glassmorphism Card ---- */
+.ice-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(8, 145, 178, 0.15);
+  border-radius: 12px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ice-card:hover {
+  border-color: rgba(34, 211, 238, 0.3);
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.05), 0 0 40px rgba(34, 211, 238, 0.02);
+}
+
+/* Green-tinted card (hero area) */
+.ice-card-green {
+  background: rgba(10, 15, 10, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  border-radius: 12px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ice-card-green:hover {
+  border-color: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.05);
+}
+
+/* ---- Pulsing Live Dot ---- */
+@keyframes ice-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.5); }
+  70% { box-shadow: 0 0 0 8px rgba(0, 255, 65, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 255, 65, 0); }
+}
+
+.ice-pulse-dot {
+  width: 8px;
+  height: 8px;
+  background: #00ff41;
+  border-radius: 50%;
+  animation: ice-pulse 2s ease-in-out infinite;
+}
+
+/* ---- Circular Progress Ring ---- */
+@keyframes ice-ring-fill {
+  from { stroke-dashoffset: 282.74; }
+}
+
+.ice-ring-circle {
+  transition: stroke-dashoffset 0.3s ease;
+  animation: ice-ring-fill 1.5s ease-out forwards;
+}
+
+/* ---- Mini Bar Chart ---- */
+@keyframes ice-bar-grow {
+  from { transform: scaleY(0); opacity: 0; }
+  to { transform: scaleY(1); opacity: 1; }
+}
+
+.ice-bar {
+  transform-origin: bottom;
+  animation: ice-bar-grow 0.6s ease-out forwards;
+}
+
+.ice-bar:nth-child(1) { animation-delay: 0.05s; }
+.ice-bar:nth-child(2) { animation-delay: 0.10s; }
+.ice-bar:nth-child(3) { animation-delay: 0.15s; }
+.ice-bar:nth-child(4) { animation-delay: 0.20s; }
+.ice-bar:nth-child(5) { animation-delay: 0.25s; }
+.ice-bar:nth-child(6) { animation-delay: 0.30s; }
+.ice-bar:nth-child(7) { animation-delay: 0.35s; }
+.ice-bar:nth-child(8) { animation-delay: 0.40s; }
+
+/* ---- Section Fade-In ---- */
+@keyframes ice-fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ice-section {
+  animation: ice-fade-in 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+.ice-section:nth-child(1)  { animation-delay: 0s; }
+.ice-section:nth-child(2)  { animation-delay: 0.06s; }
+.ice-section:nth-child(3)  { animation-delay: 0.12s; }
+.ice-section:nth-child(4)  { animation-delay: 0.18s; }
+.ice-section:nth-child(5)  { animation-delay: 0.24s; }
+.ice-section:nth-child(6)  { animation-delay: 0.30s; }
+.ice-section:nth-child(7)  { animation-delay: 0.36s; }
+.ice-section:nth-child(8)  { animation-delay: 0.42s; }
+.ice-section:nth-child(9)  { animation-delay: 0.48s; }
+.ice-section:nth-child(10) { animation-delay: 0.54s; }
+.ice-section:nth-child(11) { animation-delay: 0.60s; }
+.ice-section:nth-child(12) { animation-delay: 0.66s; }
+.ice-section:nth-child(13) { animation-delay: 0.72s; }
+
+/* ---- Table ---- */
+.ice-table-row {
+  border-bottom: 1px solid rgba(34, 211, 238, 0.08);
+  transition: background-color 0.2s ease;
+}
+
+.ice-table-row:hover {
+  background-color: rgba(34, 211, 238, 0.04);
+}
+
+/* ---- Scrollbar ---- */
+.ice-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #164e63 #040808;
+}
+
+.ice-scroll::-webkit-scrollbar { width: 5px; }
+.ice-scroll::-webkit-scrollbar-track { background: #040808; }
+.ice-scroll::-webkit-scrollbar-thumb { background: #164e63; border-radius: 3px; }
+.ice-scroll::-webkit-scrollbar-thumb:hover { background: #0891b2; }
+
+/* ---- Left Accent Borders ---- */
+.ice-accent-green {
+  border-left: 3px solid #10b981;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.ice-accent-green:hover {
+  border-left-color: #00ff41;
+  background-color: rgba(16, 185, 129, 0.04);
+}
+
+.ice-accent-cyan {
+  border-left: 3px solid #22d3ee;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.ice-accent-cyan:hover {
+  border-left-color: #67e8f9;
+  background-color: rgba(34, 211, 238, 0.04);
+}
+
+/* ---- Footer Border ---- */
+.ice-footer-border {
+  background: linear-gradient(90deg, transparent 0%, #0891b2 30%, #22d3ee 50%, #0891b2 70%, transparent 100%);
+  height: 1px;
+}
+
+/* ---- Sparkline ---- */
+.ice-sparkline {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 255, 65, 0.1) 0%,
+    rgba(0, 255, 65, 0.3) 30%,
+    rgba(0, 255, 65, 0.15) 60%,
+    rgba(0, 255, 65, 0.4) 80%,
+    rgba(0, 255, 65, 0.2) 100%
+  );
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20'%3E%3Cpath d='M0 15 Q10 12 20 14 T40 8 T60 11 T80 5 T100 9' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20'%3E%3Cpath d='M0 15 Q10 12 20 14 T40 8 T60 11 T80 5 T100 9' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E");
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+}
+
+/* ---- Back Link Pill ---- */
+.ice-pill {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.ice-pill:hover {
+  background-color: rgba(34, 211, 238, 0.1);
+  border-color: rgba(34, 211, 238, 0.4);
+  color: #22d3ee;
+}
+
+/* ---- Search Input ---- */
+.ice-search-input {
+  background: rgba(8, 20, 20, 0.9);
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  border-radius: 8px;
+  color: #e0f2fe;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ice-search-input:focus {
+  outline: none;
+  border-color: rgba(34, 211, 238, 0.4);
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.08);
+}
+
+.ice-search-input::placeholder { color: #475569; }
+
+/* ---- Monospace Data Field ---- */
+.ice-mono-field {
+  background: rgba(34, 211, 238, 0.04);
+  border: 1px solid rgba(56, 189, 248, 0.12);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.75rem;
+  color: #38bdf8;
+  word-break: break-all;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.ice-mono-field:hover {
+  background: rgba(34, 211, 238, 0.07);
+}
+
+/* ---- Port Badge Colors ---- */
+.ice-port-3333 {
+  background: rgba(0, 255, 65, 0.15);
+  color: #00ff41;
+  border: 1px solid rgba(0, 255, 65, 0.25);
+}
+
+.ice-port-5555 {
+  background: rgba(234, 179, 8, 0.15);
+  color: #eab308;
+  border: 1px solid rgba(234, 179, 8, 0.25);
+}
+
+.ice-port-7777 {
+  background: rgba(249, 115, 22, 0.15);
+  color: #f97316;
+  border: 1px solid rgba(249, 115, 22, 0.25);
+}
+
+.ice-port-9999 {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+/* ---- Stratum Port Card ---- */
+.ice-port-card {
+  background: rgba(8, 20, 20, 0.6);
+  border: 1px solid rgba(8, 145, 178, 0.15);
+  border-radius: 8px;
+  padding: 10px 14px;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.ice-port-card:hover {
+  border-color: rgba(34, 211, 238, 0.3);
+  background: rgba(8, 20, 20, 0.8);
+}
+
+/* ---- Status Badge ---- */
+.ice-status-active {
+  background: rgba(0, 255, 65, 0.12);
+  color: #00ff41;
+  border: 1px solid rgba(0, 255, 65, 0.25);
+  border-radius: 9999px;
+  padding: 2px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ---- Info Labels ---- */
+.ice-info-label {
+  font-size: 0.7rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.ice-info-label-cyan {
+  font-size: 0.7rem;
+  color: #67e8f9;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.ice-info-value {
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  font-weight: 500;
+}
+
+.ice-info-value-mono {
+  font-size: 0.75rem;
+  color: #67e8f9;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  word-break: break-all;
+}
+
+/* ---- Expandable Text ---- */
+.ice-expandable {
+  max-height: 1.5em;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.ice-expandable.expanded {
+  max-height: 200px;
+}
+
+/* ---- Section Header Cyan Underline ---- */
+.ice-section-underline {
+  background: linear-gradient(90deg, #22d3ee, transparent);
+  height: 1px;
+}
+
+.ice-section-underline-green {
+  background: linear-gradient(90deg, #10b981, transparent);
+  height: 1px;
+}

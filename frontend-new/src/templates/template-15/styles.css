@@ -1,0 +1,517 @@
+/* ══════════════════════════════════════════════════════════════
+   Axiom — Near-Black + White Headers + Violet/Indigo Metrics
+   Template 15 for Etica Mining Pool
+   ══════════════════════════════════════════════════════════════ */
+
+/* ─── CSS Variables ─── */
+:root {
+  --ax-bg: #0a0a0a;
+  --ax-card-bg: #111111;
+  --ax-card-border: #1f1f1f;
+  --ax-text: #e5e5e5;
+  --ax-text-muted: #737373;
+  --ax-label: #a3a3a3;
+  --ax-header: #ffffff;
+  --ax-violet: #8b5cf6;
+  --ax-violet-light: #a78bfa;
+  --ax-green: #22c55e;
+  --ax-row-even: #0f0f0f;
+  --ax-row-odd: #111111;
+  --ax-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ax-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --ax-max-w: 80rem; /* max-w-7xl ~ 1280px */
+  --ax-radius: 6px;
+  --ax-transition: 0.2s ease;
+}
+
+/* ─── Reset & Base ─── */
+.axiom-dashboard {
+  background-color: var(--ax-bg);
+  color: var(--ax-text);
+  font-family: var(--ax-font-body);
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.axiom-dashboard *,
+.axiom-dashboard *::before,
+.axiom-dashboard *::after {
+  box-sizing: border-box;
+}
+
+/* ─── Scrollbar ─── */
+.axiom-dashboard ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.axiom-dashboard ::-webkit-scrollbar-track {
+  background: var(--ax-bg);
+}
+
+.axiom-dashboard ::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 3px;
+}
+
+.axiom-dashboard ::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3a;
+}
+
+/* ─── Layout ─── */
+.ax-container {
+  max-width: var(--ax-max-w);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.ax-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding-bottom: 3rem;
+}
+
+/* ─── Header Bar ─── */
+.ax-header-bar {
+  border-top: 2px solid var(--ax-violet);
+  background: var(--ax-card-bg);
+  border-bottom: 1px solid var(--ax-card-border);
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.ax-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ax-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ax-header-logo {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.ax-header-pool-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--ax-header);
+  letter-spacing: -0.01em;
+}
+
+.ax-header-pool-name .ax-violet-accent {
+  color: var(--ax-violet);
+}
+
+.ax-header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ax-live-dot {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: var(--ax-green);
+  font-weight: 500;
+}
+
+.ax-live-dot::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ax-green);
+  animation: ax-pulse 2s ease-in-out infinite;
+}
+
+@keyframes ax-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.ax-back-link {
+  font-size: 0.8125rem;
+  color: var(--ax-text-muted);
+  text-decoration: none;
+  transition: color var(--ax-transition);
+}
+
+.ax-back-link:hover {
+  color: var(--ax-violet-light);
+}
+
+/* ─── Status Badge ─── */
+.ax-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ax-status-badge--active {
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--ax-green);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.ax-status-badge--confirmed {
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--ax-green);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.ax-status-badge--pending {
+  background: rgba(234, 179, 8, 0.12);
+  color: #eab308;
+  border: 1px solid rgba(234, 179, 8, 0.2);
+}
+
+/* ─── Section Header with Underline ─── */
+.ax-section-header {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ax-header);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  position: relative;
+  display: inline-block;
+}
+
+.ax-section-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--ax-violet);
+  animation: ax-underline-in 0.5s ease forwards;
+}
+
+@keyframes ax-underline-in {
+  to {
+    width: 40px;
+  }
+}
+
+/* Trigger animation when in view */
+.ax-section-header.ax-visible::after {
+  width: 40px;
+}
+
+/* ─── Card Base ─── */
+.ax-card {
+  background: var(--ax-card-bg);
+  border: 1px solid var(--ax-card-border);
+  border-radius: var(--ax-radius);
+  padding: 1.25rem;
+  transition: border-color var(--ax-transition);
+}
+
+.ax-card:hover {
+  border-color: #2a2a2a;
+}
+
+/* ─── Label ─── */
+.ax-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--ax-label);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.375rem;
+}
+
+/* ─── Metric Value ─── */
+.ax-metric {
+  font-family: var(--ax-font-mono);
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--ax-violet);
+  line-height: 1.2;
+}
+
+.ax-metric--secondary {
+  color: var(--ax-violet-light);
+  font-size: 1.125rem;
+}
+
+.ax-metric--small {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.ax-metric--white {
+  color: var(--ax-text);
+}
+
+/* ─── Mono Text (addresses, hashes) ─── */
+.ax-mono {
+  font-family: var(--ax-font-mono);
+  font-size: 0.8125rem;
+  color: var(--ax-text-muted);
+  word-break: break-all;
+}
+
+.ax-mono--bright {
+  color: var(--ax-text);
+}
+
+/* ─── Grid Layouts ─── */
+.ax-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.ax-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.ax-grid-2x3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+/* ─── Table Styles ─── */
+.ax-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--ax-radius);
+  border: 1px solid var(--ax-card-border);
+}
+
+.ax-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.ax-table thead {
+  background: #0d0d0d;
+}
+
+.ax-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--ax-label);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--ax-card-border);
+  white-space: nowrap;
+}
+
+.ax-table td {
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid rgba(31, 31, 31, 0.5);
+  white-space: nowrap;
+}
+
+.ax-table tbody tr:nth-child(even) {
+  background: var(--ax-row-even);
+}
+
+.ax-table tbody tr:nth-child(odd) {
+  background: var(--ax-row-odd);
+}
+
+.ax-table tbody tr {
+  transition: background var(--ax-transition);
+}
+
+.ax-table tbody tr:hover {
+  background: #161616;
+}
+
+/* ─── Port Badges ─── */
+.ax-port-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+}
+
+.ax-port-badge {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--ax-card-bg);
+  border: 1px solid var(--ax-card-border);
+  border-radius: var(--ax-radius);
+  padding: 0.75rem 1.25rem;
+  min-width: 140px;
+  transition: border-color var(--ax-transition);
+}
+
+.ax-port-badge:hover {
+  border-color: var(--ax-violet);
+}
+
+.ax-port-number {
+  font-family: var(--ax-font-mono);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--ax-violet);
+}
+
+.ax-port-label {
+  font-size: 0.6875rem;
+  color: var(--ax-text-muted);
+  margin-top: 0.125rem;
+}
+
+.ax-port-diff {
+  font-family: var(--ax-font-mono);
+  font-size: 0.625rem;
+  color: var(--ax-label);
+  margin-top: 0.25rem;
+}
+
+/* ─── Port Tag (inline in tables) ─── */
+.ax-port-tag {
+  display: inline-block;
+  font-family: var(--ax-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--ax-violet-light);
+  background: rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+}
+
+/* ─── Expandable Hash ─── */
+.ax-expandable {
+  cursor: pointer;
+  transition: color var(--ax-transition);
+}
+
+.ax-expandable:hover {
+  color: var(--ax-violet-light);
+}
+
+/* ─── Footer ─── */
+.ax-footer {
+  border-top: 1px solid var(--ax-card-border);
+  padding: 1.5rem 0;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--ax-text-muted);
+}
+
+.ax-footer a {
+  color: var(--ax-violet-light);
+  text-decoration: none;
+  transition: color var(--ax-transition);
+}
+
+.ax-footer a:hover {
+  color: var(--ax-violet);
+}
+
+/* ─── Utility ─── */
+.ax-text-muted {
+  color: var(--ax-text-muted);
+}
+
+.ax-text-violet {
+  color: var(--ax-violet);
+}
+
+.ax-text-violet-light {
+  color: var(--ax-violet-light);
+}
+
+.ax-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+  display: inline-block;
+  vertical-align: bottom;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 1024px) {
+  .ax-grid-3,
+  .ax-grid-2x3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .ax-grid-2,
+  .ax-grid-3,
+  .ax-grid-2x3 {
+    grid-template-columns: 1fr;
+  }
+
+  .ax-container {
+    padding: 0 1rem;
+  }
+
+  .ax-header-inner {
+    flex-wrap: wrap;
+  }
+
+  .ax-metric {
+    font-size: 1.125rem;
+  }
+
+  .ax-port-badges {
+    flex-direction: column;
+  }
+
+  .ax-port-badge {
+    min-width: unset;
+    width: 100%;
+  }
+
+  .ax-table {
+    font-size: 0.75rem;
+  }
+
+  .ax-table th,
+  .ax-table td {
+    padding: 0.5rem 0.625rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .ax-header-pool-name {
+    font-size: 0.9375rem;
+  }
+
+  .ax-section-header {
+    font-size: 0.875rem;
+  }
+
+  .ax-card {
+    padding: 1rem;
+  }
+}

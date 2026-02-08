@@ -1,0 +1,191 @@
+/* ================================================================
+   Template 12 — "Typewriter" — Black + White Clean Mono + Warm Orange
+   CSS prefix: tw-
+   ================================================================ */
+
+/* ---------- Base ---------- */
+.tw-root {
+  background: #0a0a0a;
+  color: #f0f0f0;
+  font-family: 'Fira Code', 'Fira Mono', 'Consolas', 'Monaco', monospace;
+  min-height: 100vh;
+}
+
+/* ---------- Cards ---------- */
+.tw-card {
+  background: #111111;
+  border: 1px solid #1c1c1c;
+  border-radius: 0.5rem;
+  transition: background-color 0.15s ease;
+}
+
+.tw-card:hover {
+  background: #141414;
+}
+
+/* ---------- Header ---------- */
+.tw-header {
+  border-bottom: 1px solid #1c1c1c;
+}
+
+.tw-search-input {
+  background: #111111;
+  border: 1px solid #2a2a2a;
+  border-radius: 0.375rem;
+  color: #f0f0f0;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.8125rem;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.tw-search-input::placeholder {
+  color: #525252;
+}
+
+.tw-search-input:focus {
+  border-color: #f97316;
+}
+
+/* ---------- Status dot ---------- */
+.tw-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4ade80;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* ---------- Labels ---------- */
+.tw-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #737373;
+  font-weight: 500;
+}
+
+/* ---------- Mono field (blob/hash display) ---------- */
+.tw-mono-field {
+  background: #0d0d0d;
+  border: 1px solid #1a1a1a;
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.75rem;
+  color: #737373;
+  word-break: break-all;
+  cursor: pointer;
+  transition: color 0.15s ease;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tw-mono-field.tw-expanded {
+  white-space: normal;
+  overflow: visible;
+}
+
+.tw-mono-field:hover {
+  color: #a3a3a3;
+}
+
+/* ---------- Section underline accent ---------- */
+.tw-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f0f0f0;
+  border-bottom: 2px solid #f97316;
+  display: inline-block;
+  padding-bottom: 0.25rem;
+  margin-bottom: 1.25rem;
+}
+
+/* ---------- Table ---------- */
+.tw-table-row {
+  border-bottom: 1px solid #1a1a1a;
+  transition: background-color 0.1s ease;
+}
+
+.tw-table-row:hover {
+  background: #141414;
+}
+
+/* ---------- Port colors ---------- */
+.tw-port-3333 {
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.08);
+  border: 1px solid rgba(74, 222, 128, 0.15);
+}
+
+.tw-port-5555 {
+  color: #fb923c;
+  background: rgba(251, 146, 60, 0.08);
+  border: 1px solid rgba(251, 146, 60, 0.15);
+}
+
+.tw-port-7777 {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.15);
+}
+
+.tw-port-9999 {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.08);
+  border: 1px solid rgba(248, 113, 113, 0.15);
+}
+
+/* ---------- Scrollbar ---------- */
+.tw-root ::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.tw-root ::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+.tw-root ::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 3px;
+}
+
+.tw-root ::-webkit-scrollbar-thumb:hover {
+  background: #404040;
+}
+
+/* ---------- Block/Payout row ---------- */
+.tw-list-row {
+  border-bottom: 1px solid #1a1a1a;
+  padding: 0.625rem 0;
+  transition: background-color 0.1s ease;
+}
+
+.tw-list-row:last-child {
+  border-bottom: none;
+}
+
+.tw-list-row:hover {
+  background: #141414;
+}
+
+/* ---------- Hover transitions on interactive items ---------- */
+.tw-back-link {
+  color: #525252;
+  transition: color 0.15s ease;
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+
+.tw-back-link:hover {
+  color: #a3a3a3;
+}
+
+/* ---------- Footer ---------- */
+.tw-footer-line {
+  height: 1px;
+  background: linear-gradient(to right, transparent, #2a2a2a, transparent);
+}

@@ -1,0 +1,444 @@
+/* Template 2f: Ecovise Neon — Green + Pink/Magenta Cyberpunk Split */
+
+/* ---- Custom Properties ---- */
+.neon-root {
+  --bg-primary: #050208;
+  --bg-card: rgba(10, 8, 14, 0.8);
+  --accent-green: #00ff41;
+  --accent-emerald: #10b981;
+  --accent-pink: #ec4899;
+  --accent-magenta: #d946ef;
+  --accent-purple: #a855f7;
+  --border-green: rgba(0, 255, 65, 0.15);
+  --border-pink: rgba(236, 72, 153, 0.15);
+  --text-body: #e5e7eb;
+  --text-muted: #9ca3af;
+  --text-emphasis: #ffffff;
+}
+
+/* ---- Background ---- */
+.neon-root {
+  background-color: var(--bg-primary);
+  background-image:
+    radial-gradient(ellipse 600px 400px at 0% 0%, rgba(0, 255, 65, 0.03) 0%, transparent 70%),
+    radial-gradient(ellipse 500px 500px at 100% 100%, rgba(236, 72, 153, 0.025) 0%, transparent 70%),
+    radial-gradient(ellipse 400px 300px at 50% 30%, rgba(168, 85, 247, 0.015) 0%, transparent 60%);
+}
+
+/* ---- Green Glow (pool data) ---- */
+.neon-glow-green {
+  text-shadow: 0 0 15px rgba(0, 255, 65, 0.2), 0 0 40px rgba(0, 255, 65, 0.06);
+}
+
+.neon-glow-green-strong {
+  text-shadow: 0 0 20px rgba(0, 255, 65, 0.3), 0 0 50px rgba(0, 255, 65, 0.1);
+}
+
+/* ---- Pink Glow (network/external data) ---- */
+.neon-glow-pink {
+  text-shadow: 0 0 15px rgba(236, 72, 153, 0.3), 0 0 40px rgba(236, 72, 153, 0.08);
+}
+
+.neon-glow-pink-strong {
+  text-shadow: 0 0 20px rgba(236, 72, 153, 0.35), 0 0 50px rgba(236, 72, 153, 0.12);
+}
+
+/* ---- Purple Glow (mining contract) ---- */
+.neon-glow-purple {
+  text-shadow: 0 0 15px rgba(168, 85, 247, 0.25), 0 0 40px rgba(168, 85, 247, 0.08);
+}
+
+/* ---- Logo Dual Glow ---- */
+.neon-logo-glow {
+  text-shadow: 0 0 12px rgba(0, 255, 65, 0.3), 0 0 24px rgba(236, 72, 153, 0.15);
+}
+
+.neon-logo-img {
+  filter: drop-shadow(0 0 8px rgba(0, 255, 65, 0.3)) drop-shadow(0 0 8px rgba(236, 72, 153, 0.2));
+}
+
+/* ---- Card: Green Border ---- */
+.neon-card-green {
+  background: var(--bg-card);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border-green);
+  border-radius: 12px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.neon-card-green:hover {
+  border-color: rgba(0, 255, 65, 0.3);
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.05), 0 0 40px rgba(0, 255, 65, 0.02);
+}
+
+/* ---- Card: Pink Border ---- */
+.neon-card-pink {
+  background: var(--bg-card);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border-pink);
+  border-radius: 12px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.neon-card-pink:hover {
+  border-color: rgba(236, 72, 153, 0.3);
+  box-shadow: 0 0 20px rgba(236, 72, 153, 0.05), 0 0 40px rgba(236, 72, 153, 0.02);
+}
+
+/* ---- Card: Purple Border (mining contract) ---- */
+.neon-card-purple {
+  background: var(--bg-card);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(168, 85, 247, 0.15);
+  border-radius: 12px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.neon-card-purple:hover {
+  border-color: rgba(168, 85, 247, 0.3);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.05), 0 0 40px rgba(168, 85, 247, 0.02);
+}
+
+/* ---- Pulsing Live Dot (dual color) ---- */
+@keyframes neon-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(236, 72, 153, 0.15);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 65, 0);
+  }
+}
+
+.neon-pulse-dot {
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(135deg, #00ff41, #ec4899);
+  border-radius: 50%;
+  animation: neon-pulse 2s ease-in-out infinite;
+}
+
+/* ---- Circular Gauge Gradient ---- */
+@keyframes neon-ring-fill {
+  from {
+    stroke-dashoffset: 282.74;
+  }
+}
+
+.neon-ring-circle {
+  transition: stroke-dashoffset 0.3s ease;
+  animation: neon-ring-fill 1.5s ease-out forwards;
+}
+
+/* ---- Mini Bar Chart ---- */
+@keyframes neon-bar-grow {
+  from {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.neon-bar {
+  transform-origin: bottom;
+  animation: neon-bar-grow 0.6s ease-out forwards;
+}
+
+.neon-bar:nth-child(1) { animation-delay: 0.05s; }
+.neon-bar:nth-child(2) { animation-delay: 0.10s; }
+.neon-bar:nth-child(3) { animation-delay: 0.15s; }
+.neon-bar:nth-child(4) { animation-delay: 0.20s; }
+.neon-bar:nth-child(5) { animation-delay: 0.25s; }
+.neon-bar:nth-child(6) { animation-delay: 0.30s; }
+.neon-bar:nth-child(7) { animation-delay: 0.35s; }
+.neon-bar:nth-child(8) { animation-delay: 0.40s; }
+
+/* ---- Section Fade-In ---- */
+@keyframes neon-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.neon-section {
+  animation: neon-fade-in 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+.neon-section:nth-child(1) { animation-delay: 0s; }
+.neon-section:nth-child(2) { animation-delay: 0.06s; }
+.neon-section:nth-child(3) { animation-delay: 0.12s; }
+.neon-section:nth-child(4) { animation-delay: 0.18s; }
+.neon-section:nth-child(5) { animation-delay: 0.24s; }
+.neon-section:nth-child(6) { animation-delay: 0.30s; }
+.neon-section:nth-child(7) { animation-delay: 0.36s; }
+.neon-section:nth-child(8) { animation-delay: 0.42s; }
+.neon-section:nth-child(9) { animation-delay: 0.48s; }
+.neon-section:nth-child(10) { animation-delay: 0.54s; }
+.neon-section:nth-child(11) { animation-delay: 0.60s; }
+.neon-section:nth-child(12) { animation-delay: 0.66s; }
+.neon-section:nth-child(13) { animation-delay: 0.72s; }
+
+/* ---- Table Row ---- */
+.neon-table-row {
+  border-bottom: 1px solid rgba(168, 85, 247, 0.06);
+  transition: background-color 0.2s ease;
+}
+
+.neon-table-row:hover {
+  background-color: rgba(168, 85, 247, 0.04);
+}
+
+/* ---- Scrollbar (dual tone) ---- */
+.neon-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #4c1d95 #050208;
+}
+
+.neon-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.neon-scroll::-webkit-scrollbar-track {
+  background: #050208;
+}
+
+.neon-scroll::-webkit-scrollbar-thumb {
+  background: #4c1d95;
+  border-radius: 3px;
+}
+
+.neon-scroll::-webkit-scrollbar-thumb:hover {
+  background: #a855f7;
+}
+
+/* ---- Block Left Accent (green) ---- */
+.neon-accent-green-left {
+  border-left: 3px solid #00ff41;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.neon-accent-green-left:hover {
+  border-left-color: #10b981;
+  background-color: rgba(0, 255, 65, 0.03);
+}
+
+/* ---- Payout Left Accent (pink) ---- */
+.neon-accent-pink-left {
+  border-left: 3px solid #ec4899;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.neon-accent-pink-left:hover {
+  border-left-color: #f472b6;
+  background-color: rgba(236, 72, 153, 0.03);
+}
+
+/* ---- Footer Gradient Border (green to pink) ---- */
+.neon-footer-border {
+  background: linear-gradient(90deg, transparent 0%, #00ff41 25%, #a855f7 50%, #ec4899 75%, transparent 100%);
+  height: 1px;
+}
+
+/* ---- Sparkline (green) ---- */
+.neon-sparkline-green {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 255, 65, 0.1) 0%,
+    rgba(0, 255, 65, 0.3) 30%,
+    rgba(0, 255, 65, 0.15) 60%,
+    rgba(0, 255, 65, 0.4) 80%,
+    rgba(0, 255, 65, 0.2) 100%
+  );
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20'%3E%3Cpath d='M0 15 Q10 12 20 14 T40 8 T60 11 T80 5 T100 9' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20'%3E%3Cpath d='M0 15 Q10 12 20 14 T40 8 T60 11 T80 5 T100 9' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E");
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+}
+
+/* ---- Back Link Pill ---- */
+.neon-pill {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.neon-pill:hover {
+  background-color: rgba(168, 85, 247, 0.1);
+  border-color: rgba(168, 85, 247, 0.4);
+  color: #a855f7;
+}
+
+/* ---- Search Input ---- */
+.neon-search-input {
+  background: rgba(10, 8, 14, 0.9);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-radius: 8px;
+  color: #e5e7eb;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.neon-search-input:focus {
+  outline: none;
+  border-color: rgba(168, 85, 247, 0.5);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.1);
+}
+
+.neon-search-input::placeholder {
+  color: #4b5563;
+}
+
+/* ---- Monospace Data Field (purple) ---- */
+.neon-mono-field {
+  background: rgba(168, 85, 247, 0.04);
+  border: 1px solid rgba(168, 85, 247, 0.12);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.75rem;
+  color: #a855f7;
+  word-break: break-all;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.neon-mono-field:hover {
+  background: rgba(168, 85, 247, 0.07);
+}
+
+/* ---- Port Badge Colors ---- */
+.neon-port-3333 {
+  background: rgba(0, 255, 65, 0.15);
+  color: #00ff41;
+  border: 1px solid rgba(0, 255, 65, 0.25);
+}
+
+.neon-port-5555 {
+  background: rgba(236, 72, 153, 0.15);
+  color: #ec4899;
+  border: 1px solid rgba(236, 72, 153, 0.25);
+}
+
+.neon-port-7777 {
+  background: rgba(168, 85, 247, 0.15);
+  color: #a855f7;
+  border: 1px solid rgba(168, 85, 247, 0.25);
+}
+
+.neon-port-9999 {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+/* ---- Stratum Port Card ---- */
+.neon-port-card {
+  background: rgba(10, 8, 14, 0.6);
+  border: 1px solid rgba(168, 85, 247, 0.12);
+  border-radius: 8px;
+  padding: 10px 14px;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.neon-port-card:hover {
+  border-color: rgba(168, 85, 247, 0.3);
+  background: rgba(10, 8, 14, 0.8);
+}
+
+/* ---- Status Badge (dual glow) ---- */
+.neon-status-active {
+  background: linear-gradient(135deg, rgba(0, 255, 65, 0.12), rgba(236, 72, 153, 0.08));
+  color: #00ff41;
+  border: 1px solid rgba(0, 255, 65, 0.25);
+  border-radius: 9999px;
+  padding: 2px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ---- Info Grid Items ---- */
+.neon-info-label {
+  font-size: 0.7rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.neon-info-value {
+  font-size: 0.8rem;
+  color: #d1d5db;
+  font-weight: 500;
+}
+
+.neon-info-value-mono {
+  font-size: 0.75rem;
+  color: #a855f7;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  word-break: break-all;
+}
+
+/* ---- Expandable Text ---- */
+.neon-expandable {
+  max-height: 1.5em;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.neon-expandable.expanded {
+  max-height: 200px;
+}
+
+/* ---- Section Header Underline Variants ---- */
+.neon-underline-green {
+  background: linear-gradient(90deg, #00ff41 0%, rgba(0, 255, 65, 0.1) 100%);
+  height: 1px;
+}
+
+.neon-underline-pink {
+  background: linear-gradient(90deg, #ec4899 0%, rgba(236, 72, 153, 0.1) 100%);
+  height: 1px;
+}
+
+.neon-underline-purple {
+  background: linear-gradient(90deg, #a855f7 0%, rgba(168, 85, 247, 0.1) 100%);
+  height: 1px;
+}
+
+/* ---- Dual-tone scanline subtle overlay ---- */
+.neon-root::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(168, 85, 247, 0.008) 2px,
+    rgba(168, 85, 247, 0.008) 4px
+  );
+}
+
+.neon-root > * {
+  position: relative;
+  z-index: 1;
+}
