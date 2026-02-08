@@ -10,3 +10,5 @@ pool.config.json
 .DS_Store
 dist/
 test/
+frontend/node_modules
+frontend/dist

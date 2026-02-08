@@ -57,8 +57,6 @@ const Web3 = require('web3');
 const web3utils = Web3.utils;
 const BigNumber = Web3.utils.BN;
 
-const contractData = require('../config/contractdata.json')
-
 const EventEmitter = require('events');
 class Web3PlugEmitter extends EventEmitter {}
 

@@ -2,7 +2,7 @@ node_modules
 account.config.json
 test.account.config.json
 dump.rdb
-servercommands.md 
+servercommands.md
 pool.config.json
 
 dist/*
@@ -10,3 +10,7 @@ dist/*
 logs
 
 tmp.txt
+
+frontend/node_modules/
+frontend/src/contracts/
+frontend/src/config/

@@ -17,7 +17,7 @@ export default class SocketHelper{
     }
 
     var current_hostname = window.location.hostname;
-    const socketServer = 'http://' + current_hostname + ':2053';
+    const socketServer = process.env.VUE_APP_SOCKET_URL || ('http://' + current_hostname + ':2053');
     const options = { transports: ['websocket'], forceNew: true };
     this.socket = io(socketServer, options);
 
