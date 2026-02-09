@@ -17,7 +17,8 @@ if( process.argv[2] == "staging" )
 import FileUtils from './lib/util/file-utils.js'
 import  cron from 'node-cron' 
 
-let poolConfigFull = FileUtils.readJsonFileSync('/pool.config.json');
+const configPath = process.env.POOL_CONFIG_PATH || '/pool.config.json';
+let poolConfigFull = FileUtils.readJsonFileSync(configPath);
 let poolConfig = poolConfigFull[pool_env]
 
 
