@@ -10,7 +10,7 @@ import PortBadge from '../components/PortBadge';
 import LiveDot from '../components/LiveDot';
 import StatusBadge from '../components/StatusBadge';
 import LoadingSkeleton from '../components/LoadingSkeleton';
-import { formatNumber, truncateAddress, rawToFormatted, formatPoolName } from '../lib/formatters';
+import { formatNumber, formatHashrate, truncateAddress, rawToFormatted, formatPoolName } from '../lib/formatters';
 import { ETICASCAN_URL, buildStratumPorts } from '../config/constants';
 
 const TABS = ['Mining Data', 'Getting Started', 'Pool Status', 'Recent Transactions'];
@@ -360,6 +360,10 @@ export default function Dashboard() {
 
   const { base: poolBase, suffix: poolSuffix } = formatPoolName(poolName);
 
+  // Pool-level metrics from latest stats record
+  const poolHashrate = statsRecord?.Hashrate || 0;
+  const poolMiners = statsRecord?.Numberminers || 0;
+
   return (
     <div>
       {/* Centered hero header */}
@@ -379,6 +383,22 @@ export default function Dashboard() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Pool metrics */}
+      <div className="os-metrics-bar">
+        <div className="os-metric-item">
+          <span className="os-metric-label">POOL HASHRATE</span>
+          <span className="os-metric-value emerald">{formatHashrate(poolHashrate)}</span>
+        </div>
+        <div className="os-metric-item">
+          <span className="os-metric-label">MINERS</span>
+          <span className="os-metric-value cyan">{poolMiners}</span>
+        </div>
+        <div className="os-metric-item">
+          <span className="os-metric-label">POOL FEE</span>
+          <span className="os-metric-value orange">{config?.poolFee || 0}%</span>
+        </div>
       </div>
 
       <TabNav tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />

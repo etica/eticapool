@@ -901,6 +901,49 @@ a {
 }
 
 /* =========================================================================
+   POOL METRICS BAR
+   ========================================================================= */
+
+.os-metrics-bar {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  padding: 1rem 0;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid #1f2937;
+}
+
+.os-metric-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.os-metric-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--os-dim);
+}
+
+.os-metric-value {
+  font-size: 18px;
+  font-weight: 700;
+  font-family: var(--os-font);
+}
+
+@media (max-width: 640px) {
+  .os-metrics-bar {
+    gap: 1.5rem;
+  }
+  .os-metric-value {
+    font-size: 15px;
+  }
+}
+
+/* =========================================================================
    FOOTER
    ========================================================================= */
 
