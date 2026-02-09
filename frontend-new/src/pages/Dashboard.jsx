@@ -356,9 +356,7 @@ export default function Dashboard() {
   // REST returns statsRecord; socket poolUpdate sends LastpoolStatsRecord
   const rawStats = data?.statsRecord || data?.LastpoolStatsRecord;
   const statsRecord = Array.isArray(rawStats) ? rawStats[0] : rawStats;
-  const recentPayments = statsRecord?.recentPaymentsBatched
-    || poolData?.recentPaymentsBatched
-    || [];
+  const recentPayments = data?.recentPaymentTxs || [];
 
   const { base: poolBase, suffix: poolSuffix } = formatPoolName(poolName);
 
