@@ -15,7 +15,7 @@ The fastest way to get a pool running. Docker handles Redis, the frontend build,
 ### Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) (v2+)
-- [MongoDB](https://www.mongodb.com/docs/manual/installation/) running on the host machine (port 27017), listening on `0.0.0.0` (see [MongoDB note](#mongodb-connection) below)
+- [MongoDB](https://www.mongodb.com/docs/manual/installation/) running on the host machine (port 27017) — see [MongoDB connection (CRITICAL SECURITY)](#mongodb-connection-critical-security) below
 - Two Etica wallet addresses with private keys (one for minting, one for payments)
 - A small amount of EGAZ in both addresses for gas fees
 
@@ -150,35 +150,59 @@ Available ports:
 docker compose down
 ```
 
-### MongoDB connection
+### MongoDB connection (CRITICAL SECURITY)
 
-MongoDB runs on the host machine (not inside Docker). Docker containers connect to it via `host.docker.internal`. On **macOS** and **Windows** this works out of the box. On **Linux**, MongoDB must be configured to accept connections from Docker containers:
+MongoDB runs on the host machine (not inside Docker). Docker containers connect to it via `host.docker.internal`. On **macOS** and **Windows** this works out of the box. On **Linux**, you need to configure MongoDB **and** firewall rules.
+
+> **WARNING**: MongoDB bound to `0.0.0.0` without firewall protection **will be hacked within hours**. Automated bots constantly scan the internet for exposed MongoDB instances and will delete all your data. **Always set up firewall rules BEFORE changing bindIp.**
+
+#### Automated setup (recommended)
 
 ```bash
-# Check current MongoDB bind address
-grep bindIp /etc/mongod.conf
+sudo bash scripts/setup-mongodb-docker.sh
+```
 
-# If it shows 127.0.0.1, update it to accept all connections
+This script does everything in the correct order:
+1. Adds firewall rules to **block** port 27017 from the internet
+2. Allows only localhost and Docker containers to access MongoDB
+3. Updates MongoDB `bindIp` to `0.0.0.0`
+4. Restarts MongoDB
+5. Verifies the configuration
+
+#### Manual setup
+
+If you prefer to do it manually, **follow this exact order**:
+
+```bash
+# STEP 1: FIREWALL FIRST — Block external access to MongoDB
+sudo ufw allow from 172.16.0.0/12 to any port 27017 comment 'Docker to MongoDB'
+sudo ufw allow from 127.0.0.1 to any port 27017 comment 'Localhost to MongoDB'
+sudo ufw deny in to any port 27017 comment 'Block external MongoDB'
+sudo ufw --force enable
+
+# STEP 2: Verify firewall is active
+sudo ufw status | grep 27017
+# You should see DENY for 27017 and ALLOW for Docker/localhost
+
+# STEP 3: Only AFTER firewall is confirmed, change bindIp
 sudo sed -i 's/bindIp: 127.0.0.1/bindIp: 0.0.0.0/' /etc/mongod.conf
-
-# Restart MongoDB to apply
 sudo systemctl restart mongod
 
-# Verify MongoDB is listening on all interfaces
+# STEP 4: Verify
 sudo ss -tlnp | grep 27017
 ```
 
-The `ss` output should show `0.0.0.0:27017` (not `127.0.0.1:27017`).
+> **NEVER** change `bindIp` to `0.0.0.0` without setting up the firewall first. The order matters.
 
-> **Note**: If your server is exposed to the internet, make sure MongoDB is protected by a firewall. Only ports listed in the [Firewall](#6-firewall) section need to be open — port 27017 should **not** be exposed publicly.
+#### Alternative: Keep MongoDB on localhost only
 
-**Alternative**: If you can't change MongoDB's bind address, create a `.env` file in the eticapool directory:
+If you don't want to change `bindIp`, you can use the Docker host network IP directly. Create a `.env` file:
 
 ```bash
-echo "MONGODB_URI=mongodb://YOUR_SERVER_IP:27017" > .env
+echo "MONGODB_URI=mongodb://172.17.0.1:27017" > .env
 ```
 
-Docker Compose will automatically pick it up. This also works for remote MongoDB instances or custom ports.
+This requires MongoDB to be reachable from the Docker bridge network. Some setups may need iptables rules for this.
 
 ---
 
@@ -207,7 +231,7 @@ Runs 7 containers:
 | `redis` | Cache + share queue | internal |
 | `token-collector` | Watches blockchain for mining parameters | — |
 | `share-processor` | Consumes and validates shares from Redis | — |
-| `stratum` | Accepts miner connections | 3333, 5555, 7777, 9999, 8081 |
+| `stratum` | Accepts miner connections | 3333, 5555, 7777, 9999 |
 | `web` | Frontend + REST API + Socket.IO | 80, 2053 |
 | `pools-network` | Network pool discovery | — |
 | `cleaner` | Old shares cleanup | — |
@@ -299,9 +323,10 @@ pm2 save
 pm2 startup
 ```
 
-### 6. Firewall
+### 6. Firewall (MANDATORY)
 
 ```bash
+# Allow pool services
 sudo ufw allow 22      # SSH
 sudo ufw allow 80      # Web UI
 sudo ufw allow 2053    # Socket.IO
@@ -309,9 +334,19 @@ sudo ufw allow 3333    # Stratum
 sudo ufw allow 5555    # Stratum
 sudo ufw allow 7777    # Stratum
 sudo ufw allow 9999    # Stratum
-sudo ufw allow 8081    # JSONRPC
-sudo ufw enable
+# BLOCK internal services from external access
+# Port 8081 (JSONRPC) must NEVER be exposed — internal use only
+sudo ufw deny in to any port 27017 comment 'Block external MongoDB'
+sudo ufw deny in to any port 6379  comment 'Block external Redis'
+
+# Allow Docker containers to reach MongoDB
+sudo ufw allow from 172.16.0.0/12 to any port 27017 comment 'Docker to MongoDB'
+sudo ufw allow from 127.0.0.1 to any port 27017 comment 'Localhost to MongoDB'
+
+sudo ufw --force enable
 ```
+
+> **CRITICAL**: Port 27017 (MongoDB) and 6379 (Redis) must NEVER be exposed to the internet. Automated bots scan for these ports and will delete your data within hours.
 
 ---
 

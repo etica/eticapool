@@ -23,7 +23,7 @@ let poolConfig = poolConfigFull[pool_env]
 
 
 
-console.log('poolConfig',poolConfig, poolConfigFull)
+// SECURITY: Never log poolConfig — it contains private keys
 
 console.log('init');
 

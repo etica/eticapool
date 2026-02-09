@@ -35,7 +35,7 @@ COPY networkpools/ ./networkpools/
 RUN mkdir -p /app/log && chown -R pool:pool /app/log
 USER pool
 ENV HTTP_PORT=8080
-EXPOSE 8080 2053 3333 5555 7777 9999 8081
+EXPOSE 8080 2053 3333 5555 7777 9999
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:8080/api/v1/overview || exit 1
 CMD ["node", "index.js"]
