@@ -78,7 +78,7 @@ export default function Miners() {
             <td className="py-3 px-3">
               <PortBadge port={miner.entryport} />
             </td>
-            <td className="py-3 px-3 faded">{timeAgo(miner.lastSeen)}</td>
+            <td className="py-3 px-3 faded">{timeAgo(miner.lastSubmittedSolutionTime)}</td>
           </tr>
         )}
       />

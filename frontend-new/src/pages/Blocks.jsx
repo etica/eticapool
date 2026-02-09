@@ -1,13 +1,34 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import DataTable from '../components/DataTable';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import { useBlocks } from '../hooks/useBlocks';
+import { useNetwork } from '../hooks/useNetwork';
 import { formatNumber, truncateAddress } from '../lib/formatters';
 import { ETICASCAN_URL } from '../config/constants';
 
 export default function Epochs() {
   const { data: blocks, isLoading, isError } = useBlocks();
+  const { data: networkData } = useNetwork();
   const blockList = Array.isArray(blocks) ? blocks : [];
+
+  // Build address → pool name lookup from poolList
+  const poolNameMap = useMemo(() => {
+    const map = {};
+    if (networkData?.poolList) {
+      networkData.poolList.forEach(pool => {
+        if (pool.mintAddress) {
+          map[pool.mintAddress.toLowerCase()] = pool.name;
+        }
+      });
+    }
+    return map;
+  }, [networkData?.poolList]);
+
+  function getMinerDisplay(address) {
+    if (!address) return '—';
+    const poolName = poolNameMap[address.toLowerCase()];
+    return poolName || truncateAddress(address, 8);
+  }
 
   return (
     <div>
@@ -16,7 +37,7 @@ export default function Epochs() {
         {blockList.length > 0 && (
           <p className="os-heading-sub">
             Last miner:{' '}
-            <span className="emerald">{truncateAddress(blockList[0].from, 8)}</span>
+            <span className="emerald">{getMinerDisplay(blockList[0].from)}</span>
           </p>
         )}
       </div>
@@ -57,7 +78,7 @@ export default function Epochs() {
                     rel="noreferrer"
                     className="os-link"
                   >
-                    {truncateAddress(item.from, 8)}
+                    {getMinerDisplay(item.from)}
                   </a>
                 </td>
               </tr>
