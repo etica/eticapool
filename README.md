@@ -15,7 +15,7 @@ The fastest way to get a pool running. Docker handles Redis, the frontend build,
 ### Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) (v2+)
-- [MongoDB](https://www.mongodb.com/docs/manual/installation/) running on the host machine (port 27017)
+- [MongoDB](https://www.mongodb.com/docs/manual/installation/) running on the host machine (port 27017), listening on `0.0.0.0` (see [MongoDB note](#mongodb-connection) below)
 - Two Etica wallet addresses with private keys (one for minting, one for payments)
 - A small amount of EGAZ in both addresses for gas fees
 
@@ -149,6 +149,36 @@ Available ports:
 ```bash
 docker compose down
 ```
+
+### MongoDB connection
+
+MongoDB runs on the host machine (not inside Docker). Docker containers connect to it via `host.docker.internal`. On **macOS** and **Windows** this works out of the box. On **Linux**, MongoDB must be configured to accept connections from Docker containers:
+
+```bash
+# Check current MongoDB bind address
+grep bindIp /etc/mongod.conf
+
+# If it shows 127.0.0.1, update it to accept all connections
+sudo sed -i 's/bindIp: 127.0.0.1/bindIp: 0.0.0.0/' /etc/mongod.conf
+
+# Restart MongoDB to apply
+sudo systemctl restart mongod
+
+# Verify MongoDB is listening on all interfaces
+sudo ss -tlnp | grep 27017
+```
+
+The `ss` output should show `0.0.0.0:27017` (not `127.0.0.1:27017`).
+
+> **Note**: If your server is exposed to the internet, make sure MongoDB is protected by a firewall. Only ports listed in the [Firewall](#6-firewall) section need to be open — port 27017 should **not** be exposed publicly.
+
+**Alternative**: If you can't change MongoDB's bind address, create a `.env` file in the eticapool directory:
+
+```bash
+echo "MONGODB_URI=mongodb://YOUR_SERVER_IP:27017" > .env
+```
+
+Docker Compose will automatically pick it up. This also works for remote MongoDB instances or custom ports.
 
 ---
 
