@@ -402,7 +402,7 @@ export default function Dashboard() {
         </div>
         <div className="os-metric-item">
           <span className="os-metric-label">POOL FEE</span>
-          <span className="os-metric-value orange">{config?.poolFee || 0}%</span>
+          <span className="os-metric-value" style={{ color: '#ffcead' }}>{config?.poolFee || 0}%</span>
         </div>
       </div>
 
