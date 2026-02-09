@@ -21,7 +21,7 @@ services:
       redis:
         condition: service_healthy
     environment:
-      - MONGODB_URI=mongodb://host.docker.internal:27017
+      - MONGODB_URI=${MONGODB_URI:-mongodb://host.docker.internal:27017}
       - REDIS_URL=redis://redis:6379
       - POOL_ENV=production
       - POOL_CONFIG_PATH=/app/config/pool.config.json
@@ -47,7 +47,7 @@ services:
       redis:
         condition: service_healthy
     environment:
-      - MONGODB_URI=mongodb://host.docker.internal:27017
+      - MONGODB_URI=${MONGODB_URI:-mongodb://host.docker.internal:27017}
       - REDIS_URL=redis://redis:6379
       - POOL_ENV=production
       - POOL_CONFIG_PATH=/app/config/pool.config.json
