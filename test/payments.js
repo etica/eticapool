@@ -44,19 +44,9 @@ describe('Peer Interface', function() {
 
        await mongoInterface.init('testdb')
 
-       try{
-          await mongoInterface.dropCollection('balance_payments');
-      }catch(e)
-      {
-        console.error(e)
-      }
+       await mongoInterface._getDb().collection('balance_payments').drop().catch(() => {})
 
-      try{
-         await mongoInterface.dropCollection('payment_batch');
-     }catch(e)
-     {
-       console.error(e)
-     }
+       await mongoInterface._getDb().collection('payment_batch').drop().catch(() => {})
 
       var minerEthAddress = '0xB11ca87E32075817C82Cc471994943a4290f4a14'
 

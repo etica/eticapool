@@ -14,3 +14,32 @@ frontend/node_modules
 frontend/dist
 frontend-new/node_modules
 frontend-new/dist
+
+# Admin utilities — can wipe miner data, should not be in production image
+util/
+scripts/
+deploy.js
+deploythis/
+
+# Documentation and metadata
+*.md
+LICENSE
+.gitignore
+.eslintrc*
+.babelrc
+
+# Template pool configs
+pool.config.template.json
+pool.config.description.json
+
+# Frontend source (already built in build stage)
+frontend/
+frontend-new/src/
+frontend-new/public/
+
+# Backups directory
+backups/
+
+# Warning/debug entry points
+warning-*.js
+indexdebug*.js

@@ -1,11 +1,14 @@
 import  SegfaultHandler from  'segfault-handler'; 
 SegfaultHandler.registerHandler('crash.log');
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Promise rejection:', reason);
+});
 
 //var INFURA_ROPSTEN_URL = 'https://ropsten.infura.io/v3/';
 //var INFURA_MAINNET_URL = 'https://mainnet.infura.io/v3/';
 
 var https_enabled = process.argv[2] === 'https';
-var pool_env = 'production';
+var pool_env = process.env.POOL_ENV || 'production';
 
  
 if( process.argv[2] == "staging" )
@@ -14,12 +17,11 @@ if( process.argv[2] == "staging" )
 }
  
 
-import FileUtils from './lib/util/file-utils.js'
+import { loadAndValidateConfig } from './lib/util/config-helper.js'
 import  cron from 'node-cron' 
 
 const configPath = process.env.POOL_CONFIG_PATH || '/pool.config.json';
-let poolConfigFull = FileUtils.readJsonFileSync(configPath);
-let poolConfig = poolConfigFull[pool_env]
+let poolConfig = loadAndValidateConfig(configPath, pool_env);
 
 
 
@@ -46,12 +48,22 @@ import TokenDataHelper from './lib/util/token-data-helper.js'
 
 
 var accountConfig;
- 
-import Web3 from 'web3'
- 
- 
 
-init( );
+import Web3 from 'web3'
+
+process.on('SIGTERM', () => {
+    console.log('Received SIGTERM, shutting down gracefully...');
+    setTimeout(() => process.exit(0), 3000);
+});
+process.on('SIGINT', () => {
+    console.log('Received SIGINT, shutting down gracefully...');
+    setTimeout(() => process.exit(0), 3000);
+});
+
+init( ).catch(err => {
+    console.error('Init failed:', err);
+    process.exit(1);
+});
 
 
 async function init( )

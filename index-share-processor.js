@@ -1,7 +1,10 @@
 import SegfaultHandler from 'segfault-handler';
 SegfaultHandler.registerHandler('crash.log');
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Promise rejection:', reason);
+});
 
-import FileUtils from './lib/util/file-utils.js'
+import { loadAndValidateConfig } from './lib/util/config-helper.js'
 import MongoInterface from './lib/mongo-interface.js'
 import PeerInterface from './lib/peer-interface.js'
 import RedisInterface from './lib/redis-interface.js'
@@ -10,10 +13,22 @@ import GeneralEventEmitterHandler from './lib/util/GeneralEventEmitterHandler.js
 
 var pool_env = process.env.POOL_ENV || 'production';
 const configPath = process.env.POOL_CONFIG_PATH || '/pool.config.json';
-let poolConfigFull = FileUtils.readJsonFileSync(configPath);
-let poolConfig = poolConfigFull[pool_env];
+let poolConfig = loadAndValidateConfig(configPath, pool_env);
 
 console.log('Eticapool Share Processor starting...');
+
+let peerInterface = null;
+
+process.on('SIGTERM', () => {
+    console.log('Received SIGTERM, shutting down gracefully...');
+    if (peerInterface) peerInterface._shuttingDown = true;
+    setTimeout(() => process.exit(0), 5000);
+});
+process.on('SIGINT', () => {
+    console.log('Received SIGINT, shutting down gracefully...');
+    if (peerInterface) peerInterface._shuttingDown = true;
+    setTimeout(() => process.exit(0), 5000);
+});
 
 async function init() {
     let mongoInterface = new MongoInterface();
@@ -28,7 +43,7 @@ async function init() {
     await redisPubSub.init(process.env.REDIS_URL);
     GeneralEventEmitterHandler.getInstance().setRedisPubSub(redisPubSub);
 
-    let peerInterface = new PeerInterface(mongoInterface, poolConfig, redisInterface);
+    peerInterface = new PeerInterface(mongoInterface, poolConfig, redisInterface);
     peerInterface.update();
 
     console.log('Share processor service ready');

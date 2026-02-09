@@ -1,6 +1,9 @@
+# Memory limits tuned for a 4GB VPS. If you have more RAM, increase
+# mongodb and pool services proportionally.
 services:
   redis:
-    image: redis:7-alpine
+    image: redis:7.2-alpine
+    mem_limit: 600m
     command: >
       redis-server
       --appendonly yes
@@ -17,13 +20,34 @@ services:
       timeout: 5s
       retries: 3
 
+  mongodb:
+    image: mongo:4.4.29
+    mem_limit: 1g
+    command: mongod --bind_ip_all --wiredTigerCacheSizeGB 0.5 --auth
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USER:-eticapool}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-eticapool_mongo_default_change_me}
+    volumes:
+      - mongodb-data:/data/db
+    # NO ports: section — never exposed to host or internet
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')", "-u", "${MONGO_ROOT_USER:-eticapool}", "-p", "${MONGO_ROOT_PASSWORD:-eticapool_mongo_default_change_me}", "--authenticationDatabase", "admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
   pool-app:
     build: .
+    mem_limit: 1g
     depends_on:
       redis:
         condition: service_healthy
+      mongodb:
+        condition: service_healthy
     environment:
-      - MONGODB_URI=${MONGODB_URI:-mongodb://host.docker.internal:27017}
+      - MONGODB_URI=${MONGODB_URI:-mongodb://${MONGO_ROOT_USER:-eticapool}:${MONGO_ROOT_PASSWORD:-eticapool_mongo_default_change_me}@mongodb:27017}
       - REDIS_URL=redis://:${REDIS_PASSWORD:-eticapool_redis_default_change_me}@redis:6379
       - POOL_ENV=production
       - POOL_CONFIG_PATH=/app/config/pool.config.json
@@ -38,49 +62,81 @@ services:
     volumes:
       - ./pool.config.json:/app/config/pool.config.json:ro
       - ./log:/app/log
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     restart: unless-stopped
 
   pools-network:
     build: .
+    mem_limit: 256m
     command: ["node", "indexpoolsnetwork.js"]
     depends_on:
       redis:
         condition: service_healthy
+      mongodb:
+        condition: service_healthy
     environment:
-      - MONGODB_URI=${MONGODB_URI:-mongodb://host.docker.internal:27017}
+      - MONGODB_URI=${MONGODB_URI:-mongodb://${MONGO_ROOT_USER:-eticapool}:${MONGO_ROOT_PASSWORD:-eticapool_mongo_default_change_me}@mongodb:27017}
       - REDIS_URL=redis://:${REDIS_PASSWORD:-eticapool_redis_default_change_me}@redis:6379
       - POOL_ENV=production
       - POOL_CONFIG_PATH=/app/config/pool.config.json
     volumes:
       - ./pool.config.json:/app/config/pool.config.json:ro
       - ./log:/app/log
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     healthcheck:
       disable: true
     restart: unless-stopped
 
   cleaner:
     build: .
+    mem_limit: 256m
     command: ["node", "indexcleanercoordinator.js"]
     depends_on:
       redis:
         condition: service_healthy
+      mongodb:
+        condition: service_healthy
     environment:
-      - MONGODB_URI=${MONGODB_URI:-mongodb://host.docker.internal:27017}
+      - MONGODB_URI=${MONGODB_URI:-mongodb://${MONGO_ROOT_USER:-eticapool}:${MONGO_ROOT_PASSWORD:-eticapool_mongo_default_change_me}@mongodb:27017}
       - REDIS_URL=redis://:${REDIS_PASSWORD:-eticapool_redis_default_change_me}@redis:6379
       - POOL_ENV=production
       - POOL_CONFIG_PATH=/app/config/pool.config.json
     volumes:
       - ./pool.config.json:/app/config/pool.config.json:ro
       - ./log:/app/log
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     healthcheck:
       disable: true
     restart: unless-stopped
 
+  backup:
+    image: mongo:4.4.29
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      - MONGO_ROOT_USER=${MONGO_ROOT_USER:-eticapool}
+      - MONGO_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-eticapool_mongo_default_change_me}
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        while true; do
+          STAMP=$$(date +%Y%m%d-%H%M%S)
+          echo "[backup] Starting mongodump at $$STAMP"
+          mongodump --host mongodb --port 27017 -u $${MONGO_ROOT_USER:-eticapool} -p $${MONGO_ROOT_PASSWORD:-eticapool_mongo_default_change_me} --authenticationDatabase admin --db tokenpool_production --out /backups/dump-$$STAMP
+          if [ $$? -eq 0 ]; then
+            echo "[backup] Dump successful: dump-$$STAMP"
+          else
+            echo "[backup] Dump FAILED"
+          fi
+          cd /backups && ls -dt dump-* 2>/dev/null | tail -n +3 | xargs rm -rf
+          echo "[backup] Sleeping 24h until next backup"
+          sleep 86400
+        done
+    volumes:
+      - ./backups:/backups
+    mem_limit: 256m
+    restart: unless-stopped
+    healthcheck:
+      disable: true
+
 volumes:
   redis-data:
+  mongodb-data:

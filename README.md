@@ -15,7 +15,6 @@ The fastest way to get a pool running. Docker handles Redis, the frontend build,
 ### Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) (v2+)
-- [MongoDB](https://www.mongodb.com/docs/manual/installation/) running on the host machine (port 27017) — see [MongoDB connection (CRITICAL SECURITY)](#mongodb-connection-critical-security) below
 - Two Etica wallet addresses with private keys (one for minting, one for payments)
 - A small amount of EGAZ in both addresses for gas fees
 
@@ -97,22 +96,38 @@ Edit `pool.config.json` — fill in the **production** section:
 
 > **SECURITY**: Never share your `pool.config.json` — it contains private keys. It is listed in `.gitignore` and `.dockerignore`.
 
-### 4. Start the pool
+### 4. Set passwords
+
+Create a `.env` file in the project root:
+
+```bash
+cat > .env << 'EOF'
+REDIS_PASSWORD=change_me_to_a_strong_password
+MONGO_ROOT_USER=eticapool
+MONGO_ROOT_PASSWORD=change_me_to_a_strong_password
+EOF
+```
+
+> The `.env` file is listed in `.gitignore` — it will not be committed.
+
+### 5. Start the pool
 
 ```bash
 docker compose up --build -d
 ```
 
-This starts 4 containers:
+This starts 6 containers:
 
 | Container | Role |
 |-----------|------|
+| `mongodb` | Database (internal network only, never exposed to internet) |
 | `redis` | In-memory cache + share queue |
 | `pool-app` | Main pool process (stratum, web, shares, tokens) |
 | `pools-network` | Discovers and syncs with other Etica pools |
 | `cleaner` | Periodically cleans old pending shares |
+| `backup` | Automated daily database backups to `./backups/` |
 
-### 5. Verify
+### 6. Verify
 
 ```bash
 # Check all containers are running
@@ -127,7 +142,7 @@ curl http://localhost/api/v1/overview
 
 Open `http://localhost` in your browser to see the pool frontend.
 
-### 6. Connect a miner
+### 7. Connect a miner
 
 Point your RandomX miner at:
 
@@ -144,65 +159,98 @@ Available ports:
 | 7777 | High-end CPU |
 | 9999 | Very-High-end CPU |
 
-### 7. Stop
+### 8. Stop
 
 ```bash
 docker compose down
 ```
 
-### MongoDB connection (CRITICAL SECURITY)
+> **WARNING**: Never use `docker compose down -v` — the `-v` flag **permanently deletes all pool data** (MongoDB and Redis volumes). Plain `docker compose down` is safe and preserves all data.
 
-MongoDB runs on the host machine (not inside Docker). Docker containers connect to it via `host.docker.internal`. On **macOS** and **Windows** this works out of the box. On **Linux**, you need to configure MongoDB **and** firewall rules.
+### Upgrading from a previous version (MongoDB on host)
 
-> **WARNING**: MongoDB bound to `0.0.0.0` without firewall protection **will be hacked within hours**. Automated bots constantly scan the internet for exposed MongoDB instances and will delete all your data. **Always set up firewall rules BEFORE changing bindIp.**
-
-#### Automated setup (recommended)
+If you previously ran MongoDB on the host machine (e.g., with pm2), migrate your data into the Docker container:
 
 ```bash
-sudo bash scripts/setup-mongodb-docker.sh
+# 1. Stop the old pool processes
+pm2 stop all
+
+# 2. Back up your existing database
+mongodump --db tokenpool_production --out /tmp/pool-backup
+
+# 3. Verify the backup was created
+ls -la /tmp/pool-backup/tokenpool_production/
+# You should see .bson and .metadata.json files for each collection
 ```
-
-This script does everything in the correct order:
-1. Adds firewall rules to **block** port 27017 from the internet
-2. Allows only localhost and Docker containers to access MongoDB
-3. Updates MongoDB `bindIp` to `0.0.0.0`
-4. Restarts MongoDB
-5. Verifies the configuration
-
-#### Manual setup
-
-If you prefer to do it manually, **follow this exact order**:
 
 ```bash
-# STEP 1: FIREWALL FIRST — Block external access to MongoDB
-sudo ufw allow from 172.16.0.0/12 to any port 27017 comment 'Docker to MongoDB'
-sudo ufw allow from 127.0.0.1 to any port 27017 comment 'Localhost to MongoDB'
-sudo ufw deny in to any port 27017 comment 'Block external MongoDB'
-sudo ufw --force enable
+# 4. Create your .env file (see step 4 above) and start the new Docker stack
+docker compose up --build -d
 
-# STEP 2: Verify firewall is active
-sudo ufw status | grep 27017
-# You should see DENY for 27017 and ALLOW for Docker/localhost
-
-# STEP 3: Only AFTER firewall is confirmed, change bindIp
-sudo sed -i 's/bindIp: 127.0.0.1/bindIp: 0.0.0.0/' /etc/mongod.conf
-sudo systemctl restart mongod
-
-# STEP 4: Verify
-sudo ss -tlnp | grep 27017
+# 5. Wait for all containers to be healthy (~30s)
+docker compose ps
 ```
-
-> **NEVER** change `bindIp` to `0.0.0.0` without setting up the firewall first. The order matters.
-
-#### Alternative: Keep MongoDB on localhost only
-
-If you don't want to change `bindIp`, you can use the Docker host network IP directly. Create a `.env` file:
 
 ```bash
-echo "MONGODB_URI=mongodb://172.17.0.1:27017" > .env
+# 6. Copy backup into the MongoDB container and restore
+docker cp /tmp/pool-backup/tokenpool_production \
+  $(docker compose ps -q mongodb):/tmp/tokenpool_production
+
+docker compose exec mongodb mongorestore \
+  -u "${MONGO_ROOT_USER:-eticapool}" \
+  -p "${MONGO_ROOT_PASSWORD:-eticapool_mongo_default_change_me}" \
+  --authenticationDatabase admin \
+  --db tokenpool_production \
+  /tmp/tokenpool_production
+
+# 7. Verify the restore
+docker compose exec mongodb mongo \
+  -u "${MONGO_ROOT_USER:-eticapool}" \
+  -p "${MONGO_ROOT_PASSWORD:-eticapool_mongo_default_change_me}" \
+  --authenticationDatabase admin \
+  tokenpool_production \
+  --eval "db.getCollectionNames()"
+# Should list: minerData, miner_shares, balance_payments, pool_mints, etc.
 ```
 
-This requires MongoDB to be reachable from the Docker bridge network. Some setups may need iptables rules for this.
+After confirming the restore, disable the host MongoDB service:
+
+```bash
+sudo systemctl stop mongod
+sudo systemctl disable mongod
+```
+
+> **IMPORTANT**: Also set up the firewall (see Firewall section below) to block port 27017 from the internet.
+
+### Restoring from backup
+
+The `backup` container automatically saves daily backups to the `./backups/` directory on the host. Each backup is a timestamped directory containing a full `mongodump` of the pool database. The two most recent backups are kept; older ones are deleted automatically.
+
+To restore from the most recent backup:
+
+```bash
+# 1. Find the latest backup
+ls -lt backups/
+
+# 2. Restore into the running MongoDB container
+docker compose exec -T mongodb mongorestore \
+  -u "${MONGO_ROOT_USER:-eticapool}" \
+  -p "${MONGO_ROOT_PASSWORD:-eticapool_mongo_default_change_me}" \
+  --authenticationDatabase admin \
+  --db tokenpool_production \
+  --drop \
+  backups/dump-YYYYMMDD-HHMMSS/tokenpool_production
+
+# 3. Verify the restore
+docker compose exec mongodb mongo \
+  -u "${MONGO_ROOT_USER:-eticapool}" \
+  -p "${MONGO_ROOT_PASSWORD:-eticapool_mongo_default_change_me}" \
+  --authenticationDatabase admin \
+  tokenpool_production \
+  --eval "db.getCollectionNames()"
+```
+
+> **WARNING**: The `--drop` flag deletes existing collections before restoring. Only use this if you want to fully replace the current database with the backup.
 
 ---
 
@@ -224,10 +272,11 @@ Separate processes for each role. Better for high-traffic pools with many miners
 docker compose -f docker-compose.scaled.yml up --build -d
 ```
 
-Runs 7 containers:
+Runs 8 containers:
 
 | Container | Role | Ports |
 |-----------|------|-------|
+| `mongodb` | Database (internal only) | — |
 | `redis` | Cache + share queue | internal |
 | `token-collector` | Watches blockchain for mining parameters | — |
 | `share-processor` | Consumes and validates shares from Redis | — |
@@ -292,6 +341,8 @@ sudo systemctl start mongod
 sudo systemctl enable mongod
 ```
 
+> **Security**: MongoDB defaults to `bindIp: 127.0.0.1` (localhost only), which is safe. **Never** change this to `0.0.0.0` without firewall rules — automated bots scan for exposed MongoDB instances and will delete your data within hours. When running without Docker, set the environment variable: `export MONGODB_URI=mongodb://localhost:27017`
+
 ### 4. (Optional) Install Redis
 
 Redis is optional — the pool falls back to MongoDB queues without it.
@@ -338,10 +389,6 @@ sudo ufw allow 9999    # Stratum
 # Port 8081 (JSONRPC) must NEVER be exposed — internal use only
 sudo ufw deny in to any port 27017 comment 'Block external MongoDB'
 sudo ufw deny in to any port 6379  comment 'Block external Redis'
-
-# Allow Docker containers to reach MongoDB
-sudo ufw allow from 172.16.0.0/12 to any port 27017 comment 'Docker to MongoDB'
-sudo ufw allow from 127.0.0.1 to any port 27017 comment 'Localhost to MongoDB'
 
 sudo ufw --force enable
 ```

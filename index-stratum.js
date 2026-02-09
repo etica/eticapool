@@ -1,7 +1,10 @@
 import SegfaultHandler from 'segfault-handler';
 SegfaultHandler.registerHandler('crash.log');
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Promise rejection:', reason);
+});
 
-import FileUtils from './lib/util/file-utils.js'
+import { loadAndValidateConfig } from './lib/util/config-helper.js'
 import MongoInterface from './lib/mongo-interface.js'
 import WebServer from './lib/web-server.js'
 import RedisInterface from './lib/redis-interface.js'
@@ -10,10 +13,18 @@ import GeneralEventEmitterHandler from './lib/util/GeneralEventEmitterHandler.js
 
 var pool_env = process.env.POOL_ENV || 'production';
 const configPath = process.env.POOL_CONFIG_PATH || '/pool.config.json';
-let poolConfigFull = FileUtils.readJsonFileSync(configPath);
-let poolConfig = poolConfigFull[pool_env];
+let poolConfig = loadAndValidateConfig(configPath, pool_env);
 
 console.log('Eticapool Stratum Service starting...');
+
+process.on('SIGTERM', () => {
+    console.log('Received SIGTERM, shutting down gracefully...');
+    setTimeout(() => process.exit(0), 3000);
+});
+process.on('SIGINT', () => {
+    console.log('Received SIGINT, shutting down gracefully...');
+    setTimeout(() => process.exit(0), 3000);
+});
 
 async function init() {
     let mongoInterface = new MongoInterface();

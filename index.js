@@ -1,5 +1,8 @@
 import  SegfaultHandler from  'segfault-handler'; 
 SegfaultHandler.registerHandler('crash.log');
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Promise rejection:', reason);
+});
 
 //var INFURA_ROPSTEN_URL = 'https://ropsten.infura.io/v3/';
 //var INFURA_MAINNET_URL = 'https://mainnet.infura.io/v3/';
@@ -14,12 +17,11 @@ if( process.argv[2] == "staging" )
 }
  
 
-import FileUtils from './lib/util/file-utils.js'
+import { loadAndValidateConfig } from './lib/util/config-helper.js'
 import  cron from 'node-cron' 
 
 const configPath = process.env.POOL_CONFIG_PATH || '/pool.config.json';
-let poolConfigFull = FileUtils.readJsonFileSync(configPath);
-let poolConfig = poolConfigFull[pool_env]
+let poolConfig = loadAndValidateConfig(configPath, pool_env);
 
 
 
@@ -68,10 +70,24 @@ import GeneralEventEmitterHandler from './lib/util/GeneralEventEmitterHandler.js
 var accountConfig;
 
 import Web3 from 'web3'
- 
- 
 
-init( );
+let peerInterface = null;
+
+process.on('SIGTERM', () => {
+    console.log('Received SIGTERM, shutting down gracefully...');
+    if (peerInterface) peerInterface._shuttingDown = true;
+    setTimeout(() => process.exit(0), 5000);
+});
+process.on('SIGINT', () => {
+    console.log('Received SIGINT, shutting down gracefully...');
+    if (peerInterface) peerInterface._shuttingDown = true;
+    setTimeout(() => process.exit(0), 5000);
+});
+
+init( ).catch(err => {
+    console.error('Init failed:', err);
+    process.exit(1);
+});
 
 
 async function init( )
@@ -126,7 +142,7 @@ async function init( )
 
         diagnosticsManager.update();
 
-        let peerInterface = new PeerInterface(mongoInterface, poolConfig, redisInterface)
+        peerInterface = new PeerInterface(mongoInterface, poolConfig, redisInterface)
            if (webServer.io) peerInterface.setIO(webServer.io);
            peerInterface.update();
 

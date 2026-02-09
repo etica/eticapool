@@ -103,7 +103,7 @@ describe('Pool System', async function() {
 
     await mongoInterface.init( 'tokenpool_'.concat(pool_env))
 
-    await mongoInterface.dropDatabase()
+    await mongoInterface._getDb().dropDatabase()
 });
 
 
