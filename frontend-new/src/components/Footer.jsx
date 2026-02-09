@@ -28,7 +28,7 @@ const FOOTER_COLUMNS = [
       { label: 'EticaScan', url: 'https://www.eticascan.org' },
       { label: 'Etica Stats Explorer', url: 'http://explorer.etica-stats.org/' },
       { label: 'Mining Pool Stats', url: 'https://miningpoolstats.stream/etica' },
-      { label: 'Eticapool v4.0.17', url: 'https://github.com/etica/eticapool' },
+      { label: 'Eticapool v5.0.0', url: 'https://github.com/etica/eticapool' },
     ],
   },
 ];

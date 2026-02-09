@@ -526,7 +526,7 @@ export default function Overview() {
               <a href="https://www.eticascan.org" target="_blank" rel="noreferrer" className="os-footer-link">EticaScan</a>
               <a href="http://explorer.etica-stats.org/" target="_blank" rel="noreferrer" className="os-footer-link">Etica Stats Explorer</a>
               <a href="https://miningpoolstats.stream/etica" target="_blank" rel="noreferrer" className="os-footer-link">Mining Pool Stats</a>
-              <a href="https://github.com/etica/eticapool" target="_blank" rel="noreferrer" className="os-footer-link">Eticapool v4.0.17</a>
+              <a href="https://github.com/etica/eticapool" target="_blank" rel="noreferrer" className="os-footer-link">Eticapool v5.0.0</a>
             </div>
           </div>
 
