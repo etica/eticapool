@@ -1,0 +1,424 @@
+/* Template 2d: Ecovise Gold — Green Pool Health + Gold/Amber Financial Data */
+
+/* ---- Custom Properties ---- */
+.gold-dark {
+  --bg-primary: #050504;
+  --bg-card: rgba(15, 14, 8, 0.8);
+  --accent-green: #00ff41;
+  --accent-emerald: #10b981;
+  --accent-gold: #f59e0b;
+  --accent-amber: #d97706;
+  --accent-teal: #14b8a6;
+  --border-warm: rgba(217, 119, 6, 0.15);
+  --border-green: rgba(16, 185, 129, 0.15);
+  --text-body: #e5e7eb;
+  --text-muted: #9ca3af;
+}
+
+/* ---- Warm-Black Background with Dual Gradient Mesh ---- */
+.gold-dark {
+  background-color: var(--bg-primary);
+  background-image:
+    radial-gradient(ellipse 600px 400px at 0% 0%, rgba(0, 255, 65, 0.025) 0%, transparent 70%),
+    radial-gradient(ellipse 500px 500px at 100% 0%, rgba(245, 158, 11, 0.02) 0%, transparent 70%),
+    radial-gradient(ellipse 400px 400px at 50% 100%, rgba(217, 119, 6, 0.015) 0%, transparent 60%),
+    radial-gradient(ellipse 350px 350px at 0% 100%, rgba(16, 185, 129, 0.015) 0%, transparent 60%);
+}
+
+/* ---- Green Glow (operational/health data) ---- */
+.gold-glow-green {
+  text-shadow: 0 0 20px rgba(0, 255, 65, 0.15), 0 0 40px rgba(0, 255, 65, 0.05);
+}
+
+.gold-glow-green-strong {
+  text-shadow: 0 0 24px rgba(0, 255, 65, 0.25), 0 0 48px rgba(0, 255, 65, 0.08);
+}
+
+/* ---- Gold Glow (financial/value data) ---- */
+.gold-glow-gold {
+  text-shadow: 0 0 20px rgba(245, 158, 11, 0.2), 0 0 40px rgba(245, 158, 11, 0.06);
+}
+
+.gold-glow-gold-strong {
+  text-shadow: 0 0 24px rgba(245, 158, 11, 0.3), 0 0 48px rgba(245, 158, 11, 0.1);
+}
+
+/* ---- Logo Warm Glow ---- */
+.gold-logo-glow {
+  text-shadow: 0 0 12px rgba(245, 158, 11, 0.3), 0 0 30px rgba(245, 158, 11, 0.1);
+}
+
+.gold-logo-img {
+  filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.3)) drop-shadow(0 0 20px rgba(245, 158, 11, 0.1));
+}
+
+/* ---- Warm Glassmorphism Card ---- */
+.gold-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(217, 119, 6, 0.15);
+  border-radius: 12px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gold-card:hover {
+  border-color: rgba(217, 119, 6, 0.3);
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.04), 0 0 40px rgba(217, 119, 6, 0.02);
+}
+
+/* Financial-accent card variant */
+.gold-card-financial {
+  background: var(--bg-card);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(245, 158, 11, 0.12);
+  border-radius: 12px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gold-card-financial:hover {
+  border-color: rgba(245, 158, 11, 0.3);
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.06), 0 0 40px rgba(217, 119, 6, 0.03);
+}
+
+/* ---- Pulsing Live Dot (green) ---- */
+@keyframes gold-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(0, 255, 65, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 65, 0);
+  }
+}
+
+.gold-pulse-dot {
+  width: 8px;
+  height: 8px;
+  background: #00ff41;
+  border-radius: 50%;
+  animation: gold-pulse 2s ease-in-out infinite;
+}
+
+/* ---- Circular Progress Ring ---- */
+@keyframes gold-ring-fill {
+  from {
+    stroke-dashoffset: 282.74;
+  }
+}
+
+.gold-ring-circle {
+  transition: stroke-dashoffset 0.3s ease;
+  animation: gold-ring-fill 1.5s ease-out forwards;
+}
+
+/* ---- Mini Bar Chart Bars ---- */
+@keyframes gold-bar-grow {
+  from {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.gold-bar {
+  transform-origin: bottom;
+  animation: gold-bar-grow 0.6s ease-out forwards;
+}
+
+.gold-bar:nth-child(1) { animation-delay: 0.05s; }
+.gold-bar:nth-child(2) { animation-delay: 0.10s; }
+.gold-bar:nth-child(3) { animation-delay: 0.15s; }
+.gold-bar:nth-child(4) { animation-delay: 0.20s; }
+.gold-bar:nth-child(5) { animation-delay: 0.25s; }
+.gold-bar:nth-child(6) { animation-delay: 0.30s; }
+.gold-bar:nth-child(7) { animation-delay: 0.35s; }
+.gold-bar:nth-child(8) { animation-delay: 0.40s; }
+
+/* ---- Section Fade-In ---- */
+@keyframes gold-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.gold-section {
+  animation: gold-fade-in 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+.gold-section:nth-child(1) { animation-delay: 0s; }
+.gold-section:nth-child(2) { animation-delay: 0.06s; }
+.gold-section:nth-child(3) { animation-delay: 0.12s; }
+.gold-section:nth-child(4) { animation-delay: 0.18s; }
+.gold-section:nth-child(5) { animation-delay: 0.24s; }
+.gold-section:nth-child(6) { animation-delay: 0.30s; }
+.gold-section:nth-child(7) { animation-delay: 0.36s; }
+.gold-section:nth-child(8) { animation-delay: 0.42s; }
+.gold-section:nth-child(9) { animation-delay: 0.48s; }
+.gold-section:nth-child(10) { animation-delay: 0.54s; }
+.gold-section:nth-child(11) { animation-delay: 0.60s; }
+.gold-section:nth-child(12) { animation-delay: 0.66s; }
+.gold-section:nth-child(13) { animation-delay: 0.72s; }
+
+/* ---- Table Styling ---- */
+.gold-table-row {
+  border-bottom: 1px solid rgba(217, 119, 6, 0.08);
+  transition: background-color 0.2s ease;
+}
+
+.gold-table-row:hover {
+  background-color: rgba(245, 158, 11, 0.03);
+}
+
+/* ---- Scrollbar ---- */
+.gold-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #78350f #050504;
+}
+
+.gold-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.gold-scroll::-webkit-scrollbar-track {
+  background: #050504;
+}
+
+.gold-scroll::-webkit-scrollbar-thumb {
+  background: #78350f;
+  border-radius: 3px;
+}
+
+.gold-scroll::-webkit-scrollbar-thumb:hover {
+  background: #d97706;
+}
+
+/* ---- Left Accent Borders ---- */
+.gold-accent-left-green {
+  border-left: 3px solid #10b981;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.gold-accent-left-green:hover {
+  border-left-color: #00ff41;
+  background-color: rgba(16, 185, 129, 0.04);
+}
+
+.gold-accent-left-gold {
+  border-left: 3px solid #d97706;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.gold-accent-left-gold:hover {
+  border-left-color: #f59e0b;
+  background-color: rgba(245, 158, 11, 0.04);
+}
+
+/* ---- Footer Dual Gradient Border ---- */
+.gold-footer-border {
+  background: linear-gradient(90deg, transparent 0%, #10b981 20%, #f59e0b 50%, #10b981 80%, transparent 100%);
+  height: 1px;
+}
+
+/* ---- Sparkline Placeholder ---- */
+.gold-sparkline-green {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 255, 65, 0.1) 0%,
+    rgba(0, 255, 65, 0.3) 30%,
+    rgba(0, 255, 65, 0.15) 60%,
+    rgba(0, 255, 65, 0.4) 80%,
+    rgba(0, 255, 65, 0.2) 100%
+  );
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20'%3E%3Cpath d='M0 15 Q10 12 20 14 T40 8 T60 11 T80 5 T100 9' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20'%3E%3Cpath d='M0 15 Q10 12 20 14 T40 8 T60 11 T80 5 T100 9' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E");
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+}
+
+.gold-sparkline-gold {
+  background: linear-gradient(
+    90deg,
+    rgba(245, 158, 11, 0.1) 0%,
+    rgba(245, 158, 11, 0.3) 30%,
+    rgba(245, 158, 11, 0.15) 60%,
+    rgba(245, 158, 11, 0.4) 80%,
+    rgba(245, 158, 11, 0.2) 100%
+  );
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20'%3E%3Cpath d='M0 15 Q10 12 20 14 T40 8 T60 11 T80 5 T100 9' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20'%3E%3Cpath d='M0 15 Q10 12 20 14 T40 8 T60 11 T80 5 T100 9' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E");
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+}
+
+/* ---- Back Link Pill ---- */
+.gold-pill {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.gold-pill:hover {
+  background-color: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #f59e0b;
+}
+
+/* ---- Search Input ---- */
+.gold-search-input {
+  background: rgba(15, 14, 8, 0.9);
+  border: 1px solid rgba(217, 119, 6, 0.2);
+  border-radius: 8px;
+  color: #e5e7eb;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gold-search-input:focus {
+  outline: none;
+  border-color: rgba(245, 158, 11, 0.4);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.08);
+}
+
+.gold-search-input::placeholder {
+  color: #4b5563;
+}
+
+/* ---- Monospace Data Field ---- */
+.gold-mono-field {
+  background: rgba(20, 184, 166, 0.04);
+  border: 1px solid rgba(20, 184, 166, 0.12);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.75rem;
+  color: #14b8a6;
+  word-break: break-all;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.gold-mono-field:hover {
+  background: rgba(20, 184, 166, 0.07);
+}
+
+/* ---- Port Badge Colors ---- */
+.gold-port-3333 {
+  background: rgba(0, 255, 65, 0.15);
+  color: #00ff41;
+  border: 1px solid rgba(0, 255, 65, 0.25);
+}
+
+.gold-port-5555 {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.gold-port-7777 {
+  background: rgba(217, 119, 6, 0.15);
+  color: #d97706;
+  border: 1px solid rgba(217, 119, 6, 0.25);
+}
+
+.gold-port-9999 {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+/* ---- Stratum Port Card ---- */
+.gold-port-card {
+  background: rgba(15, 14, 8, 0.6);
+  border: 1px solid rgba(217, 119, 6, 0.12);
+  border-radius: 8px;
+  padding: 10px 14px;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.gold-port-card:hover {
+  border-color: rgba(217, 119, 6, 0.3);
+  background: rgba(15, 14, 8, 0.8);
+}
+
+/* ---- Status Badge ---- */
+.gold-status-active {
+  background: rgba(0, 255, 65, 0.12);
+  color: #00ff41;
+  border: 1px solid rgba(0, 255, 65, 0.25);
+  border-radius: 9999px;
+  padding: 2px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ---- Section Headers ---- */
+.gold-header-operational {
+  height: 2px;
+  background: linear-gradient(90deg, #10b981 0%, transparent 100%);
+}
+
+.gold-header-financial {
+  height: 2px;
+  background: linear-gradient(90deg, #f59e0b 0%, transparent 100%);
+}
+
+/* ---- Info Grid Items ---- */
+.gold-info-label {
+  font-size: 0.7rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.gold-info-value {
+  font-size: 0.8rem;
+  color: #d1d5db;
+  font-weight: 500;
+}
+
+.gold-info-value-mono {
+  font-size: 0.75rem;
+  color: #14b8a6;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  word-break: break-all;
+}
+
+/* ---- Expandable Text ---- */
+.gold-expandable {
+  max-height: 1.5em;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.gold-expandable.expanded {
+  max-height: 200px;
+}
+
+/* ---- Hero Stat Card Variants ---- */
+.gold-hero-green {
+  border-top: 2px solid rgba(0, 255, 65, 0.3);
+}
+
+.gold-hero-gold {
+  border-top: 2px solid rgba(245, 158, 11, 0.3);
+}
+
+/* ---- Dual-color gauge gradient ---- */
+.gold-gauge-track {
+  stroke: #78350f;
+  opacity: 0.3;
+}

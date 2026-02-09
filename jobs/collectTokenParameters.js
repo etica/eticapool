@@ -26,7 +26,8 @@ if( workerData!=null && workerData.pool_env == "production" )
  
 
 
-let poolConfigFull = FileUtils.readJsonFileSync('/pool.config.json');
+const configPath = process.env.POOL_CONFIG_PATH || '/pool.config.json';
+let poolConfigFull = FileUtils.readJsonFileSync(configPath);
 let poolConfig = poolConfigFull[pool_env]
  
 

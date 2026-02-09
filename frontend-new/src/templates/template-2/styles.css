@@ -1,0 +1,354 @@
+/* Template 2: Ecovise Dark — Premium Dark Green Financial Dashboard */
+
+/* ---- Custom Properties ---- */
+.ecovise-dark {
+  --bg-primary: #050505;
+  --bg-card: #0a0f0a;
+  --bg-elevated: #0d1a0d;
+  --accent-green: #00ff41;
+  --accent-emerald: #10b981;
+  --accent-positive: #22c55e;
+  --border-green: rgba(16, 185, 129, 0.2);
+  --border-glow: rgba(0, 255, 65, 0.12);
+  --text-body: #e5e7eb;
+  --text-muted: #9ca3af;
+  --text-emphasis: #ffffff;
+}
+
+/* ---- Background Gradient Mesh ---- */
+.ecovise-dark {
+  background-color: var(--bg-primary);
+  background-image:
+    radial-gradient(ellipse 600px 400px at 0% 0%, rgba(0, 255, 65, 0.03) 0%, transparent 70%),
+    radial-gradient(ellipse 500px 500px at 100% 100%, rgba(16, 185, 129, 0.025) 0%, transparent 70%),
+    radial-gradient(ellipse 400px 300px at 50% 50%, rgba(0, 255, 65, 0.01) 0%, transparent 60%);
+}
+
+/* ---- Green Number Glow ---- */
+.ecovise-glow-text {
+  text-shadow: 0 0 20px rgba(0, 255, 65, 0.15), 0 0 40px rgba(0, 255, 65, 0.05);
+}
+
+.ecovise-glow-text-strong {
+  text-shadow: 0 0 24px rgba(0, 255, 65, 0.25), 0 0 48px rgba(0, 255, 65, 0.08);
+}
+
+/* ---- Logo Glow ---- */
+.ecovise-logo-glow {
+  text-shadow: 0 0 12px rgba(0, 255, 65, 0.3), 0 0 30px rgba(0, 255, 65, 0.1);
+}
+
+.ecovise-logo-img {
+  filter: drop-shadow(0 0 10px rgba(0, 255, 65, 0.3)) drop-shadow(0 0 20px rgba(0, 255, 65, 0.1));
+}
+
+/* ---- Glassmorphism Card ---- */
+.ecovise-card {
+  background: rgba(10, 15, 10, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  border-radius: 12px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ecovise-card:hover {
+  border-color: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.05), 0 0 40px rgba(16, 185, 129, 0.03);
+}
+
+/* ---- Pulsing Live Dot ---- */
+@keyframes ecovise-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(0, 255, 65, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 65, 0);
+  }
+}
+
+.ecovise-pulse-dot {
+  width: 8px;
+  height: 8px;
+  background: #00ff41;
+  border-radius: 50%;
+  animation: ecovise-pulse 2s ease-in-out infinite;
+}
+
+/* ---- Circular Progress Ring ---- */
+@keyframes ecovise-ring-fill {
+  from {
+    stroke-dashoffset: 282.74;
+  }
+}
+
+.ecovise-ring-circle {
+  transition: stroke-dashoffset 0.3s ease;
+  animation: ecovise-ring-fill 1.5s ease-out forwards;
+}
+
+/* ---- Mini Bar Chart Bars ---- */
+@keyframes ecovise-bar-grow {
+  from {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.ecovise-bar {
+  transform-origin: bottom;
+  animation: ecovise-bar-grow 0.6s ease-out forwards;
+}
+
+.ecovise-bar:nth-child(1) { animation-delay: 0.05s; }
+.ecovise-bar:nth-child(2) { animation-delay: 0.10s; }
+.ecovise-bar:nth-child(3) { animation-delay: 0.15s; }
+.ecovise-bar:nth-child(4) { animation-delay: 0.20s; }
+.ecovise-bar:nth-child(5) { animation-delay: 0.25s; }
+.ecovise-bar:nth-child(6) { animation-delay: 0.30s; }
+.ecovise-bar:nth-child(7) { animation-delay: 0.35s; }
+.ecovise-bar:nth-child(8) { animation-delay: 0.40s; }
+
+/* ---- Section Fade-In ---- */
+@keyframes ecovise-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ecovise-section {
+  animation: ecovise-fade-in 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+.ecovise-section:nth-child(1) { animation-delay: 0s; }
+.ecovise-section:nth-child(2) { animation-delay: 0.06s; }
+.ecovise-section:nth-child(3) { animation-delay: 0.12s; }
+.ecovise-section:nth-child(4) { animation-delay: 0.18s; }
+.ecovise-section:nth-child(5) { animation-delay: 0.24s; }
+.ecovise-section:nth-child(6) { animation-delay: 0.30s; }
+.ecovise-section:nth-child(7) { animation-delay: 0.36s; }
+.ecovise-section:nth-child(8) { animation-delay: 0.42s; }
+.ecovise-section:nth-child(9) { animation-delay: 0.48s; }
+.ecovise-section:nth-child(10) { animation-delay: 0.54s; }
+.ecovise-section:nth-child(11) { animation-delay: 0.60s; }
+.ecovise-section:nth-child(12) { animation-delay: 0.66s; }
+.ecovise-section:nth-child(13) { animation-delay: 0.72s; }
+
+/* ---- Table Styling ---- */
+.ecovise-table-row {
+  border-bottom: 1px solid rgba(16, 185, 129, 0.08);
+  transition: background-color 0.2s ease;
+}
+
+.ecovise-table-row:hover {
+  background-color: rgba(16, 185, 129, 0.04);
+}
+
+/* ---- Scrollbar ---- */
+.ecovise-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #064e3b #050505;
+}
+
+.ecovise-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.ecovise-scroll::-webkit-scrollbar-track {
+  background: #050505;
+}
+
+.ecovise-scroll::-webkit-scrollbar-thumb {
+  background: #064e3b;
+  border-radius: 3px;
+}
+
+.ecovise-scroll::-webkit-scrollbar-thumb:hover {
+  background: #10b981;
+}
+
+/* ---- Left Accent Border for Block/Payout Items ---- */
+.ecovise-accent-left {
+  border-left: 3px solid #10b981;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.ecovise-accent-left:hover {
+  border-left-color: #00ff41;
+  background-color: rgba(16, 185, 129, 0.04);
+}
+
+/* ---- Footer Top Gradient Border ---- */
+.ecovise-footer-border {
+  background: linear-gradient(90deg, transparent 0%, #10b981 30%, #00ff41 50%, #10b981 70%, transparent 100%);
+  height: 1px;
+}
+
+/* ---- Sparkline Placeholder (CSS gradient) ---- */
+.ecovise-sparkline {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 255, 65, 0.1) 0%,
+    rgba(0, 255, 65, 0.3) 30%,
+    rgba(0, 255, 65, 0.15) 60%,
+    rgba(0, 255, 65, 0.4) 80%,
+    rgba(0, 255, 65, 0.2) 100%
+  );
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20'%3E%3Cpath d='M0 15 Q10 12 20 14 T40 8 T60 11 T80 5 T100 9' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20'%3E%3Cpath d='M0 15 Q10 12 20 14 T40 8 T60 11 T80 5 T100 9' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E");
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+}
+
+/* ---- Back Link Pill ---- */
+.ecovise-pill {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.ecovise-pill:hover {
+  background-color: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #00ff41;
+}
+
+/* ---- Search Input ---- */
+.ecovise-search-input {
+  background: rgba(10, 15, 10, 0.9);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 8px;
+  color: #e5e7eb;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ecovise-search-input:focus {
+  outline: none;
+  border-color: rgba(0, 255, 65, 0.4);
+  box-shadow: 0 0 12px rgba(0, 255, 65, 0.08);
+}
+
+.ecovise-search-input::placeholder {
+  color: #4b5563;
+}
+
+/* ---- Monospace Data Field ---- */
+.ecovise-mono-field {
+  background: rgba(0, 255, 65, 0.04);
+  border: 1px solid rgba(16, 185, 129, 0.12);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.75rem;
+  color: #10b981;
+  word-break: break-all;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.ecovise-mono-field:hover {
+  background: rgba(0, 255, 65, 0.07);
+}
+
+/* ---- Port Badge Colors ---- */
+.ecovise-port-3333 {
+  background: rgba(0, 255, 65, 0.15);
+  color: #00ff41;
+  border: 1px solid rgba(0, 255, 65, 0.25);
+}
+
+.ecovise-port-5555 {
+  background: rgba(234, 179, 8, 0.15);
+  color: #eab308;
+  border: 1px solid rgba(234, 179, 8, 0.25);
+}
+
+.ecovise-port-7777 {
+  background: rgba(249, 115, 22, 0.15);
+  color: #f97316;
+  border: 1px solid rgba(249, 115, 22, 0.25);
+}
+
+.ecovise-port-9999 {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+/* ---- Stratum Port Card ---- */
+.ecovise-port-card {
+  background: rgba(10, 15, 10, 0.6);
+  border: 1px solid rgba(16, 185, 129, 0.12);
+  border-radius: 8px;
+  padding: 10px 14px;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.ecovise-port-card:hover {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(10, 15, 10, 0.8);
+}
+
+/* ---- Status Badge ---- */
+.ecovise-status-active {
+  background: rgba(0, 255, 65, 0.12);
+  color: #00ff41;
+  border: 1px solid rgba(0, 255, 65, 0.25);
+  border-radius: 9999px;
+  padding: 2px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ---- Section Divider ---- */
+.ecovise-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(16, 185, 129, 0.2) 20%, rgba(16, 185, 129, 0.2) 80%, transparent 100%);
+}
+
+/* ---- Info Grid Items ---- */
+.ecovise-info-label {
+  font-size: 0.7rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.ecovise-info-value {
+  font-size: 0.8rem;
+  color: #d1d5db;
+  font-weight: 500;
+}
+
+.ecovise-info-value-mono {
+  font-size: 0.75rem;
+  color: #10b981;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  word-break: break-all;
+}
+
+/* ---- Expandable Text ---- */
+.ecovise-expandable {
+  max-height: 1.5em;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.ecovise-expandable.expanded {
+  max-height: 200px;
+}

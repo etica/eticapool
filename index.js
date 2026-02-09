@@ -5,9 +5,9 @@ SegfaultHandler.registerHandler('crash.log');
 //var INFURA_MAINNET_URL = 'https://mainnet.infura.io/v3/';
 
 var https_enabled = process.argv[2] === 'https';
-var pool_env = 'production';
+var pool_env = process.env.POOL_ENV || 'production';
 
- 
+
 if( process.argv[2] == "staging" )
 {
   pool_env = 'staging'
@@ -17,7 +17,8 @@ if( process.argv[2] == "staging" )
 import FileUtils from './lib/util/file-utils.js'
 import  cron from 'node-cron' 
 
-let poolConfigFull = FileUtils.readJsonFileSync('/pool.config.json');
+const configPath = process.env.POOL_CONFIG_PATH || '/pool.config.json';
+let poolConfigFull = FileUtils.readJsonFileSync(configPath);
 let poolConfig = poolConfigFull[pool_env]
 
 
@@ -26,8 +27,8 @@ let poolConfig = poolConfigFull[pool_env]
 
 console.log(`
 
-░█▀▀░▀█▀░▀█▀░█▀▀░█▀█░█▀█░█▀█░█▀█░█░░░░░█░█░▀▀█
-░█▀▀░░█░░░█░░█░░░█▀█░█▀▀░█░█░█░█░█░░░░░▀▄▀░░▀▄
+░█▀▀░▀█▀░▀█▀░█▀▀░█▀█░█▀█░█▀█░█▀█░█░░░░░█░█░█▀▀
+░█▀▀░░█░░░█░░█░░░█▀█░█▀▀░█░█░█░█░█░░░░░▀▄▀░▀▀█
 ░▀▀▀░░▀░░▀▀▀░▀▀▀░▀░▀░▀░░░▀▀▀░▀▀▀░▀▀▀░░░░▀░░▀▀░
 
   `);
@@ -59,10 +60,13 @@ import DiagnosticsManager from './lib/diagnostics-manager.js'
 
 import ContractHelper from './lib/util/contract-helper.js'
 import TokenDataHelper from './lib/util/token-data-helper.js'
+import RedisInterface from './lib/redis-interface.js'
+import RedisPubSub from './lib/util/redis-pubsub.js'
+import GeneralEventEmitterHandler from './lib/util/GeneralEventEmitterHandler.js'
 
 
 var accountConfig;
- 
+
 import Web3 from 'web3'
  
  
@@ -79,35 +83,57 @@ async function init( )
         let mongoInterface = new MongoInterface()
         let diagnosticsManager = new DiagnosticsManager()
         let webServer = new WebServer()
-  
+
+        // Initialize Redis Streams (optional — falls back to MongoDB queue if unavailable)
+        let redisInterface = null;
+        try {
+            redisInterface = new RedisInterface();
+            await redisInterface.init(process.env.REDIS_URL);
+            console.log('Redis Streams share queue enabled');
+        } catch (err) {
+            console.log('Redis Streams not available, falling back to MongoDB share queue:', err.message);
+            redisInterface = null;
+        }
+
+        // Initialize Redis Pub/Sub (optional — independent of Streams)
+        try {
+            let redisPubSub = RedisPubSub.getInstance();
+            await redisPubSub.init(process.env.REDIS_URL);
+            GeneralEventEmitterHandler.getInstance().setRedisPubSub(redisPubSub);
+            console.log('Redis Pub/Sub enabled');
+        } catch (err) {
+            console.log('Redis Pub/Sub not available, using local events only:', err.message);
+        }
+
         await mongoInterface.init( 'tokenpool_'.concat(pool_env))
 
         let tokenInterface = new TokenInterface(mongoInterface, poolConfig)
         // await peerInterface.init(web3,accountConfig,mongoInterface,tokenInterface,pool_env) //initJSONRPCServer();
-       
+
         //This worker is dying !!!
-        await tokenInterface.init();      
+        await tokenInterface.init();
         tokenInterface.update();
 
         let web3apihelper = new Web3ApiHelper(mongoInterface, poolConfig)
 
-    
+
         await web3apihelper.init();
-        web3apihelper.update()  //fetch API data 
+        web3apihelper.update()  //fetch API data
 
         await diagnosticsManager.init(poolConfig, mongoInterface)
 
-        await webServer.init(https_enabled,poolConfig,mongoInterface);
-        
+        await webServer.init(https_enabled, poolConfig, mongoInterface, redisInterface);
+
         diagnosticsManager.update();
 
-        let peerInterface = new PeerInterface(mongoInterface, poolConfig) 
+        let peerInterface = new PeerInterface(mongoInterface, poolConfig, redisInterface)
+           if (webServer.io) peerInterface.setIO(webServer.io);
            peerInterface.update();
-           peerInterface.listenForJSONRPC(); 
+           peerInterface.listenForJSONRPC();
 
 
         let statsInterface = new StatsInterface(mongoInterface, poolConfig)
-        await statsInterface.init();      
+        await statsInterface.init();
         statsInterface.update();   
 
 }

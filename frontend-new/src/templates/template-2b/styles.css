@@ -1,0 +1,466 @@
+/* Template 2b: Ecovise Spectrum — Multi-Color Sectioned Dark Dashboard */
+
+/* ---- Custom Properties ---- */
+.spectrum-dark {
+  --bg-primary: #050505;
+  --bg-card: #0a0f0a;
+  --accent-green: #00ff41;
+  --accent-emerald: #10b981;
+  --accent-blue: #3b82f6;
+  --accent-purple: #a855f7;
+  --accent-teal: #14b8a6;
+  --accent-cyan: #06b6d4;
+  --accent-amber: #f59e0b;
+  --text-body: #e5e7eb;
+  --text-muted: #9ca3af;
+  --text-emphasis: #ffffff;
+}
+
+/* ---- Background Gradient Mesh ---- */
+.spectrum-dark {
+  background-color: var(--bg-primary);
+  background-image:
+    radial-gradient(ellipse 600px 400px at 0% 0%, rgba(0, 255, 65, 0.03) 0%, transparent 70%),
+    radial-gradient(ellipse 500px 500px at 100% 100%, rgba(59, 130, 246, 0.025) 0%, transparent 70%),
+    radial-gradient(ellipse 400px 300px at 50% 50%, rgba(168, 85, 247, 0.015) 0%, transparent 60%);
+}
+
+/* ---- Green Glow (hero/header only) ---- */
+.spectrum-glow-text {
+  text-shadow: 0 0 20px rgba(0, 255, 65, 0.15), 0 0 40px rgba(0, 255, 65, 0.05);
+}
+
+.spectrum-glow-text-strong {
+  text-shadow: 0 0 24px rgba(0, 255, 65, 0.25), 0 0 48px rgba(0, 255, 65, 0.08);
+}
+
+/* ---- Logo Glow ---- */
+.spectrum-logo-glow {
+  text-shadow: 0 0 12px rgba(0, 255, 65, 0.3), 0 0 30px rgba(0, 255, 65, 0.1);
+}
+
+.spectrum-logo-img {
+  filter: drop-shadow(0 0 10px rgba(0, 255, 65, 0.3)) drop-shadow(0 0 20px rgba(0, 255, 65, 0.1));
+}
+
+/* ---- Base Glassmorphism Card ---- */
+.spectrum-card {
+  background: rgba(10, 15, 10, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  border-radius: 12px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.spectrum-card:hover {
+  border-color: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.05), 0 0 40px rgba(16, 185, 129, 0.03);
+}
+
+/* ---- Per-Section Card Color Variants ---- */
+.spectrum-card-blue {
+  background: rgba(10, 12, 18, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 12px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.spectrum-card-blue:hover {
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.06), 0 0 40px rgba(59, 130, 246, 0.03);
+}
+
+.spectrum-card-purple {
+  background: rgba(14, 10, 18, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-radius: 12px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.spectrum-card-purple:hover {
+  border-color: rgba(168, 85, 247, 0.4);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.06), 0 0 40px rgba(168, 85, 247, 0.03);
+}
+
+.spectrum-card-teal {
+  background: rgba(10, 15, 14, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(20, 184, 166, 0.2);
+  border-radius: 12px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.spectrum-card-teal:hover {
+  border-color: rgba(20, 184, 166, 0.4);
+  box-shadow: 0 0 20px rgba(20, 184, 166, 0.06), 0 0 40px rgba(20, 184, 166, 0.03);
+}
+
+.spectrum-card-cyan {
+  background: rgba(10, 14, 16, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: 12px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.spectrum-card-cyan:hover {
+  border-color: rgba(6, 182, 212, 0.4);
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.06), 0 0 40px rgba(6, 182, 212, 0.03);
+}
+
+.spectrum-card-amber {
+  background: rgba(15, 13, 10, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 12px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.spectrum-card-amber:hover {
+  border-color: rgba(245, 158, 11, 0.4);
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.06), 0 0 40px rgba(245, 158, 11, 0.03);
+}
+
+/* ---- Pulsing Live Dot ---- */
+@keyframes spectrum-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(0, 255, 65, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 65, 0);
+  }
+}
+
+.spectrum-pulse-dot {
+  width: 8px;
+  height: 8px;
+  background: #00ff41;
+  border-radius: 50%;
+  animation: spectrum-pulse 2s ease-in-out infinite;
+}
+
+/* ---- Circular Progress Ring ---- */
+@keyframes spectrum-ring-fill {
+  from {
+    stroke-dashoffset: 282.74;
+  }
+}
+
+.spectrum-ring-circle {
+  transition: stroke-dashoffset 0.3s ease;
+  animation: spectrum-ring-fill 1.5s ease-out forwards;
+}
+
+/* ---- Mini Bar Chart Bars ---- */
+@keyframes spectrum-bar-grow {
+  from {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.spectrum-bar {
+  transform-origin: bottom;
+  animation: spectrum-bar-grow 0.6s ease-out forwards;
+}
+
+.spectrum-bar:nth-child(1) { animation-delay: 0.05s; }
+.spectrum-bar:nth-child(2) { animation-delay: 0.10s; }
+.spectrum-bar:nth-child(3) { animation-delay: 0.15s; }
+.spectrum-bar:nth-child(4) { animation-delay: 0.20s; }
+.spectrum-bar:nth-child(5) { animation-delay: 0.25s; }
+.spectrum-bar:nth-child(6) { animation-delay: 0.30s; }
+.spectrum-bar:nth-child(7) { animation-delay: 0.35s; }
+.spectrum-bar:nth-child(8) { animation-delay: 0.40s; }
+
+/* ---- Section Fade-In ---- */
+@keyframes spectrum-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.spectrum-section {
+  animation: spectrum-fade-in 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+.spectrum-section:nth-child(1) { animation-delay: 0s; }
+.spectrum-section:nth-child(2) { animation-delay: 0.06s; }
+.spectrum-section:nth-child(3) { animation-delay: 0.12s; }
+.spectrum-section:nth-child(4) { animation-delay: 0.18s; }
+.spectrum-section:nth-child(5) { animation-delay: 0.24s; }
+.spectrum-section:nth-child(6) { animation-delay: 0.30s; }
+.spectrum-section:nth-child(7) { animation-delay: 0.36s; }
+.spectrum-section:nth-child(8) { animation-delay: 0.42s; }
+.spectrum-section:nth-child(9) { animation-delay: 0.48s; }
+.spectrum-section:nth-child(10) { animation-delay: 0.54s; }
+.spectrum-section:nth-child(11) { animation-delay: 0.60s; }
+.spectrum-section:nth-child(12) { animation-delay: 0.66s; }
+.spectrum-section:nth-child(13) { animation-delay: 0.72s; }
+
+/* ---- Table Styling ---- */
+.spectrum-table-row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background-color 0.2s ease;
+}
+
+.spectrum-table-row:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* ---- Scrollbar ---- */
+.spectrum-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #1e293b #050505;
+}
+
+.spectrum-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.spectrum-scroll::-webkit-scrollbar-track {
+  background: #050505;
+}
+
+.spectrum-scroll::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 3px;
+}
+
+.spectrum-scroll::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* ---- Left Accent Borders (per-section color) ---- */
+.spectrum-accent-green {
+  border-left: 3px solid #10b981;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.spectrum-accent-green:hover {
+  border-left-color: #00ff41;
+  background-color: rgba(16, 185, 129, 0.04);
+}
+
+.spectrum-accent-blue {
+  border-left: 3px solid #3b82f6;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.spectrum-accent-blue:hover {
+  border-left-color: #60a5fa;
+  background-color: rgba(59, 130, 246, 0.04);
+}
+
+/* ---- Footer Top Gradient Border (multi-color) ---- */
+.spectrum-footer-border {
+  background: linear-gradient(90deg, transparent 0%, #10b981 15%, #3b82f6 35%, #a855f7 50%, #f59e0b 65%, #14b8a6 85%, transparent 100%);
+  height: 1px;
+}
+
+/* ---- Sparkline Placeholder ---- */
+.spectrum-sparkline {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 255, 65, 0.1) 0%,
+    rgba(0, 255, 65, 0.3) 30%,
+    rgba(0, 255, 65, 0.15) 60%,
+    rgba(0, 255, 65, 0.4) 80%,
+    rgba(0, 255, 65, 0.2) 100%
+  );
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20'%3E%3Cpath d='M0 15 Q10 12 20 14 T40 8 T60 11 T80 5 T100 9' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20'%3E%3Cpath d='M0 15 Q10 12 20 14 T40 8 T60 11 T80 5 T100 9' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E");
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+}
+
+/* ---- Back Link Pill ---- */
+.spectrum-pill {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.spectrum-pill:hover {
+  background-color: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #00ff41;
+}
+
+/* ---- Search Input ---- */
+.spectrum-search-input {
+  background: rgba(10, 15, 10, 0.9);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 8px;
+  color: #e5e7eb;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.spectrum-search-input:focus {
+  outline: none;
+  border-color: rgba(0, 255, 65, 0.4);
+  box-shadow: 0 0 12px rgba(0, 255, 65, 0.08);
+}
+
+.spectrum-search-input::placeholder {
+  color: #4b5563;
+}
+
+/* ---- Monospace Data Field — Purple variant for mining data ---- */
+.spectrum-mono-field {
+  background: rgba(168, 85, 247, 0.06);
+  border: 1px solid rgba(168, 85, 247, 0.15);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.75rem;
+  color: #c084fc;
+  word-break: break-all;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.spectrum-mono-field:hover {
+  background: rgba(168, 85, 247, 0.1);
+}
+
+/* ---- Port Badge Colors ---- */
+.spectrum-port-3333 {
+  background: rgba(0, 255, 65, 0.15);
+  color: #00ff41;
+  border: 1px solid rgba(0, 255, 65, 0.25);
+}
+
+.spectrum-port-5555 {
+  background: rgba(234, 179, 8, 0.15);
+  color: #eab308;
+  border: 1px solid rgba(234, 179, 8, 0.25);
+}
+
+.spectrum-port-7777 {
+  background: rgba(249, 115, 22, 0.15);
+  color: #f97316;
+  border: 1px solid rgba(249, 115, 22, 0.25);
+}
+
+.spectrum-port-9999 {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+/* ---- Stratum Port Card ---- */
+.spectrum-port-card {
+  background: rgba(10, 15, 10, 0.6);
+  border: 1px solid rgba(16, 185, 129, 0.12);
+  border-radius: 8px;
+  padding: 10px 14px;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.spectrum-port-card:hover {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(10, 15, 10, 0.8);
+}
+
+/* ---- Status Badge ---- */
+.spectrum-status-active {
+  background: rgba(0, 255, 65, 0.12);
+  color: #00ff41;
+  border: 1px solid rgba(0, 255, 65, 0.25);
+  border-radius: 9999px;
+  padding: 2px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ---- Info Grid Items ---- */
+.spectrum-info-label {
+  font-size: 0.7rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.spectrum-info-value {
+  font-size: 0.8rem;
+  color: #d1d5db;
+  font-weight: 500;
+}
+
+.spectrum-info-value-mono {
+  font-size: 0.75rem;
+  color: #a855f7;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  word-break: break-all;
+}
+
+/* ---- Expandable Text ---- */
+.spectrum-expandable {
+  max-height: 1.5em;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.spectrum-expandable.expanded {
+  max-height: 200px;
+}
+
+/* ---- Section Header Underlines (per-color) ---- */
+.spectrum-header-green {
+  background: linear-gradient(90deg, #10b981 0%, transparent 100%);
+  height: 1px;
+}
+
+.spectrum-header-blue {
+  background: linear-gradient(90deg, #3b82f6 0%, transparent 100%);
+  height: 1px;
+}
+
+.spectrum-header-purple {
+  background: linear-gradient(90deg, #a855f7 0%, transparent 100%);
+  height: 1px;
+}
+
+.spectrum-header-teal {
+  background: linear-gradient(90deg, #14b8a6 0%, transparent 100%);
+  height: 1px;
+}
+
+.spectrum-header-cyan {
+  background: linear-gradient(90deg, #06b6d4 0%, transparent 100%);
+  height: 1px;
+}
+
+.spectrum-header-amber {
+  background: linear-gradient(90deg, #f59e0b 0%, transparent 100%);
+  height: 1px;
+}
+
+.spectrum-header-white {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.3) 0%, transparent 100%);
+  height: 1px;
+}

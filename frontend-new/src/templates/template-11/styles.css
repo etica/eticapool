@@ -1,0 +1,84 @@
+/* ═══ VOID — Pure Black Monospace Terminal Dashboard ═══ */
+
+/* Base */
+.void-bg {
+  background-color: #000000;
+}
+
+/* Thin horizontal rules */
+.void-rule {
+  border-top: 1px solid #27272a;
+}
+
+/* Cyan glow for key metrics */
+.void-cyan {
+  color: #06b6d4;
+  text-shadow: 0 0 8px rgba(6, 182, 212, 0.3);
+}
+
+/* Subtle row hover */
+.void-row:hover {
+  background-color: #0a0a0a;
+}
+
+/* Search input */
+.void-search {
+  background: transparent;
+  border: 1px solid #3f3f46;
+  color: #e4e4e7;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.void-search:focus {
+  border-color: #06b6d4;
+}
+
+.void-search::placeholder {
+  color: #52525b;
+}
+
+/* Status dot pulse */
+.void-dot-active {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #22c55e;
+  animation: void-pulse 2s ease-in-out infinite;
+}
+
+@keyframes void-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Port color accents */
+.void-port-3333 { color: #06b6d4; }
+.void-port-5555 { color: #a78bfa; }
+.void-port-7777 { color: #f59e0b; }
+.void-port-9999 { color: #f43f5e; }
+
+/* Scrollbar */
+.void-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.void-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.void-scroll::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 2px;
+}
+
+.void-scroll::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
+
+/* Mono hash truncation */
+.void-hash {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

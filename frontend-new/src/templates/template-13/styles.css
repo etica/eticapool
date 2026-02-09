@@ -1,0 +1,117 @@
+/* === SLATE — Charcoal + White + Blue/Teal Institutional Dashboard === */
+
+/* Sidebar fixed positioning */
+.slate-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 14rem;
+  height: 100vh;
+  background-color: #0e0e0e;
+  border-right: 1px solid #1e1e1e;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.slate-main {
+  margin-left: 14rem;
+  min-height: 100vh;
+  background-color: #111111;
+}
+
+/* Smooth scrollbar */
+.slate-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.slate-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.slate-scroll::-webkit-scrollbar-thumb {
+  background: #242424;
+  border-radius: 2px;
+}
+
+.slate-scroll::-webkit-scrollbar-thumb:hover {
+  background: #383838;
+}
+
+/* Search input */
+.slate-search {
+  background: transparent;
+  border: 1px solid #333333;
+  color: #e5e5e5;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.slate-search:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2);
+}
+
+.slate-search::placeholder {
+  color: #525252;
+}
+
+/* Subtle table row hover */
+.slate-row {
+  transition: background-color 0.15s ease;
+}
+
+.slate-row:hover {
+  background-color: #1c1c1c;
+}
+
+/* Nav item hover */
+.slate-nav-item {
+  transition: color 0.15s ease, background-color 0.15s ease;
+  cursor: pointer;
+}
+
+.slate-nav-item:hover {
+  background-color: #161616;
+  color: #ffffff;
+}
+
+/* Sparkline bars */
+.slate-spark-bar {
+  transition: height 0.3s ease;
+}
+
+/* Hash truncation */
+.slate-hash {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Top-3 blue left border accent */
+.slate-top-rank {
+  border-left: 2px solid #2563eb;
+}
+
+/* Sidebar active nav indicator */
+.slate-nav-active {
+  color: #2563eb;
+  background-color: rgba(37, 99, 235, 0.08);
+  border-right: 2px solid #2563eb;
+}
+
+/* Responsive: collapse sidebar on small screens */
+@media (max-width: 768px) {
+  .slate-sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    border-right: none;
+    border-bottom: 1px solid #1e1e1e;
+  }
+
+  .slate-main {
+    margin-left: 0;
+  }
+}
