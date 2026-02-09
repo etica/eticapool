@@ -129,7 +129,6 @@ async function init( )
         let peerInterface = new PeerInterface(mongoInterface, poolConfig, redisInterface)
            if (webServer.io) peerInterface.setIO(webServer.io);
            peerInterface.update();
-           peerInterface.listenForJSONRPC();
 
 
         let statsInterface = new StatsInterface(mongoInterface, poolConfig)
