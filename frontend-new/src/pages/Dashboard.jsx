@@ -353,7 +353,9 @@ export default function Dashboard() {
     : null;
 
   // statsRecord is an array — get first element; recentPaymentsBatched lives in poolData
-  const statsRecord = Array.isArray(data?.statsRecord) ? data.statsRecord[0] : data?.statsRecord;
+  // REST returns statsRecord; socket poolUpdate sends LastpoolStatsRecord
+  const rawStats = data?.statsRecord || data?.LastpoolStatsRecord;
+  const statsRecord = Array.isArray(rawStats) ? rawStats[0] : rawStats;
   const recentPayments = statsRecord?.recentPaymentsBatched
     || poolData?.recentPaymentsBatched
     || [];
@@ -363,6 +365,7 @@ export default function Dashboard() {
   // Pool-level metrics from latest stats record
   const poolHashrate = statsRecord?.Hashrate || 0;
   const poolMiners = statsRecord?.Numberminers || 0;
+  const poolWorkers = statsRecord?.Numberworkers || 0;
 
   return (
     <div>
@@ -394,6 +397,10 @@ export default function Dashboard() {
         <div className="os-metric-item">
           <span className="os-metric-label">MINERS</span>
           <span className="os-metric-value cyan">{poolMiners}</span>
+        </div>
+        <div className="os-metric-item">
+          <span className="os-metric-label">WORKERS</span>
+          <span className="os-metric-value cyan">{poolWorkers}</span>
         </div>
         <div className="os-metric-item">
           <span className="os-metric-label">POOL FEE</span>
