@@ -65,6 +65,28 @@ export function rawSubtract(a, b) {
   }
 }
 
+/**
+ * Split a pool name into base + "POOL" suffix for display.
+ * "Etica Pool"        → { base: "ETICA", suffix: "POOL" }
+ * "Etica Mining Pool" → { base: "ETICA MINING", suffix: "POOL" }
+ * "MyPool"            → { base: "MY", suffix: "POOL" }
+ * "SomeNode"          → { base: "SOMENODE", suffix: "POOL" }
+ */
+export function formatPoolName(name) {
+  if (!name) return { base: 'ETICA', suffix: 'POOL' };
+  const upper = name.toUpperCase().trim();
+  // If it ends with " POOL", split there
+  if (upper.endsWith(' POOL')) {
+    return { base: upper.slice(0, -5).trim(), suffix: 'POOL' };
+  }
+  // If it ends with "POOL" (no space, e.g. "MyPool"), split before "POOL"
+  if (upper.endsWith('POOL') && upper.length > 4) {
+    return { base: upper.slice(0, -4).trim(), suffix: 'POOL' };
+  }
+  // Doesn't contain "pool" at all — append POOL
+  return { base: upper, suffix: 'POOL' };
+}
+
 export function mintStatusLabel(poolstatus) {
   if (poolstatus === 0) return 'unprocessed';
   if (poolstatus === 2) return 'processed + rewards';

@@ -5,9 +5,10 @@ import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
 import Miners from './pages/Miners'
 import MinerProfile from './pages/MinerProfile'
-import Blocks from './pages/Blocks'
+import Epochs from './pages/Blocks'
 import Payments from './pages/Payments'
-import Network from './pages/Network'
+import ActivePools from './pages/ActivePools'
+import MintAddresses from './pages/MintAddresses'
 
 // Template imports — lazy-loaded, dev-only
 const TemplateSelector = import.meta.env.DEV ? lazy(() => import('./templates/TemplateSelector')) : null;
@@ -48,9 +49,10 @@ export default function App() {
         <Route path="/miners" element={<Miners />} />
         <Route path="/miner/:address/:worker" element={<MinerProfile />} />
         <Route path="/miner/:address" element={<MinerProfile />} />
-        <Route path="/blocks" element={<Blocks />} />
+        <Route path="/epochs" element={<Epochs />} />
         <Route path="/payments" element={<Payments />} />
-        <Route path="/network" element={<Network />} />
+        <Route path="/pools" element={<ActivePools />} />
+        <Route path="/mint-addresses" element={<MintAddresses />} />
       </Route>
 
       {/* Template routes — dev only */}

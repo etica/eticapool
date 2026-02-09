@@ -913,7 +913,7 @@ a {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
-  padding: 0 0.5rem;
+  padding: 0;
 }
 
 @media (max-width: 640px) {

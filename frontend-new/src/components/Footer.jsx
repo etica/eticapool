@@ -35,7 +35,7 @@ const FOOTER_COLUMNS = [
 
 export default function Footer({ contractAddress, poolFee, minimumPayout }) {
   return (
-    <footer className="pt-10 pb-8">
+    <footer className="pt-10 pb-8 max-w-5xl mx-auto px-4 sm:px-6">
       <div className="os-footer-line mb-8" />
 
       <div className="os-footer-columns">

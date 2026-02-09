@@ -5,14 +5,14 @@ import { useBlocks } from '../hooks/useBlocks';
 import { formatNumber, truncateAddress } from '../lib/formatters';
 import { ETICASCAN_URL } from '../config/constants';
 
-export default function Blocks() {
+export default function Epochs() {
   const { data: blocks, isLoading, isError } = useBlocks();
   const blockList = Array.isArray(blocks) ? blocks : [];
 
   return (
     <div>
       <div className="os-heading">
-        <h1 className="os-heading-title">BLOCKS & EPOCHS</h1>
+        <h1 className="os-heading-title">EPOCHS</h1>
         {blockList.length > 0 && (
           <p className="os-heading-sub">
             Last miner:{' '}

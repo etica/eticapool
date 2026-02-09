@@ -1,491 +1,395 @@
-### EticaPool  
+# EticaPool
 
-Original pool Developed by InfernalToast with help from the 0xBitcoin Community (https://github.com/0xbitcoin/tokenpool) (GNU PUBLIC LICENSE)
+Mining pool for [Etica Protocol](https://www.eticaprotocol.org) (ETI) — RandomX Proof of Work.
 
-A pool for mining EIP918 Tokens
+Original pool developed by InfernalToast with help from the 0xBitcoin Community ([tokenpool](https://github.com/0xbitcoin/tokenpool)) (GNU Public License).
 
-See me running at http://eticapool.com
+See it running at [eticapool.com](http://eticapool.com)
 
+---
 
+## Quick Start (Docker)
 
+The fastest way to get a pool running. Docker handles Redis, the frontend build, and all processes automatically.
 
-Miner:
-https://bio.hiveos.farm/repo/SoliditySHA3Miner-2.3.4.tar.gz  
-https://bio.hiveos.farm/repo/SoliditySHA3Miner-2.3.4.zip  
+### Prerequisites
 
-How to mine:
-https://www.eticaprotocol.org/eticadocs/mining.html
+- [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) (v2+)
+- [MongoDB](https://www.mongodb.com/docs/manual/installation/) running on the host machine (port 27017)
+- Two Etica wallet addresses with private keys (one for minting, one for payments)
+- A small amount of EGAZ in both addresses for gas fees
 
-### BASIC SETUP  (needs Node 14) [nvm install 14]
+### 1. Clone and prepare wallets
 
-MAKE SURE TO USE NPM 6.14.17 and NODE 14.20.1
-you can install both versions with: nvm install 14
- 
-BEFORE EACH NEW BUILD AND CHECK AGAIN YOUR ON NPM 6.14.17 AND NODE 14.20.1 
+```bash
+git clone https://github.com/etica/eticapool.git
+cd eticapool
+```
 
-USE MONGODB 4.4.1
+You need **two separate wallets** funded with EGAZ:
 
-Overall process (for details check: ## EXAMPLE FRESH INSTALL ON BRAND NEW SERVER, SERVER COMMANDS):
-1. npm install
+| Wallet | Purpose |
+|--------|---------|
+| **Minting address** | Submits mining solutions to the blockchain |
+| **Payments address** | Owner of the BatchedPayments contract — sends payouts to miners |
 
-2. rename 'pool.config.description.json' to 'pool.config.json' and fill it with the pool's etica account data (make two new accounts, one for minting one for payments and fill both with a small amount of EGAZ)
+### 2. Deploy the BatchedPayments contract
 
-3. Install mongodb 4.4.1, make sure it is running as a service
+The pool pays miners through a BatchedPayments smart contract that sends ETI to multiple miners in a single transaction. You need to deploy your own instance.
 
-4. 'npm run build'  #(to build the website files)
+1. Open `deploythis/BatchedPayments.sol`
+2. In the `Ownable` constructor, replace the hardcoded owner address with **your payments address**:
+   ```solidity
+   constructor() public {
+     owner = 0xYOUR_PAYMENTS_PUBLIC_ADDRESS;
+   }
+   ```
+3. Deploy the contract to the Etica network using Remix, Hardhat, or any deployment tool
+4. After deployment, update the contract address in `config/DeployedContractInfo.json`:
 
-5. 'npm run pool' #(or 'npm run pool staging 'for staging test mode)
- 
-
-
-
-### CONFIGURING  - set up  pool.config.json
-
-##### pool.config.json
-SHARING YOUR POOL CONFIG can expose your private keys.  !!! be cautious!!!  
-update pool.config.template.json with your parameters and rename it pool.config.json  
-For tests you can generate new private keys on this website: https://vanity-eth.tk/  
-For prod check online tutorials, you can get private keys using geth command line and then exporting to metamask or directly in metamask  
-
-## Deploy a BatchedPayments.sol Contract
-Deploy BatchedPayments.sol contract (it is the contract in deploythis folder).
-Then after deploy, Enter the address of your BatchedPayments contract in src/config/DeployedContractInfo.json  
-
-
-## HOW TO TEST
-1. Point a EIP918 tokenminer at your pool using http://localhost:8080   (make sure firewall allows this port)
-2. Start the server with 'npm run build' and 'npm run server staging' to put it into staging test mode
-3. View website interface at http://localhost (Feel free to set up nginx/apache to serve the static files in /dist)
-
-You should see that the miner is able to successfully submit shares to the pool when the share difficulty is set to a low value such as 100 and the pool is in 'staging mode'.  Then you can run the pool on mainnet using 'npm run server'.
-
-
-## Installing MongoDB
-
-USE MONGODB 4.4.1  
-
-Digitalocean guide:
-https://www.digitalocean.com/community/tutorials/how-to-install-mongodb-on-ubuntu-16-04#step-3-%E2%80%94-adjusting-the-firewall-(optional)
-
- - Mongo is used to store data related to miner shares, balances, and payments
-
- (WSL: sudo mongod --dbpath ~/data/db)
-
-
-## EXAMPLE FRESH INSTALL ON BRAND NEW SERVER, SERVER COMMANDS:
-
--> sudo apt-get install build-essential  
-then : install nvm with following command:  
--> wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash  
-  
-(nvm install guides (follow part a): https://www.whitesourcesoftware.com/free-developer-tools/blog/how-to-update-node-js-to-latest-version/)  
-  
-  
-close terminal then open it again  
--> sudo apt install node-gyp
--> sudo apt update  
--> command -v nvm  
--> nvm install 14  
--> node --version  
-check it's version  14.20.1
--> npm --version  
-check it's version 6.14.17
--> npm i pm2 -g  
--> curl -fsSL https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -  
--> echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list  
--> sudo apt update  
--> sudo apt install mongodb-org  
--> sudo systemctl start mongod.service  
--> sudo ufw allow 22  
--> sudo ufw allow 3000 (if you want to run express on this port, in pool.config.json set yourpoolurl:3000 as poolUrl)
--> sudo ufw allow 80  (by default express will be on port 80, so in poolUrl just enter your pool url without ports)
--> sudo ufw allow 8080  
--> sudo ufw allow 8081 
--> sudo ufw allow 3333 
--> sudo ufw allow 5555 
--> sudo ufw allow 7777  
--> sudo ufw allow ssh  
--> sudo ufw enable   
-
--> cd /var  
--> mkdir www  
--> cd www  
--> git clone repo address here
-
--> npm install  
--> npm run build  
-  
-Initiate pool with:  
--> node index.js (creates database tokenpool_production and collections)  
-  
-Run pool with pm2:  
--> pm2 start index.js  
--> pm2 start indexcleanercoordinator.js  
--> pm2 start indexpoolsnetwork.js
-  
-You're ETI pool is running  
-  
-
-  
-## MAIN SCRIPTS PROCESS:
-index.js is the main process of the  pool, it handles everything necessary on its own  
-indexcleanercoordinator.js perdiodically deletes old shares for optimisation  
-indexpoolsnetwork.js handles everything related to sharing data and receiving stats from other Etica mining pools  
-
-
-
-## RANDOMX INFORMATION | HELPER
-
-### How randomx mining pools calculate the target to send to miners?
-
-The full 256-bit targets space are compressed into 32-bit representations for efficiency in communication between pools and miners.
-The system includes methods for converting between full 256-bit targets, 32-bit compact targets, and difficulty values.
-Pool converts 256-bit blockchain target to a 32-bit compact representation.
-Pool sends this compact target to miners as part of a job.
-Miners receive the job and convert the compact target back to a difficulty value.
-
-To convert a 256-bit target to the 32-bit representation expected by miners:
-
-    Start with the 256-bit target.
-    Calculate the equivalent difficulty: difficulty = (2^256 - 1) / target
-    Take only the most significant 32 bits of this result.
-    Swap the byte order (endianness) of these 32 bits.
-    Pad the result to 8 hexadecimal digits.
-
-Examples with Actual Values: Example 1:
-256-bit target: 241210905721997303218596142046449620042433489913738428771172669245410596
-
-    Calculate difficulty: (2^256 - 1) / 241210905721997303218596142046449620042433489913738428771172669245410596 ≈ 1
-    Since this difficulty is too low, let's use a more reasonable value, say 1000
-    Calculate 32-bit representation: ((2^256 - 1) / 1000) >> 224 ≈ 0xFFFFFF
-    Swap endianness and pad: FFFFFF00
-    Final compact target to send to miners: "ffffff00"
-
-Example 2:
-Let's say we want a higher difficulty, around 1,000,000
-
-    Start with difficulty 1,000,000
-    Calculate 32-bit representation: ((2^256 - 1) / 1,000,000) >> 224 ≈ 0xFFFF
-    Swap endianness and pad: FFFF0000
-    Final compact target to send to miners: "ffff0000"
-
-Example 3:
-For a very high difficulty, say 1,000,000,000
-
-    Start with difficulty 1,000,000,000
-    Calculate 32-bit representation: ((2^256 - 1) / 1,000,000,000) >> 224 ≈ 0xFFFF
-    Swap endianness and pad: FFFF0000
-    Final compact target to send to miners: "ffff0000"
-
-Note that in the last two examples, due to the limitations of the 32-bit representation, very high difficulties may result in the same compact target. This is one of the limitations of this legacy system.
-
-
-
-  
---------------------------------    FUNCTION MAPPING  -----------------------------------
-
-
-
-token-data-helper.js
-   -> static async collectPoolAccountBalances(poolConfig,  mongoInterface  ){
-      ->Updates poolAccountBalances in mongo DB
-    
-let poolAccountBalances = {  
-       mintingAccountBalances: {},
-       paymentsAccountBalances: {},
-       tokensApprovedToBatchPayments:0 ,
-       updatedAt: PeerHelper.getTimeNowSeconds()
-
+```json
+{
+  "networks": {
+    "etica": {
+      "contracts": {
+        "EticaRelease": {"name":"EticaRelease", "blockchain_address":"0x34c61EA91bAcdA647269d4e310A86b875c09946f"},
+        "batchedpayments": {"name":"BatchedPayments", "blockchain_address":"0xYOUR_DEPLOYED_CONTRACT_ADDRESS"}
+      }
     }
+  }
+}
+```
 
+> **Important**: The `owner` address hardcoded in the contract and the `paymentsConfig.publicAddress` in pool.config.json **must be the same address**. Only the owner can call the contract to send batched payouts to miners.
 
+### 3. Configure
 
+```bash
+cp pool.config.template.json pool.config.json
+```
 
+Edit `pool.config.json` — fill in the **production** section:
 
-diagnostic-manager.js 
- Repetitive functions that run on back end server to collect stats about blockchain:
+```jsonc
+{
+  "production": {
+    "poolName": "My Etica Pool",                    // Display name
+    "poolUrl": "http://your-server-ip-or-domain",   // Public URL
+    "MainPeerPoolUrl": "http://eticapool.com",      // Main peer for network sync
+    "poolEnv": "production",
 
-     -> async collectStats()
+    "mintingConfig": {
+      "publicAddress": "0xYOUR_MINTING_ADDRESS",    // Minting wallet
+      "privateKey": "YOUR_MINTING_PRIVATE_KEY",     // !! Keep secret !!
+      "poolTokenFee": 5,                            // Pool fee %
+      "web3Provider": "https://eticamainnet.eticascan.org"
+    },
 
-     -> async monitorPoolStatus(){
+    "paymentsConfig": {
+      "publicAddress": "0xCONTRACT_OWNER_ADDRESS",  // Must match the BatchedPayments contract owner
+      "privateKey": "CONTRACT_OWNER_PRIVATE_KEY",   // !! Keep secret !!
+      "minBalanceForTransfer": 1500000000000000000, // Min payout (1.5 ETI in wei)
+      "web3Provider": "https://eticamainnet.eticascan.org"
+    }
+  }
+}
+```
 
+> **SECURITY**: Never share your `pool.config.json` — it contains private keys. It is listed in `.gitignore` and `.dockerignore`.
 
+### 4. Start the pool
 
-jobs:
-collectTokenParameters.js
--> look like file to initialise Mongo and the pool
-  -> runTask()
-     -> get tokenDataHelper.collecTokenParameters( tokenContract, wbe3, mongoInterface)
-     -> await mongoInterface.init( 'tokenpool_'.concat(pool_env))   
+```bash
+docker compose up --build -d
+```
 
+This starts 4 containers:
 
-api-helper.js
- -> return test route "This is the Api"
+| Container | Role |
+|-----------|------|
+| `redis` | In-memory cache + share queue |
+| `pool-app` | Main pool process (stratum, web, shares, tokens) |
+| `pools-network` | Discovers and syncs with other Etica pools |
+| `cleaner` | Periodically cleans old pending shares |
 
-congig-helper.js
- -> empty file
+### 5. Verify
 
-contract-helper.js
- -> returns Contracts and Contracts address, by take addresses from config/DeployedContractInfo.json
+```bash
+# Check all containers are running
+docker compose ps
 
-file-utils.js
- -> readJsonFileSync()
+# Watch logs
+docker compose logs -f pool-app
 
-logging-helper.js
-    -> static async appendLog(message, typeCode,   mongoInterface ){
-       -> Update Mongo DB with log message
+# Test the API
+curl http://localhost/api/v1/overview
+```
 
-    -> static async deleteOldLogs( mongoInterface ){
+Open `http://localhost` in your browser to see the pool frontend.
 
+### 6. Connect a miner
 
-peer-helper.js
+Point your RandomX miner at:
 
- // ----------  Get Now time info (not blockchain but local using new Date() )  -----------  //
-                -> getTimeNowSeconds()
-                -> static getTimeNowUnix()
- // ----------  Get Now time info (not blockchain but local using new Date() )  -----------  //
+```
+stratum+tcp://your-server-ip:3333
+```
 
+Available ports:
 
- // ----------  Get Pool Minimum Difficulty and Pool Minimum Share Target from parameter object poolConfig -----------  //
-                -> static getPoolMinimumShareDifficulty(poolConfig)
-                -> static getPoolMinimumShareTarget( poolConfig )
- // ----------  Get Pool Minimum Difficulty and Pool Minimum Share Target from parameter object poolConfig -----------  //
+| Port | Difficulty |
+|------|-----------|
+| 3333 | Low-end CPU |
+| 5555 | Mid-range CPU |
+| 7777 | High-end CPU |
+| 9999 | Very-High-end CPU |
 
+### 7. Stop
 
- // ----------  Get Current Target from Difficulty -----------  //
-                -> static getTargetFromDifficulty(difficulty)
- // ----------  Get Current Target from Difficulty -----------  //
+```bash
+docker compose down
+```
 
+---
 
+## Docker Deployment Modes
 
-// ----------  Get Pool Data (Token Fee, Minting address, Payment Address) -----------  //
-               -> static   getPoolData(poolConfig)
-// ----------  Get Pool Data (Token Fee, Minting address, Payment Address) -----------  //
+### Standard (docker-compose.yml)
 
+Single-process monolith. Best for small to medium pools.
 
- // Specific Miner //
+```bash
+docker compose up --build -d
+```
 
-          // ---------  Get Balance of Payments of a specific Miner  ------------  //
-              -> static async getMinerBalancePayments(minerAddress,  mongoInterface)
-          // ---------  Get Balance of Payments of a specific Miner  ------------  //
+### Scaled (docker-compose.scaled.yml)
 
+Separate processes for each role. Better for high-traffic pools with many miners.
 
-         // --------- Get Specific Miner or Create Miner if dont exist -------- //
-              -> static async getMinerData(minerEthAddress, mongoInterface)
-                        uses -> static getDefaultMinerData(minerEthAddress)
-         // --------- Get Specific Miner or Create Miner if dont exist -------- //
+```bash
+docker compose -f docker-compose.scaled.yml up --build -d
+```
 
+Runs 7 containers:
 
-         // ------- Returns Empty Object with structure of Miner fields to store in Mongo DB  -------- //
-              -> static getDefaultMinerData(minerEthAddress)
-         // ------- Returns Empty Object with structure of Miner fields to store in Mongo DB  -------- //
+| Container | Role | Ports |
+|-----------|------|-------|
+| `redis` | Cache + share queue | internal |
+| `token-collector` | Watches blockchain for mining parameters | — |
+| `share-processor` | Consumes and validates shares from Redis | — |
+| `stratum` | Accepts miner connections | 3333, 5555, 7777, 9999, 8081 |
+| `web` | Frontend + REST API + Socket.IO | 80, 2053 |
+| `pools-network` | Network pool discovery | — |
+| `cleaner` | Old shares cleanup | — |
 
- 
-          // -------  Returns Empty Object with hashrate field  -------- //
-              -> static getDefaultSharesData(minerEthAddress){
-          // -------  Returns Empty Object with hashrate field  -------- //
+### Privacy (docker-compose.privacy.yml)
 
+Same as standard but without network pool discovery — your pool won't announce itself to other pools or fetch their data.
 
-          // -------  Updates minerData fields shareCredits, validSubmittedSolutionsCount, lastSubmittedSolutionTime  -------- //
-              -> static async awardShareCredits( minerEthAddress, shareCredits , mongoInterface)
-          // -------  Updates minerData fields shareCredits, validSubmittedSolutionsCount, lastSubmittedSolutionTime  -------- //
+```bash
+docker compose -f docker-compose.privacy.yml up --build -d
+```
 
+---
 
+## Manual Setup (without Docker)
 
-          // -------  Returns MinerShares from a specific Miner  -------- //
-              -> static async getMinerShares(minerEthAddress, mongoInterface)
-          // -------  Returns MinerShares from a specific Miner  -------- //
+### Prerequisites
 
+- **Node.js 18** (with npm)
+- **MongoDB** (4.4+) running as a service
+- **build-essential**, **cmake**, **python3**, **git** (for native module compilation)
 
+### 1. Install dependencies
 
-          // -------  Updates alltimeTokenBalance field (with value tokenRewardAmt) for a specific Miner on Mongo DB -------- //
-              -> static async awardTokensBalanceForShares( minerEthAddress, difficulty , poolConfig, mongoInterface)
-                      ->let tokenRewardAmt = await PeerHelper.getTokenRewardForShareOfDifficulty(difficulty,poolConfig, mongoInterface)
-          // -------  Updates alltimeTokenBalance field (with value tokenRewardAmt) for a specific Miner on Mongo DB -------- //
+```bash
+# Install system dependencies (Ubuntu/Debian)
+sudo apt-get install -y build-essential cmake python3 git
 
+# Install Node 18 via nvm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
+source ~/.bashrc
+nvm install 18
 
-          // -----  Returns Estimated Hashrate from (MinerAddress)  ---------- //   
-              -> static async estimateMinerHashrate(minerAddress, mongoInterface)
-                         -> var hashrate = PeerHelper.getEstimatedShareHashrate( totalDiff, seconds );
-          // -----  Returns Estimated Hashrate from (MinerAddress)  ---------- //   
+# Clone and install
+git clone https://github.com/etica/eticapool.git
+cd eticapool
+npm install
 
+# Build the frontend
+cd frontend-new
+npm install
+npm run build
+cd ..
+```
 
-           // -----  Returns Average Time to find Solution from (MinerAddress)  ---------- //
-               -> static async getAverageSolutionTime(minerAddress, mongoInterface)
-           // -----  Returns Average Time to find Solution from (MinerAddress)  ---------- //
+### 2. Configure
 
+```bash
+cp pool.config.template.json pool.config.json
+# Edit pool.config.json with your wallet addresses and private keys
+```
 
-           // --------  Stores minerEthAddress into DB  ---------  //
-               -> static async saveMinerDataToRedisMongo(minerEthAddress, minerData, mongoInterface)
-           // --------  Stores minerEthAddress into DB  ---------  //
+### 3. Install and start MongoDB
 
+```bash
+# Ubuntu/Debian — see https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/
+sudo systemctl start mongod
+sudo systemctl enable mongod
+```
 
-           // -----  Returns Estimated Hashrate from (MinerAddress)  ---------- //  
-               -> static async estimateMinerHashrate(minerAddress, mongoInterface)
-                         -> var submitted_shares = await PeerHelper.getSharesData(minerAddress, mongoInterface)
-                         -> var hashrate = PeerHelper.getEstimatedShareHashrate( totalDiff, seconds );
-           // -----  Returns Estimated Hashrate from (MinerAddress)  ---------- //  
+### 4. (Optional) Install Redis
 
+Redis is optional — the pool falls back to MongoDB queues without it.
 
+```bash
+sudo apt-get install -y redis-server
+sudo systemctl start redis-server
+sudo systemctl enable redis-server
+```
 
-           // -----  Returns Average Time to find Solution from (MinerAddress)  ---------- //
-                -> static async getAverageSolutionTime(minerAddress, mongoInterface)
-           // -----  Returns Average Time to find Solution from (MinerAddress)  ---------- //
+If Redis is running, set the environment variable:
 
-// Specific Miner //
+```bash
+export REDIS_URL=redis://localhost:6379
+```
 
+### 5. Run with pm2
 
-// All Miners //
-           // -------  Returns total totalShares by adding from all Miners  -------- //
-               -> static async getTotalMinerShares(mongoInterface)
-           // -------  Returns total totalShares by adding from all Miners  -------- //
-
-           // -------  Returns total totalHashrate by adding from all Miners  -------- //
-               -> static async getTotalMinerHashrate(mongoInterface)
-           // -------  Returns total totalHashrate by adding from all Miners  -------- //
-
-           // -------  Returns all Miners  -------- //
-               -> static  async getMinerList( mongoInterface )
-           // -------  Returns all Miners  -------- //
-
-           // -------  Deletes OLD miner_shares  -------- //
-               -> static async cleanOldData(mongoInterface, poolConfig){
-           // -------  Deletes OLD miner_shares  -------- //
-
-
-// All Miners //
-
-
-// Calculate general Data //
-
-
-             // --------  Updates each Miner Hashrate  ---------  //
-                -> static async calculateMinerHashrateData(mongoInterface, poolConfig)
-             // --------  Updates each Miner Hashrate  ---------  //
-
-             // -------  Returns netReward global variable from Blockreward and by taking into account Pool fees and shareDiff and totalDifficulty  -------- //
-                -> static async getTokenRewardForShareOfDifficulty(shareDiff, poolConfig, mongoInterface)
-             // -------  Returns netReward global variable from Blockreward and by taking into account Pool fees and shareDiff and totalDifficulty  -------- //
-
-
-             // -------  Returns object with global Mining reward and Pool data  -------- //
-              -> static async getPoolFeesMetrics(poolConfig, mongoInterface)
-             // -------  Returns object with global Mining reward and Pool data  -------- //
-
-
-
-// Calculate general Data //
-
-
-// Specific Share //
-
-// --------  Returns Sharecredits (Math.floor(difficulty)) from Difficulty  ---------  // 
-                -> static async getShareCreditsFromDifficulty(difficulty,shareIsASolution,poolConfig)
-// --------  Returns Sharecredits (Math.floor(difficulty)) from Difficulty  ---------  //
-
-// -----  Returns Estimated Hashrate from (difficulty and timeToFindSeconds) ---------- //
-                -> static getEstimatedShareHashrate(difficulty, timeToFindSeconds )
-// -----  Returns Estimated Hashrate from (difficulty and timeToFindSeconds) ---------- //
-
-// Specific Share  //
-
-
-// Solutions  //
-
-          // -----  Save submited Solution  ---------- //
-               -> static  async saveSubmittedSolutionTransactionData(tx_hash,transactionData, mongoInterface)
-          // -----  Save submited Solution  ---------- //
-
-         // -----  Check balanceTransfer.confirmed (for a paymentId)  ---------- //
-               -> static async loadStoredSubmittedSolutionTransaction(tx_hash, mongoInterface )
-         // -----  Check balanceTransfer.confirmed (for a paymentId)  ---------- //
-
-
-         // -----  Get saved submited Solution (from tx_hash)  ---------- //
-               -> static async loadStoredSubmittedSolutionTransaction(tx_hash, mongoInterface )
-         // -----  Get saved submited Solution (from tx_hash)  ---------- //
-
-
-// Solutions  //
-
-
-
- --------------------------------    FUNCTION MAPPING  -----------------------------------
-
-token-interface:
-  -> buildBalancePayments:
-   creates balance_payments record i MongoDb with {batchedPaymentUuid:undefined} value
-
-   -> buildBatchedPaymentTransactions:
- updtaes balance_payments record i MongoDb with {batchedPaymentUuid:newBatchedPaymentTxData.uui}  value 
-
-
- transactions-coordinator.js:
-
-addTransactionToQueue(txType, txData,  mongoInterface, poolConfig)
-
-txData will be used to create packedData with status queued
-var packetData = {
-       block: blockNum,
-       txType: txType, //batched_payment or solution 
-       txData: txData, 
-       txHash: null,
-       status: 'queued'  //queued, pending, reverted, success 
-
-     }
- Will store an object (packetData with Batch id). Then all ballance_payment object with this batch id will be used in broadcast function    
-
- broadcastQueuedBatchedPaymentTransactions
-  -> broadcastTransaction
-
-
-
-  Updates alltimeTokenBalance with tokensAwarded:
-     -> awardTokensBalanceForShares()
-
-
-// MINERS INTERFACE PROCESS //
-
-peer-interface.js: 
-async initJSONRPCServer()  // This is the interface that miners connect to ! 
-   stores sharedata in 'queued_shares_list'and then 
-   calls
-   -> processQueuedShares() 
-     get sharedata from 'queued_shares_list' and immediatly deletes sharedata and then
-     calls 
-     -> PeerInterface.handlePeerShareSubmit() with sharedata and then 
-     check: 
-     computed_digest === sharedata.digest && sharedata.difficulty >= sharedata.minShareDifficulty && digestBigNumber.lt(minShareTarget)
-     if sharedata isSolution calls -> this.prehandleValidShare() with sharedata
-     else insert sharedata in 'miner_shares' with isSolution False
-        -> this.prehandleValidShare()
-        checks no existence of this sharedata in 'miner_shares' yet
-        gets MinerData and estimates var timeToFoFindShare with minerData.lastSubmittedSolutionTime. timeToFoFindShare set to 0 if no minerData.lastSubmittedSolution
-        stores ShareData in 'miner_pendingshares' with isSolution True and timeToFoFindShare
-        and then calls
-    -> TokenInterface.queueMiningSolution() with sharedata
-
-    queueMiningSolution will mine the transaction
-    transactionsCoordinator.rewardCrawl() will scan the blockchain periodically and store solutions mined by the pool in 'pool_mints'
-
-    When transactionsCoordinator.rewardCrawl() finds a solution with same challengeNumber as a 'miner_pendingshares' it
-    calls 
-    -> PeerInterface.processValidShare() with pendingshare
-
-
-    -> PeerInterface.processValidShare()
-    check no existence of this pendingshare in 'miner_shares'
-    insert pendingshare in 'miner_shares' to make sure this diggest cant be submited twice
-    updates minerData with lastSubmittedSolutionTime() equal to now
-    calaculate ShareCredits based on sharedata.difficulty / totalpool difficulty ratio
-    and then calls
-    -> PeerHelper.awardTokensBalanceForShares() with minerEthAddress and ShareCredits. It actually increases token balance based on shareCredits
-
-    -> PeerHelper.awardTokensBalanceForShares()
-       calculates tokenRewardAmt with PeerHelper.getTokenRewardForShareOfDifficulty(minerAddress, ShareCredits)
-       increases with tokenRewardAmt and stores updated minerData.alltimeTokenBalance
-
-
--> Rq: removed return{} on submit share() function when peer submit invalid json. Solved issue miners errors and unable to detect new challenge numbers
-
-// MINERS INTERFACE PROCESS //
+```bash
+npm i -g pm2
+
+# Start all 3 processes
+pm2 start index.js
+pm2 start indexpoolsnetwork.js
+pm2 start indexcleanercoordinator.js
+
+# Save and enable startup
+pm2 save
+pm2 startup
+```
+
+### 6. Firewall
+
+```bash
+sudo ufw allow 22      # SSH
+sudo ufw allow 80      # Web UI
+sudo ufw allow 2053    # Socket.IO
+sudo ufw allow 3333    # Stratum
+sudo ufw allow 5555    # Stratum
+sudo ufw allow 7777    # Stratum
+sudo ufw allow 9999    # Stratum
+sudo ufw allow 8081    # JSONRPC
+sudo ufw enable
+```
+
+---
+
+## Configuration Reference
+
+### pool.config.json
+
+The config file has two top-level keys: `staging` and `production`. The pool reads the section matching the `POOL_ENV` environment variable (defaults to `production`).
+
+| Field | Description |
+|-------|-------------|
+| `poolName` | Display name shown in the frontend header and network pools list |
+| `poolUrl` | Public URL of your pool (e.g. `http://mypool.com`) |
+| `MainPeerPoolUrl` | URL of the main Etica pool to sync network data from |
+| `poolEnv` | `staging` or `production` |
+
+#### mintingConfig
+
+| Field | Description |
+|-------|-------------|
+| `publicAddress` | Etica address used for submitting mining solutions |
+| `privateKey` | Private key for the minting address |
+| `poolTokenFee` | Pool fee percentage (e.g. `5` = 5%) |
+| `maxGasPriceGwei` | Maximum gas price for minting transactions |
+| `gasPriceBoost` | Gas price boost in gwei |
+| `overrideSuspension` | `true` to keep minting even during low-profit periods |
+| `web3Provider` | Etica RPC endpoint |
+
+#### paymentsConfig
+
+| Field | Description |
+|-------|-------------|
+| `publicAddress` | Etica address used for sending miner payouts |
+| `privateKey` | Private key for the payments address |
+| `minBalanceForTransfer` | Minimum payout threshold in wei (1 ETI = 1000000000000000000) |
+| `minPaymentsInBatch` | Minimum payments per batch transaction |
+| `PoolSecurityBalance` | Minimum EGAZ to keep in payments address |
+| `poolRewardsBonus` | Bonus reward percentage for miners (optional) |
+| `maxGasPriceGwei` | Maximum gas price for payment transactions |
+| `web3Provider` | Etica RPC endpoint |
+
+#### miningConfig
+
+| Field | Description |
+|-------|-------------|
+| `minimumShareDifficulty` | Minimum share difficulty accepted |
+| `minimumShareDifficultyHard` | Hard minimum (rejects below this) |
+| `allowCustomVardiff` | Allow miners to set custom difficulty |
+| `newShareExpectedTime` | Expected seconds between shares (for vardiff) |
+
+---
+
+## Processes
+
+| Script | Purpose | Required |
+|--------|---------|----------|
+| `index.js` | Main pool — stratum server, web server, share processing, token collection, transaction coordination | Yes |
+| `indexpoolsnetwork.js` | Discovers other Etica pools, syncs network stats, manages pool list | Recommended |
+| `indexcleanercoordinator.js` | Cleans old pending shares from MongoDB (runs hourly, keeps last 1000 epochs) | Recommended |
+
+---
+
+## Architecture
+
+```
+Miners (RandomX)
+    |
+    |  Stratum TCP (ports 3333/5555/7777/9999)
+    v
++-----------+       +-------+       +---------+
+|  Stratum  | ----> | Redis | ----> |  Share  |
+|  Server   |       | Queue |       |Processor|
++-----------+       +-------+       +---------+
+                                        |
+                                        v
++-----------+       +---------+     +---------+
+|   Web     | <---- | MongoDB | <-- |  Token  |
+|  Server   |       |         |     |Interface|
++-----------+       +---------+     +---------+
+    |                                   |
+    |  HTTP :80 + Socket.IO :2053       |  Blockchain RPC
+    v                                   v
+ Browser                          Etica Network
+```
+
+- **Redis** (optional): High-performance share queue between stratum and processor. Falls back to MongoDB if unavailable.
+- **MongoDB**: Persistent storage for miners, shares, rewards, payments, pool stats.
+- **Socket.IO**: Real-time updates pushed to the frontend (new shares, pool stats, blocks).
+
+---
+
+## How Mining Rewards Work
+
+1. **Share submission**: Miner submits RandomX proof via stratum
+2. **Share validation**: Pool verifies the hash meets difficulty target
+3. **Block found**: When a share solves the on-chain challenge, pool submits the minting transaction
+4. **PPLNS rewards**: `rewardCrawl()` distributes block rewards proportionally based on last N shares (Pay Per Last N Shares)
+5. **Payment creation**: `buildBalancePayments()` creates payment records when miner balance exceeds the minimum payout threshold
+6. **Batched payment**: `buildBatchedPaymentTransactions()` groups pending payments and broadcasts on-chain
+7. **Confirmation**: Pool monitors the transaction until it is mined and confirmed
+
+---
+
+## Links
+
+- [Etica Protocol](https://www.eticaprotocol.org)
+- [How to Mine Etica](https://www.eticaprotocol.org/eticadocs/mining.html)
+- [Block Explorer (EticaScan)](https://www.eticascan.org)
+- [Etica Web App](https://www.etica.io)
+- [Reddit](https://reddit.com/r/etica)
+- [GitHub](https://github.com/etica)

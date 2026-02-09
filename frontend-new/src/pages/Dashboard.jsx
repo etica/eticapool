@@ -10,7 +10,7 @@ import PortBadge from '../components/PortBadge';
 import LiveDot from '../components/LiveDot';
 import StatusBadge from '../components/StatusBadge';
 import LoadingSkeleton from '../components/LoadingSkeleton';
-import { formatNumber, truncateAddress, rawToFormatted } from '../lib/formatters';
+import { formatNumber, truncateAddress, rawToFormatted, formatPoolName } from '../lib/formatters';
 import { ETICASCAN_URL, buildStratumPorts } from '../config/constants';
 
 const TABS = ['Mining Data', 'Getting Started', 'Pool Status', 'Recent Transactions'];
@@ -358,13 +358,15 @@ export default function Dashboard() {
     || poolData?.recentPaymentsBatched
     || [];
 
+  const { base: poolBase, suffix: poolSuffix } = formatPoolName(poolName);
+
   return (
     <div>
       {/* Centered hero header */}
       <div className="os-header">
         <div className="os-header-title">
           <img src="/images/eti-logo.png" alt="ETI" className="w-10 h-10" />
-          ETICA <span className="accent">POOL</span>
+          {poolBase} <span className="accent">{poolSuffix}</span>
         </div>
         <p className="os-header-sub">Pool Overview &mdash; Mining Data &amp; Status</p>
         <p className="os-header-mono">{poolUrl}</p>

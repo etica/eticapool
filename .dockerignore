@@ -8,7 +8,9 @@ crash.log
 pool.config.json
 .env
 .DS_Store
-dist/
 test/
+templates/
 frontend/node_modules
 frontend/dist
+frontend-new/node_modules
+frontend-new/dist

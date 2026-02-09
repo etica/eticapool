@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   redis:
     image: redis:7-alpine
@@ -103,6 +101,46 @@ services:
       - ./log:/app/log
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  pools-network:
+    build: .
+    command: ["node", "indexpoolsnetwork.js"]
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      - MONGODB_URI=mongodb://host.docker.internal:27017
+      - REDIS_URL=redis://redis:6379
+      - POOL_ENV=production
+      - POOL_CONFIG_PATH=/app/config/pool.config.json
+    volumes:
+      - ./pool.config.json:/app/config/pool.config.json:ro
+      - ./log:/app/log
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      disable: true
+    restart: unless-stopped
+
+  cleaner:
+    build: .
+    command: ["node", "indexcleanercoordinator.js"]
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      - MONGODB_URI=mongodb://host.docker.internal:27017
+      - REDIS_URL=redis://redis:6379
+      - POOL_ENV=production
+      - POOL_CONFIG_PATH=/app/config/pool.config.json
+    volumes:
+      - ./pool.config.json:/app/config/pool.config.json:ro
+      - ./log:/app/log
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      disable: true
     restart: unless-stopped
 
 volumes:

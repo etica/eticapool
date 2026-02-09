@@ -1,14 +1,12 @@
-# Stage 1: Build frontend (Node 16 for vue-cli-service + webpack 4)
-FROM node:16-bullseye AS frontend-builder
-WORKDIR /app/frontend
-COPY frontend/package.json frontend/package-lock.json ./
+# Stage 1: Build frontend (React + Vite)
+FROM node:18-bullseye AS frontend-builder
+WORKDIR /app/frontend-new
+COPY frontend-new/package.json frontend-new/package-lock.json ./
 RUN npm ci
-COPY frontend/ ./
-COPY contracts/ /app/contracts/
-COPY config/DeployedContractInfo.json /app/config/DeployedContractInfo.json
+COPY frontend-new/ ./
 RUN npm run build
 
-# Stage 2: Build backend (Node 18 for native modules)
+# Stage 2: Build backend (Node 18 for native modules like randomx)
 FROM node:18-bullseye AS backend-builder
 WORKDIR /app
 RUN apt-get update && apt-get install -y build-essential cmake python3 git && rm -rf /var/lib/apt/lists/*
@@ -23,7 +21,7 @@ RUN groupadd -r pool && useradd -r -g pool -m pool
 
 COPY package.json package-lock.json ./
 COPY --from=backend-builder /app/node_modules ./node_modules
-COPY --from=frontend-builder /app/dist ./dist
+COPY --from=frontend-builder /app/frontend-new/dist ./dist
 
 # Copy backend source (explicit, no COPY . .)
 COPY express.js ./
