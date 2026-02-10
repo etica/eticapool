@@ -356,7 +356,7 @@ export default function MinerProfile() {
                       <span className="faded">--</span>
                     )}
                   </td>
-                  <td className="py-3 px-3"><StatusBadge status={payment.status} /></td>
+                  <td className="py-3 px-3"><StatusBadge status={payment.confirmed ? 'confirmed' : (payment.batchedPaymentUuid ? 'pending' : 'unprocessed')} /></td>
                 </tr>
               )}
             />
@@ -378,7 +378,6 @@ export default function MinerProfile() {
                 { label: 'Pool Shares', align: 'right' },
                 { label: 'My Shares', align: 'right' },
                 { label: '% of Pool', align: 'right' },
-                { label: 'Port' },
                 { label: 'Reward', align: 'right' },
               ]}
               data={rewardsData || []}
@@ -399,7 +398,6 @@ export default function MinerProfile() {
                     <td className="py-3 px-3 right">{r.poolshares}</td>
                     <td className="py-3 px-3 right">{r.shares}</td>
                     <td className="py-3 px-3 right emerald">{pct}</td>
-                    <td className="py-3 px-3"><PortBadge port={r.minerport} /></td>
                     <td className="py-3 px-3 right emerald">{reward}{bonus}</td>
                   </tr>
                 );
