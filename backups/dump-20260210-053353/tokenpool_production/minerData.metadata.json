@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"minerEthAddress":{"$numberInt":"1"}},"name":"minerEthAddress_1"}],"uuid":"73eb89643da04848bb30941f7b9bd042","collectionName":"minerData","type":"collection"}

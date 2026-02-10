@@ -9,6 +9,7 @@ services:
       --appendonly yes
       --maxmemory 512mb
       --maxmemory-policy noeviction
+      --loglevel warning
       --requirepass ${REDIS_PASSWORD:-eticapool_redis_default_change_me}
     # Redis port not exposed to host; only accessible to services via internal network
     volumes:
@@ -23,17 +24,22 @@ services:
   mongodb:
     image: mongo:4.4.29
     mem_limit: 1g
-    command: mongod --bind_ip_all --wiredTigerCacheSizeGB 0.5 --auth
+    command: mongod --bind_ip_all --wiredTigerCacheSizeGB 0.5 --auth --quiet --slowms 5000 --setParameter diagnosticDataCollectionEnabled=false
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USER:-eticapool}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-eticapool_mongo_default_change_me}
     volumes:
       - mongodb-data:/data/db
     # NO ports: section — never exposed to host or internet
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "1"
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')", "-u", "${MONGO_ROOT_USER:-eticapool}", "-p", "${MONGO_ROOT_PASSWORD:-eticapool_mongo_default_change_me}", "--authenticationDatabase", "admin"]
-      interval: 10s
+      test: ["CMD", "mongo", "--quiet", "--eval", "db.adminCommand('ping')", "-u", "${MONGO_ROOT_USER:-eticapool}", "-p", "${MONGO_ROOT_PASSWORD:-eticapool_mongo_default_change_me}", "--authenticationDatabase", "admin"]
+      interval: 30s
       timeout: 5s
       retries: 5
       start_period: 30s
@@ -188,7 +194,7 @@ services:
         while true; do
           STAMP=$$(date +%Y%m%d-%H%M%S)
           echo "[backup] Starting mongodump at $$STAMP"
-          mongodump --host mongodb --port 27017 -u $${MONGO_ROOT_USER:-eticapool} -p $${MONGO_ROOT_PASSWORD:-eticapool_mongo_default_change_me} --authenticationDatabase admin --db tokenpool_production --out /backups/dump-$$STAMP
+          mongodump --host mongodb --port 27017 -u $${MONGO_ROOT_USER:-eticapool} -p $${MONGO_ROOT_PASSWORD:-eticapool_mongo_default_change_me} --authenticationDatabase admin --db tokenpool_production --out /backups/dump-$$STAMP --quiet
           if [ $$? -eq 0 ]; then
             echo "[backup] Dump successful: dump-$$STAMP"
           else

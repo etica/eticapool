@@ -32,10 +32,8 @@ LICENSE
 pool.config.template.json
 pool.config.description.json
 
-# Frontend source (already built in build stage)
+# Old Vue frontend (not used in Docker build)
 frontend/
-frontend-new/src/
-frontend-new/public/
 
 # Backups directory
 backups/

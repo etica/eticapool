@@ -8,6 +8,71 @@ See it running at [eticapool.com](http://eticapool.com)
 
 ---
 
+## Pool Quickstart (Copy-Paste)
+
+Just run these commands on a fresh Ubuntu server. Replace the placeholder values with yours.
+
+```bash
+# 1. Check if Docker is already installed
+docker --version
+# → If it prints "Docker version 20.x" or higher: Docker is OK, go to step 2.
+# → If it prints "command not found" or a version below 20: install Docker:
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
+# Then log out and log back in so Docker works without sudo.
+
+# 2. Clone the pool
+git clone https://github.com/etica/eticapool.git
+cd eticapool
+
+# 3. Create your config
+cp pool.config.template.json pool.config.json
+nano pool.config.json
+```
+
+Before filling in the config, you need to prepare **2 Etica (ETH) addresses** with their private keys and **deploy 1 smart contract**:
+
+1. **Create 2 wallets** (e.g. via MetaMask) — each with a public address and private key. Fund both with some EGAZ for gas fees.
+   - **Wallet A (Minting)** — the pool uses this to submit mining solutions to the blockchain
+   - **Wallet B (Payments)** — the pool uses this to send ETI payouts to miners
+
+2. **Deploy the BatchedPayments contract** — this contract allows the pool to pay multiple miners in a single transaction. When deploying, you must set **Wallet B** as the contract owner. See [Deploy the BatchedPayments contract](#2-deploy-the-batchedpayments-contract) below for detailed instructions.
+
+Once you have your 2 wallets and deployed contract, fill in the `"production"` section of `pool.config.json`:
+- `"poolUrl"` → your server IP or domain (e.g. `"http://123.45.67.89"`)
+- `"mintingConfig"."publicAddress"` → Wallet A address
+- `"mintingConfig"."privateKey"` → Wallet A private key
+- `"paymentsConfig"."publicAddress"` → Wallet B address (same address you set as contract owner)
+- `"paymentsConfig"."privateKey"` → Wallet B private key
+
+```bash
+# 4. Set passwords
+cat > .env << 'EOF'
+REDIS_PASSWORD=pick_a_strong_redis_password_here
+MONGO_ROOT_USER=eticapool
+MONGO_ROOT_PASSWORD=pick_a_strong_mongo_password_here
+EOF
+
+# 5. Open firewall ports
+sudo ufw allow 22 80 443 2053 3333 5555 7777 9999
+sudo ufw deny 27017
+sudo ufw deny 6379
+sudo ufw --force enable
+
+# 6. Start the pool
+docker compose up --build -d
+
+# 7. Check it's running
+docker compose ps
+docker compose logs -f pool-app
+```
+
+Your pool is now live at `http://YOUR_SERVER_IP`. Miners connect to `stratum+tcp://YOUR_SERVER_IP:3333`.
+
+For HTTPS, see [HTTPS with Let's Encrypt](#7-https-with-lets-encrypt-recommended) below.
+
+---
+
 ## Quick Start (Docker)
 
 The fastest way to get a pool running. Docker handles Redis, the frontend build, and all processes automatically.
@@ -394,6 +459,79 @@ sudo ufw --force enable
 ```
 
 > **CRITICAL**: Port 27017 (MongoDB) and 6379 (Redis) must NEVER be exposed to the internet. Automated bots scan for these ports and will delete your data within hours.
+
+### 7. HTTPS with Let's Encrypt (Recommended)
+
+HTTPS encrypts all traffic between miners' browsers and your pool. It also enables secure WebSocket (`wss://`) for real-time updates.
+
+#### Install nginx and certbot
+
+```bash
+sudo apt install -y nginx certbot python3-certbot-nginx
+```
+
+#### Get a certificate
+
+```bash
+sudo certbot certonly --nginx -d yourdomain.com -d www.yourdomain.com
+```
+
+Follow the prompts — certbot will verify domain ownership and save the certificate to `/etc/letsencrypt/live/yourdomain.com/`.
+
+#### Generate DH parameters
+
+```bash
+sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
+```
+
+This takes about 1 minute.
+
+#### Configure nginx
+
+Copy the included nginx template:
+
+```bash
+sudo cp config/nginx/default /etc/nginx/sites-available/default
+```
+
+Replace the placeholder domain with yours:
+
+```bash
+sudo sed -i 's/YOUR_DOMAIN.com/yourdomain.com/g' /etc/nginx/sites-available/default
+```
+
+Test and reload:
+
+```bash
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+#### Update firewall
+
+```bash
+sudo ufw allow 443   # HTTPS
+```
+
+#### What this does
+
+- `http://yourdomain.com` automatically redirects to `https://yourdomain.com`
+- nginx proxies web traffic to the pool on port 8080
+- Socket.IO (real-time updates) goes through `wss://yourdomain.com/socket.io/` — no need to expose port 2053
+- Stratum ports (3333/5555/7777/9999) are unaffected — miners connect directly via TCP
+
+#### Certificate auto-renewal
+
+Certbot installs a systemd timer that renews certificates automatically. Verify it's active:
+
+```bash
+sudo systemctl status certbot.timer
+```
+
+To test renewal:
+
+```bash
+sudo certbot renew --dry-run
+```
 
 ---
 

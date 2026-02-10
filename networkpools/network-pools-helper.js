@@ -713,7 +713,7 @@ static async axiosgetRequestURL(get_request_uri){
   
 })
 .catch(error => {
-  console.log(error);
+  console.error('axiosget error:', error.message || error.code);
   reject(error);
 });
 
@@ -723,14 +723,14 @@ static async axiosgetRequestURL(get_request_uri){
 
 
 static async axiospostRequestURL(request_uri, _data){
-  
+
   return new Promise(   (resolve, reject) => {
     axios.post(request_uri, _data)
 .then(response => {
   resolve(response.data)
 })
 .catch(error => {
-  console.log(error);
+  console.error('axiospost error:', error.message || error.code);
   reject(error);
 });
 

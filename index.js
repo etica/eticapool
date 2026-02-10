@@ -1,4 +1,9 @@
-import  SegfaultHandler from  'segfault-handler'; 
+// Suppress mongodb 3.6 driver noise (not fixable without driver upgrade)
+const _origWarn = console.warn;
+console.warn = (...args) => { if (args[0] && typeof args[0] === 'string' && args[0].includes('Top-level use of w')) return; _origWarn.apply(console, args); };
+process.on('warning', (w) => { if (w.message && w.message.includes('MongoError')) return; console.warn(w); });
+
+import  SegfaultHandler from  'segfault-handler';
 SegfaultHandler.registerHandler('crash.log');
 process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Promise rejection:', reason);
