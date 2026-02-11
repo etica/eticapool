@@ -45,11 +45,15 @@ export default function Navbar() {
                 {dd.title} <span className="ml-1 text-[8px]">&#9662;</span>
               </button>
               <div className="os-nav-dropdown-menu">
-                {dd.rows.map((row) =>
-                  row.external ? (
+                {dd.rows.map((row) => {
+                  if (row.requiresWallet && !isConnected) return null;
+                  const url = row.url.includes(':address') && address
+                    ? row.url.replace(':address', address.toLowerCase())
+                    : row.url;
+                  return row.external ? (
                     <a
                       key={row.title}
-                      href={row.url}
+                      href={url}
                       target="_blank"
                       rel="noreferrer"
                       className="os-nav-dropdown-link"
@@ -59,14 +63,14 @@ export default function Navbar() {
                   ) : (
                     <Link
                       key={row.title}
-                      to={row.url}
+                      to={url}
                       className="os-nav-dropdown-link"
                       onClick={() => setMobileNavOpen(false)}
                     >
                       {row.title}
                     </Link>
-                  )
-                )}
+                  );
+                })}
               </div>
             </div>
           ))}

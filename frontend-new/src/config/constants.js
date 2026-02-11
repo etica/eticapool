@@ -1,4 +1,5 @@
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+export const ETI_DECIMALS = 18;
 // When behind nginx, Socket.IO connects through the same origin via /socket.io/ path.
 // Only use VITE_SOCKET_URL for dev mode (direct connection to port 2053).
 export const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || '';

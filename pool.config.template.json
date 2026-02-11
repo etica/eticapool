@@ -36,7 +36,9 @@
     "paymentsConfig":{
       "enablePPS":true,
       "maxGasPriceGwei": 5,
-      "minBalanceForTransfer": 1500000000000000000,  
+      "minBalanceForTransfer": 1500000000000000000,
+      "customMinPayoutFloor": 10000000000000000,
+      "customMinPayoutCeiling": 50000000000000000000,
       "rebroadcastPaymentWaitBlocks": 10,
       "minPaymentsInBatch": 1,
       "PoolSecurityBalance": 10000000000000000,
@@ -82,13 +84,15 @@
     "paymentsConfig":{
       "enablePPS":true,
       "maxGasPriceGwei": 5,
-      "minBalanceForTransfer": 1500000000000000000,  
+      "minBalanceForTransfer": 1500000000000000000,
+      "customMinPayoutFloor": 10000000000000000,
+      "customMinPayoutCeiling": 50000000000000000000,
       "rebroadcastPaymentWaitBlocks": 10,
       "minPaymentsInBatch": 1,
       "PoolSecurityBalance": 10000000000000000,
       "poolRewardsBonus": 20,
 
-      
+
       "publicAddress": "",
       "privateKey":"",
 

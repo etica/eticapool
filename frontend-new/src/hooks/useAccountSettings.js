@@ -47,5 +47,24 @@ export function useAccountSettings(token) {
     return data;
   }, [token]);
 
-  return { settings, isLoading, error, updateDifficulty, refetch: fetchSettings };
+  const updateMinPayout = useCallback(async (value) => {
+    if (!token) throw new Error('Not authenticated');
+    const res = await fetch(`${API_BASE_URL}/api/v2/account/settings`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ customMinPayout: value }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to update min payout');
+    }
+    const data = await res.json();
+    setSettings((prev) => ({ ...prev, customMinPayout: data.customMinPayout }));
+    return data;
+  }, [token]);
+
+  return { settings, isLoading, error, updateDifficulty, updateMinPayout, refetch: fetchSettings };
 }

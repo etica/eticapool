@@ -5,8 +5,9 @@ import WalletModal from '../components/WalletModal';
 import { useWallet } from '../hooks/useWallet';
 import { useAuth } from '../hooks/useAuth';
 import { useAccountSettings } from '../hooks/useAccountSettings';
+import { usePoolOverview } from '../hooks/usePoolOverview';
 import { truncateAddress, formatNumber } from '../lib/formatters';
-import { PORT_META, PORT_COLORS } from '../config/constants';
+import { PORT_META, PORT_COLORS, ETI_DECIMALS } from '../config/constants';
 
 const PORT_MINIMUMS = Object.entries(PORT_META).map(([port, meta]) => ({
   port: Number(port),
@@ -213,34 +214,147 @@ function DifficultyCard({ settings, isLoading, error, onSave, onClear }) {
   );
 }
 
-function PayoutCard() {
+function weiToEti(wei) {
+  if (!wei) return 0;
+  return Number(wei) / Math.pow(10, ETI_DECIMALS);
+}
+
+function etiToWei(eti) {
+  if (!eti) return 0;
+  return Math.round(Number(eti) * Math.pow(10, ETI_DECIMALS));
+}
+
+function PayoutCard({ settings, isLoading, error, onSave, onClear, poolConfig }) {
+  const [inputValue, setInputValue] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState(null);
+
+  const floorWei = poolConfig?.customMinPayoutFloor || 10000000000000000;
+  const ceilingWei = poolConfig?.customMinPayoutCeiling || 50000000000000000000;
+  const defaultWei = poolConfig?.minimumPayout || 1500000000000000000;
+
+  const floorEti = weiToEti(floorWei);
+  const ceilingEti = weiToEti(ceilingWei);
+  const defaultEti = weiToEti(defaultWei);
+
+  const currentWei = settings?.customMinPayout;
+  const hasCustom = currentWei && currentWei > 0;
+  const currentEti = hasCustom ? weiToEti(currentWei) : null;
+
+  async function handleSave() {
+    const val = Number(inputValue);
+    if (!val || val < floorEti || val > ceilingEti) {
+      setSaveMsg({ type: 'error', text: `Must be between ${floorEti} and ${ceilingEti} ETI` });
+      return;
+    }
+    setSaving(true);
+    setSaveMsg(null);
+    try {
+      await onSave(etiToWei(val));
+      setSaveMsg({ type: 'ok', text: 'Minimum payout updated!' });
+      setInputValue('');
+    } catch (err) {
+      setSaveMsg({ type: 'error', text: err.message });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleClear() {
+    setSaving(true);
+    setSaveMsg(null);
+    try {
+      await onClear(null);
+      setSaveMsg({ type: 'ok', text: 'Custom payout cleared — using pool default' });
+      setInputValue('');
+    } catch (err) {
+      setSaveMsg({ type: 'error', text: err.message });
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <DataCard
-      accent="linear-gradient(90deg, #374151, #4b5563)"
-      tag="COMING SOON"
-      tagColor="gray"
+      accent="linear-gradient(90deg, #f59e0b, #f97316)"
+      tag="SETTINGS"
+      tagColor="amber"
       title="Minimum Payout"
     >
-      <div style={{ opacity: 0.5 }}>
-        <p className="text-xs mb-4" style={{ color: '#9ca3af' }}>
-          Configure the minimum payout threshold for your mining rewards.
-        </p>
-        <DataRow label="Current Value">
-          <span style={{ color: '#9ca3af' }}>
-            <span style={{ marginRight: '0.5rem' }}>&#128274;</span>
-            1.5 ETI (default)
-          </span>
-        </DataRow>
-        <div className="mt-4">
-          <input
-            type="number"
-            disabled
-            placeholder="Custom minimum payout"
-            className="os-input w-full"
-            style={{ opacity: 0.4, cursor: 'not-allowed' }}
-          />
-        </div>
-      </div>
+      <p className="text-xs mb-4" style={{ color: '#9ca3af' }}>
+        Set a custom minimum payout threshold. Balances above this amount are paid out
+        automatically. The daily sweep pays all balances above {floorEti} ETI every 24h regardless.
+      </p>
+
+      <DataRow label="Current Value">
+        <span className={hasCustom ? 'amber' : ''} style={hasCustom ? { color: '#f59e0b' } : { color: '#9ca3af' }}>
+          {hasCustom
+            ? `${currentEti} ETI (custom)`
+            : `${defaultEti} ETI (default)`}
+        </span>
+      </DataRow>
+
+      {isLoading ? (
+        <p className="text-xs mt-4" style={{ color: '#9ca3af' }}>Loading settings...</p>
+      ) : error ? (
+        <p className="text-xs red mt-4">{error}</p>
+      ) : (
+        <>
+          <div className="mt-4">
+            <input
+              type="number"
+              min={floorEti}
+              max={ceilingEti}
+              step="0.01"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder={`Enter ETI amount (${floorEti} - ${ceilingEti})`}
+              className="os-input w-full"
+            />
+          </div>
+
+          <div className="flex gap-2 mt-3">
+            <button
+              onClick={handleSave}
+              disabled={saving || !inputValue}
+              className="os-btn os-btn-emerald"
+            >
+              {saving ? 'Saving...' : 'Save'}
+            </button>
+            {hasCustom && (
+              <button
+                onClick={handleClear}
+                disabled={saving}
+                className="os-btn os-btn-dim"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+
+          {saveMsg && (
+            <p className={`text-xs mt-2 ${saveMsg.type === 'ok' ? 'emerald' : 'red'}`}>
+              {saveMsg.text}
+            </p>
+          )}
+
+          <div className="mt-5 pt-4" style={{ borderTop: '1px solid rgba(55,65,81,0.3)' }}>
+            <p className="os-label mb-2">Payout Limits</p>
+            <DataRow label="Minimum">
+              <span style={{ color: '#d1d5db' }}>{floorEti} ETI</span>
+            </DataRow>
+            <DataRow label="Maximum">
+              <span style={{ color: '#d1d5db' }}>{ceilingEti} ETI</span>
+            </DataRow>
+            <DataRow label="Pool Default">
+              <span style={{ color: '#d1d5db' }}>{defaultEti} ETI</span>
+            </DataRow>
+            <p className="text-xs mt-3" style={{ color: '#6b7280', fontStyle: 'italic' }}>
+              Daily sweep pays all balances above {floorEti} ETI every 24h regardless of this setting.
+            </p>
+          </div>
+        </>
+      )}
     </DataCard>
   );
 }
@@ -248,7 +362,8 @@ function PayoutCard() {
 export default function Account() {
   const { address, isConnected, connect, disconnect, showModal, wallets, selectWallet, closeModal, connecting, connectError: walletError, connectSuccess } = useWallet();
   const { token, isAuthenticated, login, logout } = useAuth(address);
-  const { settings, isLoading, error, updateDifficulty, refetch } = useAccountSettings(token);
+  const { settings, isLoading, error, updateDifficulty, updateMinPayout, refetch } = useAccountSettings(token);
+  const { data: overviewData } = usePoolOverview();
 
   const [connectError, setConnectError] = useState(null);
   const [authError, setAuthError] = useState(null);
@@ -345,7 +460,14 @@ export default function Account() {
           onSave={updateDifficulty}
           onClear={updateDifficulty}
         />
-        <PayoutCard />
+        <PayoutCard
+          settings={settings}
+          isLoading={isLoading}
+          error={error}
+          onSave={updateMinPayout}
+          onClear={updateMinPayout}
+          poolConfig={overviewData?.config}
+        />
       </div>
 
       <div className="mt-8 text-center">

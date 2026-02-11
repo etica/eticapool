@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useMinerProfile } from '../hooks/useMinerProfile';
 import { useMinerShares } from '../hooks/useMinerShares';
@@ -13,6 +13,7 @@ import PortBadge from '../components/PortBadge';
 import StatusBadge from '../components/StatusBadge';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import StatsGrid from '../components/StatsGrid';
+import PoolChart from '../components/PoolChart';
 import {
   formatHashrate,
   timeAgo,
@@ -22,7 +23,207 @@ import {
 } from '../lib/formatters';
 import { ETICASCAN_URL } from '../config/constants';
 
-const TABS = ['Overview', 'Shares', 'Payments', 'Rewards'];
+const TABS = ['Overview', 'Graph', 'Shares', 'Payments', 'Rewards'];
+
+/* ---------- Graph Tab ---------- */
+
+function MinerGraphTab({ sharesData, sharesLoading, rewardsData, rewardsLoading }) {
+  // Transform shares into uPlot data: difficulty over time
+  const sharesChart = useMemo(() => {
+    if (!sharesData || sharesData.length < 2) return null;
+    const sorted = [...sharesData].reverse();
+    const n = sorted.length;
+    const timestamps = new Array(n);
+    const difficulties = new Array(n);
+    let min = Infinity, max = 0, sum = 0;
+
+    for (let i = 0; i < n; i++) {
+      const t = sorted[i].time;
+      timestamps[i] = t < 1e12 ? t : Math.floor(t / 1000);
+      difficulties[i] = Number(sorted[i].difficulty) || 0;
+      if (difficulties[i] > max) max = difficulties[i];
+      if (difficulties[i] < min) min = difficulties[i];
+      sum += difficulties[i];
+    }
+
+    return {
+      data: [timestamps, difficulties],
+      current: difficulties[n - 1],
+      avg: sum / n,
+      min: min === Infinity ? 0 : min,
+      max,
+    };
+  }, [sharesData]);
+
+  // Transform rewards into uPlot data: ETI earned per epoch
+  const rewardsChart = useMemo(() => {
+    if (!rewardsData || rewardsData.length < 2) return null;
+    const sorted = [...rewardsData].reverse();
+    const n = sorted.length;
+    const epochs = new Array(n);
+    const rewards = new Array(n);
+    const poolPct = new Array(n);
+    let sumETI = 0, maxETI = 0, sumPct = 0;
+
+    for (let i = 0; i < n; i++) {
+      const r = sorted[i];
+      const t = r.createdAt;
+      epochs[i] = t ? (t < 1e12 ? t : Math.floor(t / 1000)) : (Date.now() / 1000 - (n - i) * 600);
+      try {
+        rewards[i] = Number(BigInt(r.tokensAwarded || 0)) / 1e18;
+      } catch {
+        rewards[i] = 0;
+      }
+      poolPct[i] = r.poolshares > 0 ? (r.shares / r.poolshares) * 100 : 0;
+      sumETI += rewards[i];
+      if (rewards[i] > maxETI) maxETI = rewards[i];
+      sumPct += poolPct[i];
+    }
+
+    return {
+      data: [epochs, rewards, poolPct],
+      totalETI: sumETI,
+      avgETI: sumETI / n,
+      maxETI,
+      avgPct: sumPct / n,
+    };
+  }, [rewardsData]);
+
+  // Compact formatter for Y axis labels (e.g. 400000 → "400K")
+  const fmtDiff = (u, v) => {
+    if (v == null) return '--';
+    if (v >= 1e6) return (v / 1e6).toFixed(1) + 'M';
+    if (v >= 1e3) return (v / 1e3).toFixed(0) + 'K';
+    return v.toFixed(0);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Share Difficulty Chart */}
+      <div className="os-block">
+        <SectionTitle color="emerald">Share Difficulty</SectionTitle>
+        {sharesLoading ? (
+          <LoadingSkeleton type="card" />
+        ) : (
+          <PoolChart
+            data={sharesChart?.data || null}
+            title="Share Difficulty — Recent"
+            height={260}
+            series={[
+              {
+                label: 'Difficulty',
+                color: '#34d399',
+                fill: 'rgba(52, 211, 153, 0.08)',
+                width: 2,
+                value: (u, v) => v == null ? '--' : formatNumber(Math.round(v)),
+              },
+            ]}
+            axes={[
+              {
+                stroke: 'rgba(255,255,255,0.15)',
+                grid: { stroke: 'rgba(255,255,255,0.04)', width: 1 },
+                ticks: { stroke: 'rgba(255,255,255,0.08)', width: 1 },
+                font: '11px "JetBrains Mono", monospace',
+                gap: 8,
+              },
+              {
+                stroke: '#34d399',
+                grid: { stroke: 'rgba(255,255,255,0.04)', width: 1 },
+                ticks: { stroke: 'rgba(255,255,255,0.08)', width: 1 },
+                font: '11px "JetBrains Mono", monospace',
+                gap: 8,
+                size: 56,
+                values: (u, vals) => vals.map(v => fmtDiff(u, v)),
+              },
+            ]}
+            stats={sharesChart ? [
+              { label: 'Current', value: formatNumber(Math.round(sharesChart.current)), color: '#34d399' },
+              { label: 'Average', value: formatNumber(Math.round(sharesChart.avg)), color: '#9ca3af' },
+              { label: 'Peak', value: formatNumber(Math.round(sharesChart.max)), color: '#f97316' },
+              { label: 'Low', value: formatNumber(Math.round(sharesChart.min)), color: '#6b7280' },
+            ] : undefined}
+            legend={[{ label: 'Share Difficulty', color: '#34d399' }]}
+          />
+        )}
+      </div>
+
+      {/* Rewards Chart */}
+      <div className="os-block">
+        <SectionTitle color="orange">Earnings Per Epoch</SectionTitle>
+        {rewardsLoading ? (
+          <LoadingSkeleton type="card" />
+        ) : (
+          <PoolChart
+            data={rewardsChart?.data || null}
+            title="PPLNS Rewards"
+            height={260}
+            series={[
+              {
+                label: 'ETI Earned',
+                color: '#f97316',
+                fill: 'rgba(249, 115, 22, 0.08)',
+                width: 2,
+                value: (u, v) => v == null ? '--' : v.toFixed(4) + ' ETI',
+              },
+              {
+                label: '% of Pool',
+                color: '#06b6d4',
+                width: 1.5,
+                scale: 'pct',
+                dash: [4, 4],
+                value: (u, v) => v == null ? '--' : v.toFixed(2) + '%',
+              },
+            ]}
+            scales={{
+              x: { time: true },
+              y: { auto: true },
+              pct: { auto: true },
+            }}
+            axes={[
+              {
+                stroke: 'rgba(255,255,255,0.15)',
+                grid: { stroke: 'rgba(255,255,255,0.04)', width: 1 },
+                ticks: { stroke: 'rgba(255,255,255,0.08)', width: 1 },
+                font: '11px "JetBrains Mono", monospace',
+                gap: 8,
+              },
+              {
+                stroke: '#f97316',
+                grid: { stroke: 'rgba(255,255,255,0.04)', width: 1 },
+                ticks: { stroke: 'rgba(255,255,255,0.08)', width: 1 },
+                font: '11px "JetBrains Mono", monospace',
+                gap: 8,
+                size: 70,
+                values: (u, vals) => vals.map(v => v == null ? '' : v.toFixed(2) + ' ETI'),
+              },
+              {
+                side: 1,
+                scale: 'pct',
+                stroke: '#06b6d4',
+                grid: { show: false },
+                ticks: { stroke: 'rgba(255,255,255,0.08)', width: 1 },
+                font: '11px "JetBrains Mono", monospace',
+                gap: 8,
+                size: 56,
+                values: (u, vals) => vals.map(v => v == null ? '' : v.toFixed(0) + '%'),
+              },
+            ]}
+            stats={rewardsChart ? [
+              { label: 'Total Earned', value: rewardsChart.totalETI.toFixed(4) + ' ETI', color: '#f97316' },
+              { label: 'Avg / Epoch', value: rewardsChart.avgETI.toFixed(4) + ' ETI', color: '#9ca3af' },
+              { label: 'Best Epoch', value: rewardsChart.maxETI.toFixed(4) + ' ETI', color: '#34d399' },
+              { label: 'Avg Pool %', value: rewardsChart.avgPct.toFixed(2) + '%', color: '#06b6d4' },
+            ] : undefined}
+            legend={[
+              { label: 'ETI Earned (left axis)', color: '#f97316' },
+              { label: '% of Pool (right axis)', color: '#06b6d4' },
+            ]}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function MinerProfile() {
   const { address: rawAddress, worker: routeWorker } = useParams();
@@ -44,9 +245,11 @@ export default function MinerProfile() {
   // For shares/payments/rewards, use full worker address when viewing a worker
   // (these collections store records by exact minerEthAddress including worker suffix)
   const queryAddress = isWorker ? `${baseAddress}.${workerName}`.toLowerCase() : baseAddress;
-  const { data: sharesData, isLoading: sharesLoading } = useMinerShares(activeTab === 'Shares' ? queryAddress : null);
+  const needShares = activeTab === 'Shares' || activeTab === 'Graph';
+  const needRewards = activeTab === 'Rewards' || activeTab === 'Graph';
+  const { data: sharesData, isLoading: sharesLoading } = useMinerShares(needShares ? queryAddress : null);
   const { data: paymentsData, isLoading: paymentsLoading } = useMinerPayments(activeTab === 'Payments' ? queryAddress : null);
-  const { data: rewardsData, isLoading: rewardsLoading } = useMinerRewards(activeTab === 'Rewards' ? queryAddress : null);
+  const { data: rewardsData, isLoading: rewardsLoading } = useMinerRewards(needRewards ? queryAddress : null);
 
   const minerData = profileData?.minerData;
   // API returns challengeDetails as an array; take the first (current) entry
@@ -289,6 +492,16 @@ export default function MinerProfile() {
             </div>
           )}
         </>
+      )}
+
+      {/* Graph Tab */}
+      {activeTab === 'Graph' && (
+        <MinerGraphTab
+          sharesData={sharesData}
+          sharesLoading={sharesLoading}
+          rewardsData={rewardsData}
+          rewardsLoading={rewardsLoading}
+        />
       )}
 
       {/* Shares Tab */}
