@@ -123,7 +123,9 @@ services:
     entrypoint: ["/bin/bash", "-c"]
     command:
       - |
+        echo "[backup] Container started. First backup in 24h."
         while true; do
+          sleep 86400
           STAMP=$$(date +%Y%m%d-%H%M%S)
           echo "[backup] Starting mongodump at $$STAMP"
           mongodump --host mongodb --port 27017 -u $${MONGO_ROOT_USER:-eticapool} -p $${MONGO_ROOT_PASSWORD:-eticapool_mongo_default_change_me} --authenticationDatabase admin --db tokenpool_production --out /backups/dump-$$STAMP --quiet
@@ -133,8 +135,6 @@ services:
             echo "[backup] Dump FAILED"
           fi
           cd /backups && ls -dt dump-* 2>/dev/null | tail -n +3 | xargs rm -rf
-          echo "[backup] Sleeping 24h until next backup"
-          sleep 86400
         done
     volumes:
       - ./backups:/backups
