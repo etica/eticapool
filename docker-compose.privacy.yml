@@ -113,7 +113,7 @@ services:
           else
             echo "[backup] Dump FAILED"
           fi
-          cd /backups && ls -dt dump-* 2>/dev/null | tail -n +3 | xargs rm -rf
+          cd /backups && ls -dt dump-* 2>/dev/null | tail -n +2 | xargs rm -rf
         done
     volumes:
       - ./backups:/backups
