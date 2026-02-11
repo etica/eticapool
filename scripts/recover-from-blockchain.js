@@ -19,11 +19,14 @@
  *   --rpc-url           RPC endpoint (default: https://eticamainnet.eticascan.org)
  *   --mongodb-uri       MongoDB URI (default: mongodb://localhost:27017)
  *   --db-name           Target rebuild DB name (default: tokenpool_rebuild)
- *   --use-eticascan     Use eticascan API instead of RPC for TX lookups
+ *   --use-eticascan     Use eticascan API for TX detail lookups (faster than RPC, discovery always via RPC)
  *   --eticascan-url     Eticascan API base URL (default: https://eticascan.org/apiv1)
  *   --swap              After rebuild, swap rebuild DB with production (interactive confirm)
  *   --production-db     Production DB name for swap (default: tokenpool_production)
  *   --copy-live-shares  Copy live share data from production into rebuild before swap
+ *   --verify-mint <tx>  Verify a single pool mint by TX hash (spot-check mode)
+ *   --verify-mint-block <n>  Verify pool mints in a specific block number
+ *   --verify-payment <tx>  Verify a payment TX: decode all miners + amounts (spot-check mode)
  *
  * Workflow:
  *   1. Restore last year's backup into tokenpool_rebuild (manual: mongorestore --db tokenpool_rebuild)
@@ -45,8 +48,13 @@
  *   - These are copied from production with --copy-live-shares
  */
 
-import Web3 from 'web3';
-import Mongodb from 'mongodb';
+// Lightweight imports for ABI decoding (loads instantly)
+import abiModule from 'web3-eth-abi';
+const abiCoder = abiModule.default || abiModule;
+
+// Heavy imports (Web3, Mongodb) loaded dynamically only when needed
+let Web3, Mongodb;
+
 import https from 'https';
 import http from 'http';
 import readline from 'readline';
@@ -114,7 +122,10 @@ function parseArgs() {
     eticascanUrl: 'https://eticascan.org/apiv1',
     swap: false,
     productionDb: 'tokenpool_production',
-    copyLiveShares: false
+    copyLiveShares: false,
+    verifyMint: null,
+    verifyMintBlock: null,
+    verifyPayment: null
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -124,7 +135,7 @@ function parseArgs() {
       case '--pool-address': opts.poolAddress = args[++i]; break;
       case '--payment-address': opts.paymentAddress = args[++i]; break;
       case '--from-block': opts.fromBlock = parseInt(args[++i]); break;
-      case '--to-block': opts.toBlock = args[++i] === 'latest' ? 'latest' : parseInt(args[++i]); break;
+      case '--to-block': { const v = args[++i]; opts.toBlock = v === 'latest' ? 'latest' : parseInt(v); break; }
       case '--network': opts.network = args[++i]; break;
       case '--rpc-url': opts.rpcUrl = args[++i]; break;
       case '--mongodb-uri': opts.mongodbUri = args[++i]; break;
@@ -134,13 +145,18 @@ function parseArgs() {
       case '--swap': opts.swap = true; break;
       case '--production-db': opts.productionDb = args[++i]; break;
       case '--copy-live-shares': opts.copyLiveShares = true; break;
+      case '--verify-mint': opts.verifyMint = args[++i]; break;
+      case '--verify-mint-block': opts.verifyMintBlock = parseInt(args[++i]); break;
+      case '--verify-payment': opts.verifyPayment = args[++i]; break;
       default:
         console.error(`Unknown option: ${args[i]}`);
         process.exit(1);
     }
   }
 
-  if (!opts.swap) {
+  const isVerifyMode = opts.verifyMint || opts.verifyMintBlock || opts.verifyPayment;
+
+  if (!opts.swap && !isVerifyMode) {
     if (!opts.poolAddress) {
       console.error('ERROR: --pool-address is required (pool minting address)');
       console.error('  This is the address that mines/mints blocks (mintingConfig.publicAddress)');
@@ -151,9 +167,9 @@ function parseArgs() {
       console.error('  This is the address that sends batched payments (paymentsConfig.publicAddress)');
       process.exit(1);
     }
-    opts.poolAddress = opts.poolAddress.toLowerCase();
-    opts.paymentAddress = opts.paymentAddress.toLowerCase();
   }
+  if (opts.poolAddress) opts.poolAddress = opts.poolAddress.toLowerCase();
+  if (opts.paymentAddress) opts.paymentAddress = opts.paymentAddress.toLowerCase();
 
   return opts;
 }
@@ -192,12 +208,23 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// ─── Step 1: Recover pool_mints from Mint events ───
+function withTimeout(promise, ms, label) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`${label} timed out after ${ms / 1000}s`)), ms)
+    )
+  ]);
+}
+
+// ─── Step 1: Recover pool_mints from Mint events (RPC scan + eticascan details) ───
 async function recoverPoolMints(web3, opts, dbo) {
-  console.log('\n═══ Step 1: Recovering pool_mints from Mint events ═══');
+  console.log('\n═══ Step 1: Recovering pool_mints (scanning Mint events via RPC) ═══');
 
   const contracts = CONTRACTS[opts.network];
   const tokenContract = new web3.eth.Contract([MINT_EVENT_ABI], contracts.EticaRelease);
+  let allPoolMints = [];
+  let allEtiMints = [];
 
   let toBlock = opts.toBlock;
   if (toBlock === 'latest') {
@@ -207,9 +234,6 @@ async function recoverPoolMints(web3, opts, dbo) {
   }
 
   const CHUNK_SIZE = 10000;
-  let allPoolMints = [];
-  let allEtiMints = [];
-
   for (let from = opts.fromBlock; from <= toBlock; from += CHUNK_SIZE) {
     const to = Math.min(from + CHUNK_SIZE - 1, toBlock);
     process.stdout.write(`  Scanning blocks ${from} - ${to}...`);
@@ -256,169 +280,215 @@ async function recoverPoolMints(web3, opts, dbo) {
     console.log('  Writing pool_mints to database...');
     let inserted = 0, skipped = 0;
     for (const mint of allPoolMints) {
-      const existing = await dbo.collection('pool_mints').findOne({ epochCount: mint.epochCount });
+      const existing = await dbo.collection('pool_mints').findOne({ transactionhash: mint.transactionhash });
       if (!existing) {
         await dbo.collection('pool_mints').insertOne(mint);
         inserted++;
       } else {
         skipped++;
       }
+      if ((inserted + skipped) % 500 === 0) {
+        process.stdout.write(`\r  pool_mints progress: ${inserted + skipped}/${allPoolMints.length} (${inserted} new, ${skipped} existing)`);
+      }
     }
-    console.log(`  Inserted: ${inserted}, Skipped (already exist): ${skipped}`);
+    console.log(`\n  pool_mints: ${inserted} inserted, ${skipped} skipped (already exist)`);
 
     console.log('  Writing all_eti_mints to database...');
     inserted = 0; skipped = 0;
     for (const mint of allEtiMints) {
-      const existing = await dbo.collection('all_eti_mints').findOne({ epochCount: mint.epochCount });
+      const existing = await dbo.collection('all_eti_mints').findOne({ transactionhash: mint.transactionhash });
       if (!existing) {
         await dbo.collection('all_eti_mints').insertOne(mint);
         inserted++;
       } else {
         skipped++;
       }
+      if ((inserted + skipped) % 500 === 0) {
+        process.stdout.write(`\r  all_eti_mints progress: ${inserted + skipped}/${allEtiMints.length} (${inserted} new, ${skipped} existing)`);
+      }
     }
-    console.log(`  Inserted: ${inserted}, Skipped (already exist): ${skipped}`);
+    console.log(`\n  all_eti_mints: ${inserted} inserted, ${skipped} skipped (already exist)`);
   } else if (opts.dryRun) {
-    console.log('  [DRY RUN] Would insert pool_mints:');
-    for (const mint of allPoolMints.slice(0, 5)) {
-      console.log(`    epoch=${mint.epochCount} tx=${mint.transactionhash} reward=${mint.blockreward}`);
-    }
-    if (allPoolMints.length > 5) console.log(`    ... and ${allPoolMints.length - 5} more`);
+    console.log(`  [DRY RUN] Would insert ${allPoolMints.length} pool_mints, ${allEtiMints.length} all_eti_mints`);
   }
 
   return allPoolMints;
 }
 
 // ─── Step 2: Recover balance_payments from BatchedPayments TXs ───
+// Hybrid approach: RPC for full TX discovery (by nonce), eticascan for fast TX detail decoding.
+// The payment EOA sends TXs with nonces 0..N-1. We iterate every nonce, get the TX hash via
+// eth_getTransactionByNonce (not available) — actually we use eth_getTransactionCount to get
+// the total nonce, then for each nonce we fetch the TX by scanning. Since there's no
+// eth_getTransactionByNonce in standard web3, we use getPastLogs on Transfer events FROM
+// the payment address to discover all TX hashes, then decode each via eticascan.
 async function recoverPayments(web3, opts, dbo) {
   console.log('\n═══ Step 2: Recovering balance_payments from BatchedPayments TXs ═══');
 
   const contracts = CONTRACTS[opts.network];
   const batchedPaymentsAddress = contracts.BatchedPayments.toLowerCase();
-  const multisendSig = web3.eth.abi.encodeFunctionSignature(MULTISEND_ABI);
+  const multisendSig = abiCoder.encodeFunctionSignature(MULTISEND_ABI);
   console.log(`  multisend selector: ${multisendSig}`);
+  console.log(`  BatchedPayments:   ${contracts.BatchedPayments}`);
+  console.log(`  Payment address:   ${opts.paymentAddress}`);
 
-  let paymentTxs = [];
-
-  if (opts.useEticascan) {
-    console.log(`  Using eticascan API to fetch TXs from ${opts.paymentAddress}...`);
-    let page = 1;
-    let hasMore = true;
-
-    while (hasMore) {
-      try {
-        const data = await eticascanFetch(
-          opts.eticascanUrl,
-          `/transactions?address=${opts.paymentAddress}&page=${page}&limit=100`
-        );
-
-        if (!data || !data.data || data.data.length === 0) {
-          hasMore = false;
-          break;
-        }
-
-        for (const tx of data.data) {
-          const toAddr = (tx.to || '').toLowerCase();
-          if (toAddr === batchedPaymentsAddress) {
-            paymentTxs.push(tx.hash || tx.txHash);
-          }
-        }
-
-        console.log(`  Page ${page}: ${data.data.length} TXs, ${paymentTxs.length} payment TXs so far`);
-        if (data.data.length < 100) hasMore = false;
-        page++;
-        await sleep(500);
-      } catch (err) {
-        console.error(`  API error on page ${page}: ${err.message}`);
-        hasMore = false;
-      }
-    }
-  } else {
-    console.log(`  Using RPC to find payment TXs (this may be slow)...`);
-    console.log(`  Tip: Use --use-eticascan for faster scanning via API`);
-
-    let toBlock = opts.toBlock;
-    if (toBlock === 'latest') {
-      const latest = await web3.eth.getBlock('latest');
-      toBlock = latest.number;
-    }
-
-    const transferEventSig = web3.utils.sha3('Transfer(address,address,uint256)');
-    const CHUNK = 10000;
-
-    for (let from = opts.fromBlock; from <= toBlock; from += CHUNK) {
-      const to = Math.min(from + CHUNK - 1, toBlock);
-      process.stdout.write(`  Scanning blocks ${from} - ${to}...`);
-
-      try {
-        const logs = await web3.eth.getPastLogs({
-          fromBlock: from,
-          toBlock: to,
-          address: contracts.EticaRelease,
-          topics: [
-            transferEventSig,
-            web3.utils.padLeft(opts.paymentAddress, 64)
-          ]
-        });
-
-        const txHashes = [...new Set(logs.map(l => l.transactionHash))];
-        for (const txHash of txHashes) {
-          const tx = await web3.eth.getTransaction(txHash);
-          if (tx && tx.to && tx.to.toLowerCase() === batchedPaymentsAddress) {
-            paymentTxs.push(txHash);
-          }
-        }
-
-        console.log(` ${logs.length} logs, ${paymentTxs.length} payment TXs so far`);
-      } catch (err) {
-        console.log(` ERROR: ${err.message}`);
-      }
-
-      await sleep(200);
-    }
+  if (!web3) {
+    console.error('  ERROR: Web3 is required for full history scanning.');
+    return { allPayments: [], allTransactions: [] };
   }
 
-  // Filter by block range (eticascan may return TXs outside our range)
-  console.log(`\n  Total payment TXs found: ${paymentTxs.length}`);
+  let paymentTxHashes = [];
 
-  // Decode each payment TX
-  let allPayments = [];
-  let allTransactions = [];
+  // ─── Discover ALL payment TX hashes via RPC getPastLogs ───
+  // The BatchedPayments contract itself emits NO logs. It calls transferFrom()
+  // on the EticaRelease token, which emits Transfer(from, to, value) events.
+  // In these Transfer events, `from` = BatchedPayments contract address (it holds
+  // the allowance), and `to` = each miner receiving payment.
+  //
+  // Strategy: scan for Transfer events on the EticaRelease token contract
+  // where topic[1] (from) = BatchedPayments contract address padded to 32 bytes.
+  // Each unique transactionHash from matched logs is one multisend() call.
+  const transferSig = web3.utils.sha3('Transfer(address,address,uint256)');
+  const batchedPadded = '0x' + batchedPaymentsAddress.slice(2).padStart(64, '0');
+  console.log(`  Scanning for ERC20 Transfer events FROM BatchedPayments contract (full history via RPC)...`);
 
-  for (let i = 0; i < paymentTxs.length; i++) {
-    const txHash = paymentTxs[i];
-    process.stdout.write(`  Decoding TX ${i + 1}/${paymentTxs.length}: ${txHash.slice(0, 16)}...`);
+  let toBlock = opts.toBlock;
+  if (toBlock === 'latest') {
+    const latest = await web3.eth.getBlock('latest');
+    toBlock = latest.number;
+    console.log(`  Latest block: ${toBlock}`);
+  }
+
+  const CHUNK = 10000;
+  const seenTxHashes = new Set();
+
+  for (let from = opts.fromBlock; from <= toBlock; from += CHUNK) {
+    const to = Math.min(from + CHUNK - 1, toBlock);
+    process.stdout.write(`  Scanning blocks ${from} - ${to}...`);
 
     try {
-      const tx = await web3.eth.getTransaction(txHash);
-      const receipt = await web3.eth.getTransactionReceipt(txHash);
+      const logs = await web3.eth.getPastLogs({
+        fromBlock: from,
+        toBlock: to,
+        address: contracts.EticaRelease, // Transfer events on the token contract
+        topics: [transferSig, batchedPadded] // from = BatchedPayments contract
+      });
 
-      if (!tx || !tx.input || tx.input.length < 10) {
+      let newCount = 0;
+      for (const log of logs) {
+        if (!seenTxHashes.has(log.transactionHash)) {
+          seenTxHashes.add(log.transactionHash);
+          paymentTxHashes.push(log.transactionHash);
+          newCount++;
+        }
+      }
+
+      console.log(` ${logs.length} logs, ${newCount} new TXs (${paymentTxHashes.length} total)`);
+    } catch (err) {
+      console.log(` ERROR: ${err.message}`);
+      // Retry with smaller chunk on error
+      if (CHUNK > 1000) {
+        console.log(`  Retrying with smaller chunks...`);
+        const SMALL_CHUNK = 2000;
+        for (let sf = from; sf <= to; sf += SMALL_CHUNK) {
+          const st = Math.min(sf + SMALL_CHUNK - 1, to);
+          try {
+            const logs2 = await web3.eth.getPastLogs({
+              fromBlock: sf,
+              toBlock: st,
+              address: contracts.EticaRelease,
+              topics: [transferSig, batchedPadded]
+            });
+            for (const log of logs2) {
+              if (!seenTxHashes.has(log.transactionHash)) {
+                seenTxHashes.add(log.transactionHash);
+                paymentTxHashes.push(log.transactionHash);
+              }
+            }
+          } catch (err2) {
+            console.log(`    Sub-chunk ${sf}-${st} ERROR: ${err2.message}`);
+          }
+          await sleep(200);
+        }
+      }
+    }
+
+    await sleep(200);
+  }
+
+  console.log(`\n  Total payment TXs found: ${paymentTxHashes.length}`);
+
+  // ─── Decode each payment TX (via eticascan API for speed, RPC fallback) ───
+  let allPayments = [];
+  let allTransactions = [];
+  const useEticascanForDetails = opts.useEticascan;
+
+  for (let i = 0; i < paymentTxHashes.length; i++) {
+    const txHash = paymentTxHashes[i];
+    process.stdout.write(`  Decoding TX ${i + 1}/${paymentTxHashes.length}: ${txHash.slice(0, 16)}...`);
+
+    try {
+      let txInput, txBlockNumber, txFrom, txTo, txStatus, txGas;
+
+      if (useEticascanForDetails) {
+        // Fast path: fetch TX details from eticascan API
+        const txResp = await eticascanFetch(opts.eticascanUrl, `/tx/${txHash}`);
+        if (!txResp || !txResp.querysuccess || !txResp.result) {
+          // Fallback to RPC if eticascan fails for this TX
+          console.log(' eticascan miss, trying RPC...');
+          const tx = await web3.eth.getTransaction(txHash);
+          const receipt = await web3.eth.getTransactionReceipt(txHash);
+          txInput = tx.input;
+          txBlockNumber = tx.blockNumber;
+          txFrom = tx.from;
+          txTo = tx.to;
+          txStatus = receipt.status ? 'success' : 'reverted';
+          txGas = receipt.gasUsed;
+        } else {
+          const tx = txResp.result;
+          txInput = tx.input;
+          txBlockNumber = tx.blockNumber;
+          txFrom = tx.from;
+          txTo = tx.to;
+          txStatus = tx.status === 1 ? 'success' : 'reverted';
+          txGas = tx.gas;
+        }
+      } else {
+        // RPC-only path
+        const tx = await web3.eth.getTransaction(txHash);
+        const receipt = await web3.eth.getTransactionReceipt(txHash);
+        txInput = tx.input;
+        txBlockNumber = tx.blockNumber;
+        txFrom = tx.from;
+        txTo = tx.to;
+        txStatus = receipt.status ? 'success' : 'reverted';
+        txGas = receipt.gasUsed;
+      }
+
+      if (!txInput || txInput.length < 10) {
         console.log(' SKIP (no input data)');
         continue;
       }
 
-      // Skip if outside our block range
-      if (opts.fromBlock > 0 && tx.blockNumber < opts.fromBlock) {
-        console.log(` SKIP (block ${tx.blockNumber} < fromBlock ${opts.fromBlock})`);
+      if (opts.fromBlock > 0 && txBlockNumber < opts.fromBlock) {
+        console.log(` SKIP (block ${txBlockNumber} < fromBlock ${opts.fromBlock})`);
         continue;
       }
 
-      const selector = tx.input.slice(0, 10);
+      const selector = txInput.slice(0, 10);
       if (selector !== multisendSig) {
         console.log(` SKIP (selector ${selector} != ${multisendSig})`);
         continue;
       }
 
-      const decoded = web3.eth.abi.decodeParameters(
+      const decoded = abiCoder.decodeParameters(
         MULTISEND_ABI.inputs,
-        '0x' + tx.input.slice(10)
+        '0x' + txInput.slice(10)
       );
 
       const paymentId = decoded.paymentId;
       const dests = decoded.dests;
       const values = decoded.values;
-      const txStatus = receipt.status ? 'success' : 'reverted';
 
       console.log(` ${txStatus} | UUID=${paymentId.slice(0, 16)}... | ${dests.length} payments`);
 
@@ -433,10 +503,10 @@ async function recoverPayments(web3, opts, dbo) {
             amountToPay: values[idx].toString()
           }))
         },
-        blockNumber: tx.blockNumber,
-        from: tx.from,
-        to: tx.to,
-        gasUsed: receipt.gasUsed,
+        blockNumber: txBlockNumber,
+        from: txFrom,
+        to: txTo,
+        gasUsed: txGas,
         recoveredFromBlockchain: true
       });
 
@@ -444,7 +514,7 @@ async function recoverPayments(web3, opts, dbo) {
         allPayments.push({
           minerEthAddress: dests[j].toLowerCase(),
           amountToPay: values[j].toString(),
-          block: tx.blockNumber,
+          block: txBlockNumber,
           batchedPaymentUuid: paymentId,
           txHash: txHash,
           confirmed: txStatus === 'success',
@@ -456,7 +526,7 @@ async function recoverPayments(web3, opts, dbo) {
       console.log(` ERROR: ${err.message}`);
     }
 
-    await sleep(300);
+    await sleep(useEticascanForDetails ? 200 : 300);
   }
 
   console.log(`\n  Total individual payments decoded: ${allPayments.length}`);
@@ -474,7 +544,7 @@ async function recoverPayments(web3, opts, dbo) {
         skipped++;
       }
     }
-    console.log(`  Transactions - Inserted: ${inserted}, Skipped: ${skipped}`);
+    console.log(`  transactions: ${inserted} inserted, ${skipped} skipped`);
 
     console.log('  Writing balance_payments to database...');
     inserted = 0; skipped = 0;
@@ -489,18 +559,13 @@ async function recoverPayments(web3, opts, dbo) {
       } else {
         skipped++;
       }
+      if ((inserted + skipped) % 500 === 0) {
+        process.stdout.write(`\r  balance_payments progress: ${inserted + skipped}/${allPayments.length} (${inserted} new, ${skipped} existing)`);
+      }
     }
-    console.log(`  Balance payments - Inserted: ${inserted}, Skipped: ${skipped}`);
+    console.log(`\n  balance_payments: ${inserted} inserted, ${skipped} skipped`);
   } else if (opts.dryRun) {
-    console.log('  [DRY RUN] Would insert transactions:');
-    for (const tx of allTransactions.slice(0, 5)) {
-      console.log(`    ${tx.status} tx=${tx.txHash.slice(0, 20)}... uuid=${tx.txData.uuid.slice(0, 16)}... ${tx.txData.payments.length} payments`);
-    }
-    console.log('  [DRY RUN] Would insert balance_payments:');
-    for (const p of allPayments.slice(0, 5)) {
-      console.log(`    ${p.minerEthAddress.slice(0, 12)}... amount=${p.amountToPay} confirmed=${p.confirmed}`);
-    }
-    if (allPayments.length > 5) console.log(`    ... and ${allPayments.length - 5} more`);
+    console.log(`  [DRY RUN] Would insert ${allTransactions.length} transactions, ${allPayments.length} balance_payments`);
   }
 
   return { allPayments, allTransactions };
@@ -551,17 +616,10 @@ async function recomputeMinerBalances(allPayments, opts, dbo) {
       const existing = await dbo.collection('minerData').findOne({ minerEthAddress: addr });
 
       if (existing) {
-        // Existing miner from backup. blockchain total = floor for alltimeTokenBalance.
-        // If backup has HIGHER value, keep it (covers pending unpaid balance).
-        // If backup has LOWER value, update to blockchain value (backup was stale/corrupted).
         const currentAlltime = BigInt(existing.alltimeTokenBalance || '0');
-        const currentAwarded = BigInt(existing.tokensAwarded || '0');
         const blockchainTotal = data.totalPaid;
 
         if (blockchainTotal > currentAlltime) {
-          // Blockchain shows more was paid than backup knows about.
-          // Set alltimeTokenBalance = blockchainTotal (minimum proven amount)
-          // Set tokensAwarded = blockchainTotal (all has been paid out)
           await dbo.collection('minerData').updateOne(
             { minerEthAddress: addr },
             { $set: {
@@ -573,8 +631,6 @@ async function recomputeMinerBalances(allPayments, opts, dbo) {
           );
           updated++;
         } else {
-          // Backup value is >= blockchain total. That's expected (includes pending unpaid).
-          // Just update tokensReceived to match actual blockchain payments.
           const currentReceived = BigInt(existing.tokensReceived || '0');
           if (blockchainTotal > currentReceived) {
             await dbo.collection('minerData').updateOne(
@@ -587,7 +643,6 @@ async function recomputeMinerBalances(allPayments, opts, dbo) {
           }
         }
       } else {
-        // Miner not in backup at all — create from blockchain data
         await dbo.collection('minerData').insertOne({
           minerEthAddress: addr,
           minerEthAddressBase: addr,
@@ -602,11 +657,16 @@ async function recomputeMinerBalances(allPayments, opts, dbo) {
         });
         created++;
       }
+
+      const total = updated + created + unchanged;
+      if (total % 100 === 0) {
+        process.stdout.write(`\r  minerData progress: ${total}/${miners.length} (${updated} updated, ${created} created, ${unchanged} unchanged)`);
+      }
     }
 
-    console.log(`  Updated: ${updated}, Created: ${created}, Unchanged: ${unchanged}`);
+    console.log(`\n  minerData: ${updated} updated, ${created} created, ${unchanged} unchanged`);
   } else {
-    console.log('\n  [DRY RUN] Would update/create minerData for each address');
+    console.log(`\n  [DRY RUN] Would update/create minerData for ${miners.length} addresses`);
   }
 
   return minerTotals;
@@ -806,6 +866,302 @@ function generateReport(poolMints, payments, transactions, minerTotals, opts) {
   }
 }
 
+// ─── Verify a single pool mint TX or block (via eticascan API) ───
+async function verifyMint(opts) {
+  const contracts = CONTRACTS[opts.network];
+  const eticascanUrl = opts.eticascanUrl;
+
+  if (opts.verifyMint) {
+    const txHash = opts.verifyMint;
+    console.log(`\n═══ Verify Mint TX: ${txHash} ═══\n`);
+
+    console.log('  Fetching TX from eticascan...');
+    const resp = await eticascanFetch(eticascanUrl, `/tx/${txHash}`);
+    if (!resp || !resp.querysuccess || !resp.result) {
+      console.log('  ERROR: Transaction not found on eticascan');
+      return;
+    }
+    const tx = resp.result;
+    const blockTimestamp = tx.block ? tx.block.timestamp : null;
+
+    console.log(`  Block:       ${tx.blockNumber}`);
+    if (blockTimestamp) console.log(`  Timestamp:   ${new Date(blockTimestamp * 1000).toISOString()}`);
+    console.log(`  From:        ${tx.from}`);
+    console.log(`  To:          ${tx.to}`);
+    console.log(`  Status:      ${tx.status === 1 ? 'SUCCESS' : 'REVERTED'}`);
+    console.log(`  Gas:         ${tx.gas}`);
+
+    // Check if this TX is to the EticaRelease contract (mint TX)
+    const isToEticaRelease = tx.to && tx.to.toLowerCase() === contracts.EticaRelease.toLowerCase();
+    if (!isToEticaRelease) {
+      console.log(`\n  WARNING: TX target ${tx.to} is NOT the EticaRelease contract (${contracts.EticaRelease})`);
+    }
+
+    // Check transfers for mint data
+    const transfers = tx.transfers || [];
+    if (transfers.length === 0 && !tx.eticatransf) {
+      console.log('\n  No ETI transfers found in this transaction.');
+      console.log('  This TX may not be a mining/minting transaction.');
+      return;
+    }
+
+    // For a mint TX, the minter is tx.from and the transfer shows the block reward
+    const minter = tx.from.toLowerCase();
+    const isPoolMint = opts.poolAddress ? (minter === opts.poolAddress) : null;
+
+    // eticatransf field contains the ETI transfer amount if any
+    const transferAmount = tx.eticatransf || (transfers.length > 0 ? transfers[0].amount : '0');
+    const rewardETI = Number(BigInt(transferAmount)) / 1e18;
+
+    console.log(`\n  ┌─ Mint Analysis ────────────────────────────────────`);
+    console.log(`  │ Minter:         ${tx.from}`);
+    if (isPoolMint !== null) {
+      console.log(`  │ Is pool mint:   ${isPoolMint ? 'YES' : 'NO (different address)'}`);
+      if (!isPoolMint) {
+        console.log(`  │   Pool address: ${opts.poolAddress}`);
+      }
+    } else {
+      console.log(`  │ Is pool mint:   (use --pool-address to check)`);
+    }
+    console.log(`  │ ETI transferred: ${transferAmount} wei (${rewardETI.toFixed(8)} ETI)`);
+
+    if (transfers.length > 0) {
+      console.log(`  │`);
+      console.log(`  │ Transfers in this TX:`);
+      for (const t of transfers) {
+        const amt = Number(BigInt(t.amount)) / 1e18;
+        console.log(`  │   ${t.from} → ${t.to}: ${amt.toFixed(8)} ETI`);
+      }
+    }
+
+    console.log(`  └────────────────────────────────────────────────────`);
+  }
+
+  if (opts.verifyMintBlock) {
+    const blockNum = opts.verifyMintBlock;
+    console.log(`\n═══ Verify Mints in Block: ${blockNum} ═══\n`);
+
+    console.log('  Fetching block with TXs from eticascan...');
+    const resp = await eticascanFetch(eticascanUrl, `/blockwithtxs/${blockNum}`);
+    if (!resp || !resp.data) {
+      console.log('  ERROR: Block not found on eticascan');
+      return;
+    }
+    const block = resp.data;
+    console.log(`  Block:       ${block.number}`);
+    console.log(`  Timestamp:   ${new Date(block.timestamp * 1000).toISOString()}`);
+
+    const txs = block.etransactions || [];
+    console.log(`  TX count:    ${txs.length}`);
+
+    // Filter TXs that target the EticaRelease contract (potential mint TXs)
+    const mintTxs = txs.filter(tx =>
+      tx.to && tx.to.toLowerCase() === contracts.EticaRelease.toLowerCase()
+    );
+
+    if (mintTxs.length === 0) {
+      console.log('\n  No transactions to the EticaRelease contract found in this block.');
+      return;
+    }
+
+    console.log(`\n  Found ${mintTxs.length} transaction(s) to EticaRelease contract:\n`);
+
+    // For each TX, fetch full details from /tx/{hash} to get transfer amounts
+    let poolMintCount = 0;
+    for (const mintTx of mintTxs) {
+      console.log(`  Fetching details for TX ${mintTx.hash.slice(0, 20)}...`);
+      const txResp = await eticascanFetch(eticascanUrl, `/tx/${mintTx.hash}`);
+      if (!txResp || !txResp.querysuccess || !txResp.result) {
+        console.log(`  ┌─ TX: ${mintTx.hash.slice(0, 24)}... ──`);
+        console.log(`  │ Could not fetch TX details`);
+        console.log(`  └────────────────────────────────────────────────`);
+        continue;
+      }
+
+      const fullTx = txResp.result;
+      const minter = fullTx.from.toLowerCase();
+      const isPoolMint = opts.poolAddress ? (minter === opts.poolAddress) : null;
+      if (isPoolMint) poolMintCount++;
+
+      const transferAmount = fullTx.eticatransf || '0';
+      const rewardETI = transferAmount !== '0' ? Number(BigInt(transferAmount)) / 1e18 : 0;
+
+      console.log(`  ┌─ TX: ${fullTx.hash.slice(0, 24)}... ──`);
+      console.log(`  │ Minter:         ${fullTx.from}`);
+      if (isPoolMint !== null) {
+        console.log(`  │ Is pool mint:   ${isPoolMint ? 'YES' : 'NO'}`);
+      }
+      if (transferAmount !== '0') {
+        console.log(`  │ ETI transferred: ${transferAmount} wei (${rewardETI.toFixed(8)} ETI)`);
+      }
+
+      const transfers = fullTx.transfers || [];
+      if (transfers.length > 0) {
+        for (const t of transfers) {
+          const amt = Number(BigInt(t.amount)) / 1e18;
+          console.log(`  │   ${t.from} → ${t.to}: ${amt.toFixed(8)} ETI`);
+        }
+      }
+      console.log(`  └────────────────────────────────────────────────`);
+    }
+
+    if (opts.poolAddress) {
+      console.log(`\n  Summary: ${poolMintCount} pool mint(s) out of ${mintTxs.length} EticaRelease TX(s) in block ${blockNum}`);
+    }
+  }
+}
+
+// ─── Verify a single payment TX (via eticascan API) ───
+async function verifyPayment(opts) {
+  const txHash = opts.verifyPayment;
+  const contracts = CONTRACTS[opts.network];
+  const batchedPaymentsAddress = contracts.BatchedPayments.toLowerCase();
+  const multisendSig = abiCoder.encodeFunctionSignature(MULTISEND_ABI);
+  const eticascanUrl = opts.eticascanUrl;
+
+  console.log(`\n═══ Verify Payment TX: ${txHash} ═══\n`);
+
+  console.log('  Fetching TX from eticascan...');
+  const resp = await eticascanFetch(eticascanUrl, `/tx/${txHash}`);
+  if (!resp || !resp.querysuccess || !resp.result) {
+    console.log('  ERROR: Transaction not found on eticascan');
+    return;
+  }
+  const tx = resp.result;
+  const blockTimestamp = tx.block ? tx.block.timestamp : null;
+
+  console.log(`  Block:       ${tx.blockNumber}`);
+  if (blockTimestamp) console.log(`  Timestamp:   ${new Date(blockTimestamp * 1000).toISOString()}`);
+  console.log(`  From:        ${tx.from}`);
+  console.log(`  To:          ${tx.to}`);
+  console.log(`  Status:      ${tx.status === 1 ? 'SUCCESS' : 'REVERTED'}`);
+  console.log(`  Gas:         ${tx.gas}`);
+
+  // Check if this is a BatchedPayments TX
+  const toAddr = (tx.to || '').toLowerCase();
+  if (toAddr !== batchedPaymentsAddress) {
+    console.log(`\n  WARNING: TX target ${tx.to} is NOT the BatchedPayments contract (${contracts.BatchedPayments})`);
+    console.log('  This may not be a pool payment transaction.');
+  }
+
+  if (!tx.input || tx.input.length < 10) {
+    console.log('\n  ERROR: No input data — this is not a contract call');
+    return;
+  }
+
+  const selector = tx.input.slice(0, 10);
+  if (selector !== multisendSig) {
+    console.log(`\n  ERROR: Function selector ${selector} does not match multisend() (${multisendSig})`);
+    console.log('  This is not a multisend payment transaction.');
+    return;
+  }
+
+  console.log('  Decoding multisend() input data...');
+
+  // Decode the multisend call (local — no RPC needed)
+  const decoded = abiCoder.decodeParameters(
+    MULTISEND_ABI.inputs,
+    '0x' + tx.input.slice(10)
+  );
+
+  const paymentId = decoded.paymentId;
+  const dests = decoded.dests;
+  const values = decoded.values;
+  const txStatus = tx.status === 1 ? 'success' : 'reverted';
+
+  console.log(`\n  Payment UUID:  ${paymentId}`);
+  console.log(`  TX status:     ${txStatus}`);
+  console.log(`  Recipients:    ${dests.length}`);
+
+  // Calculate totals
+  let totalAmount = BigInt(0);
+  const minerPayments = [];
+
+  for (let i = 0; i < dests.length; i++) {
+    const amount = BigInt(values[i]);
+    totalAmount += amount;
+    minerPayments.push({
+      address: dests[i].toLowerCase(),
+      amountWei: values[i].toString(),
+      amountETI: Number(amount) / 1e18
+    });
+  }
+
+  // Sort by amount descending for display
+  minerPayments.sort((a, b) => b.amountETI - a.amountETI);
+
+  const totalETI = Number(totalAmount) / 1e18;
+  console.log(`  Total paid:    ${totalAmount.toString()} wei (${totalETI.toFixed(8)} ETI)`);
+
+  console.log(`\n  ┌─ Miner Payments (${minerPayments.length} recipients) ──────────────`);
+  console.log(`  │`);
+  console.log(`  │  #   Address                                      Amount (ETI)         Amount (wei)`);
+  console.log(`  │  ─── ──────────────────────────────────────────── ──────────────────── ─────────────────────────`);
+
+  for (let i = 0; i < minerPayments.length; i++) {
+    const p = minerPayments[i];
+    const num = String(i + 1).padStart(3);
+    const etiStr = p.amountETI.toFixed(8).padStart(20);
+    console.log(`  │  ${num} ${p.address}  ${etiStr} ${p.amountWei}`);
+  }
+
+  console.log(`  │`);
+  console.log(`  │  TOTAL: ${totalETI.toFixed(8)} ETI across ${minerPayments.length} miners`);
+  console.log(`  └──────────────────────────────────────────────────────────────────`);
+
+  // Cross-check with eticascan transfers
+  const transfers = tx.transfers || [];
+  if (transfers.length > 0) {
+    console.log(`\n  ┌─ Eticascan Transfer Cross-Check ─────────────────`);
+    console.log(`  │  Eticascan recorded ${transfers.length} ETI transfer(s) for this TX:`);
+    for (const t of transfers) {
+      const amt = Number(BigInt(t.amount)) / 1e18;
+      console.log(`  │    ${t.from} → ${t.to}: ${amt.toFixed(8)} ETI`);
+    }
+    console.log(`  └──────────────────────────────────────────────────`);
+  }
+
+  // Show what the recovery script would do for each miner
+  console.log(`\n  ┌─ Recovery Impact Per Miner ──────────────────────`);
+  console.log(`  │`);
+  console.log(`  │  What the recovery script would record for each miner:`);
+  console.log(`  │`);
+
+  if (txStatus === 'success') {
+    console.log(`  │  For each miner above, this confirmed TX would:`);
+    console.log(`  │    - Add to balance_payments: { minerEthAddress, amountToPay, confirmed: true }`);
+    console.log(`  │    - Increment their alltimeTokenBalance by the amount`);
+    console.log(`  │    - Increment their tokensAwarded by the amount`);
+    console.log(`  │    - Set tokensReceived = sum of all confirmed blockchain payments`);
+    console.log(`  │`);
+    console.log(`  │  Example for top recipient:`);
+    const top = minerPayments[0];
+    console.log(`  │    ${top.address}`);
+    console.log(`  │    alltimeTokenBalance += ${top.amountWei} (${top.amountETI.toFixed(8)} ETI)`);
+    console.log(`  │    tokensAwarded       += ${top.amountWei}`);
+    console.log(`  │    tokensReceived      += ${top.amountWei}`);
+  } else {
+    console.log(`  │  TX was REVERTED — no balance changes would be applied.`);
+    console.log(`  │  Payments would be recorded with confirmed: false`);
+  }
+
+  console.log(`  │`);
+  console.log(`  └──────────────────────────────────────────────────`);
+
+  // Show the transaction record that would be created
+  console.log(`\n  ┌─ Transaction Record ─────────────────────────────`);
+  console.log(`  │  txType:       batched_payment`);
+  console.log(`  │  status:       ${txStatus}`);
+  console.log(`  │  txHash:       ${txHash}`);
+  console.log(`  │  blockNumber:  ${tx.blockNumber}`);
+  console.log(`  │  from:         ${tx.from}`);
+  console.log(`  │  to:           ${tx.to}`);
+  console.log(`  │  gas:          ${tx.gas}`);
+  console.log(`  │  uuid:         ${paymentId}`);
+  console.log(`  │  payments:     ${dests.length}`);
+  console.log(`  └──────────────────────────────────────────────────`);
+}
+
 // ─── Main ───
 async function main() {
   const opts = parseArgs();
@@ -813,6 +1169,38 @@ async function main() {
   console.log('╔════════════════════════════════════════════════╗');
   console.log('║   EticaPool Database Recovery from Blockchain  ║');
   console.log('╚════════════════════════════════════════════════╝');
+
+  // Verify (spot-check) mode — uses eticascan API, no RPC or heavy imports needed
+  if (opts.verifyMint || opts.verifyMintBlock || opts.verifyPayment) {
+    console.log('  Mode: VERIFICATION (spot-check via eticascan)');
+    console.log(`  Network:         ${opts.network}`);
+    console.log(`  Eticascan:       ${opts.eticascanUrl}`);
+    if (opts.poolAddress) console.log(`  Pool address:    ${opts.poolAddress}`);
+
+    if (opts.verifyMint || opts.verifyMintBlock) {
+      await verifyMint(opts);
+    }
+    if (opts.verifyPayment) {
+      await verifyPayment(opts);
+    }
+    return;
+  }
+
+  // ─── Heavy imports: only load what's needed ───
+  // Swap mode needs Mongodb only.
+  // Rebuild mode ALWAYS needs Web3 (RPC scanning for full history).
+  // --use-eticascan only affects TX detail lookups (faster), but discovery is always via RPC.
+  const needsWeb3 = !opts.swap;
+  const needsMongo = !opts.dryRun || opts.swap;
+
+  if (needsWeb3) {
+    console.log('  Loading Web3 driver (this may take a moment)...');
+    Web3 = (await import('web3')).default;
+  }
+  if (needsMongo) {
+    console.log('  Loading MongoDB driver...');
+    Mongodb = (await import('mongodb')).default;
+  }
 
   // Swap-only mode
   if (opts.swap) {
@@ -839,20 +1227,34 @@ async function main() {
   console.log(`  Network:         ${opts.network}`);
   console.log(`  Pool address:    ${opts.poolAddress}`);
   console.log(`  Payment address: ${opts.paymentAddress}`);
-  console.log(`  RPC:             ${opts.rpcUrl}`);
   console.log(`  MongoDB:         ${opts.mongodbUri}`);
   console.log(`  Target DB:       ${opts.dbName} (side rebuild DB)`);
   console.log(`  Mode:            ${opts.dryRun ? 'DRY RUN' : 'LIVE WRITE'}`);
-  console.log(`  Eticascan:       ${opts.useEticascan ? 'Yes' : 'No'}`);
+  console.log(`  Data source:     RPC (${opts.rpcUrl})${opts.useEticascan ? ' + Eticascan API (' + opts.eticascanUrl + ') for TX details' : ''}`);
 
-  // Connect to Web3
-  const web3 = new Web3(opts.rpcUrl);
+  // Connect to Web3 (always needed for rebuild — RPC scanning for full history)
+  let web3 = null;
+  web3 = new Web3(opts.rpcUrl);
   try {
     const blockNumber = await web3.eth.getBlockNumber();
     console.log(`  Connected to RPC. Current block: ${blockNumber}`);
   } catch (err) {
     console.error(`  ERROR: Cannot connect to RPC at ${opts.rpcUrl}: ${err.message}`);
     process.exit(1);
+  }
+
+  // If using eticascan for TX details, test connectivity
+  if (opts.useEticascan) {
+    console.log('  Testing eticascan connectivity...');
+    try {
+      const blockResp = await eticascanFetch(opts.eticascanUrl, '/lastblock');
+      if (!blockResp || !blockResp.querysuccess) throw new Error('bad response');
+      console.log(`  Eticascan OK. Latest block: ${blockResp.result.number}`);
+    } catch (err) {
+      console.error(`  WARNING: Cannot reach eticascan API at ${opts.eticascanUrl}: ${err.message}`);
+      console.error('  Will use RPC for TX details instead (slower).');
+      opts.useEticascan = false;
+    }
   }
 
   // Connect to MongoDB
