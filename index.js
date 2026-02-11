@@ -70,6 +70,7 @@ import TokenDataHelper from './lib/util/token-data-helper.js'
 import RedisInterface from './lib/redis-interface.js'
 import RedisPubSub from './lib/util/redis-pubsub.js'
 import GeneralEventEmitterHandler from './lib/util/GeneralEventEmitterHandler.js'
+import ChartDataHelper from './lib/util/chart-data-helper.js'
 
 
 var accountConfig;
@@ -127,6 +128,14 @@ async function init( )
         }
 
         await mongoInterface.init( 'tokenpool_'.concat(pool_env))
+
+        // Ensure pre-computed chart linedata exists (builds from poolStatsRecords if missing/stale)
+        try {
+            await ChartDataHelper.getInstance().ensureChart('pool_hashrate_24h', mongoInterface);
+            console.log('Chart linedata initialized');
+        } catch (err) {
+            console.error('Chart linedata initialization error (non-fatal):', err.message);
+        }
 
         let tokenInterface = new TokenInterface(mongoInterface, poolConfig)
         // await peerInterface.init(web3,accountConfig,mongoInterface,tokenInterface,pool_env) //initJSONRPCServer();

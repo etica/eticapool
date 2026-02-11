@@ -15,6 +15,7 @@ import WebServer from './lib/web-server.js'
 import DiagnosticsManager from './lib/diagnostics-manager.js'
 import RedisPubSub from './lib/util/redis-pubsub.js'
 import GeneralEventEmitterHandler from './lib/util/GeneralEventEmitterHandler.js'
+import ChartDataHelper from './lib/util/chart-data-helper.js'
 
 var pool_env = process.env.POOL_ENV || 'production';
 const configPath = process.env.POOL_CONFIG_PATH || '/pool.config.json';
@@ -45,6 +46,14 @@ async function init() {
         console.log('Redis Pub/Sub enabled for cross-process events');
     } catch (err) {
         console.log('Redis Pub/Sub not available, using local events only:', err.message);
+    }
+
+    // Ensure pre-computed chart linedata exists
+    try {
+        await ChartDataHelper.getInstance().ensureChart('pool_hashrate_24h', mongoInterface);
+        console.log('Chart linedata initialized');
+    } catch (err) {
+        console.error('Chart linedata initialization error (non-fatal):', err.message);
     }
 
     let diagnosticsManager = new DiagnosticsManager();

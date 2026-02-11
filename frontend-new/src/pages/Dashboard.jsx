@@ -316,37 +316,31 @@ function RecentTransactionsTab({ recentPayments }) {
 
 /* ---------- Main Dashboard ---------- */
 
-/** Transform poolStatsRecords (desc order) into uPlot columnar data (asc order) */
-function useChartData(records) {
+/** Transform linedata chart document into uPlot columnar data */
+function useChartData(chartDoc) {
   return useMemo(() => {
-    if (!records || records.length < 2) return null;
-    // records are sorted desc (newest first) — reverse to ascending
-    const sorted = [...records].reverse();
-    const n = sorted.length;
-    const timestamps = new Array(n);
-    const hashrates = new Array(n);
-    const miners = new Array(n);
+    if (!chartDoc || !chartDoc.timestamps || chartDoc.timestamps.length < 2) return null;
+    const ts = chartDoc.timestamps;
+    const hr = chartDoc.series.hashrate;
+    const mn = chartDoc.series.miners;
+    const n = ts.length;
 
     let minH = Infinity, maxH = 0, sumH = 0;
 
     for (let i = 0; i < n; i++) {
-      const r = sorted[i];
-      timestamps[i] = Number(r.recordedat) || 0;
-      hashrates[i] = Number(r.Hashrate) || 0;
-      miners[i] = Number(r.Numberminers) || 0;
-      if (hashrates[i] > maxH) maxH = hashrates[i];
-      if (hashrates[i] < minH) minH = hashrates[i];
-      sumH += hashrates[i];
+      if (hr[i] > maxH) maxH = hr[i];
+      if (hr[i] < minH) minH = hr[i];
+      sumH += hr[i];
     }
 
     return {
-      data: [timestamps, hashrates, miners],
+      data: [ts, hr, mn],
       avg: sumH / n,
       min: minH === Infinity ? 0 : minH,
       max: maxH,
-      current: hashrates[n - 1],
+      current: hr[n - 1],
     };
-  }, [records]);
+  }, [chartDoc]);
 }
 
 export default function Dashboard() {
