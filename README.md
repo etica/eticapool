@@ -73,6 +73,35 @@ For HTTPS, see [HTTPS with Let's Encrypt](#7-https-with-lets-encrypt-recommended
 
 ---
 
+## Docker Commands
+
+```bash
+# Start the pool (build + detached)
+docker compose up --build -d
+
+# Start with live logs
+docker compose up --build
+
+# View logs (all containers)
+docker compose logs -f
+
+# View logs (pool only)
+docker compose logs -f pool-app
+
+# Check container status
+docker compose ps
+
+# Restart the pool
+docker compose restart
+
+# Stop the pool (preserves data)
+docker compose down
+```
+
+> **WARNING**: Never use `docker compose down -v` — the `-v` flag **permanently deletes all pool data**.
+
+---
+
 ## Quick Start (Docker)
 
 The fastest way to get a pool running. Docker handles Redis, the frontend build, and all processes automatically.
