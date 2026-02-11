@@ -1,1 +1,0 @@
-{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"minerEthAddress":{"$numberInt":"1"}},"name":"minerEthAddress_1"},{"v":{"$numberInt":"2"},"key":{"digest":{"$numberInt":"1"}},"name":"digest_1"}],"uuid":"49aea27b7e7b40fcad146b32f58de090","collectionName":"miner_shares","type":"collection"}

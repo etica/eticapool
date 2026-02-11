@@ -1,1 +1,0 @@
-{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"recordedat":{"$numberInt":"1"}},"name":"recordedat_1"}],"uuid":"85cf66543e02416a99eb91ad35d450ed","collectionName":"poolStatsRecords","type":"collection"}

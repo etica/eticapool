@@ -1,1 +1,0 @@
-{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"d535edb4ce764b9a9f175693008c084d","collectionName":"poolAccountBalances","type":"collection"}
