@@ -1054,6 +1054,261 @@ a {
    UTILITY CLASSES
    ========================================================================= */
 
+/* =========================================================================
+   WALLET & ACCOUNT COMPONENTS
+   ========================================================================= */
+
+.os-navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.os-wallet-btn {
+  font-family: var(--os-font);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  color: var(--os-emerald);
+  background: rgba(52, 211, 153, 0.08);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.os-wallet-btn:hover {
+  background: rgba(52, 211, 153, 0.15);
+  border-color: var(--os-emerald);
+}
+
+.os-wallet-addr {
+  font-family: var(--os-font);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  border: 1px solid var(--os-dim);
+  color: var(--os-emerald);
+  background: rgba(52, 211, 153, 0.05);
+  text-decoration: none;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.os-wallet-addr:hover {
+  border-color: var(--os-emerald);
+  background: rgba(52, 211, 153, 0.1);
+}
+
+.os-mobile-wallet {
+  width: 100%;
+  padding: 0.5rem 0;
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .os-navbar-right .os-wallet-btn,
+  .os-navbar-right .os-wallet-addr {
+    display: none;
+  }
+  .os-mobile-wallet {
+    display: block;
+  }
+}
+
+/* Input field */
+.os-input {
+  font-family: var(--os-font);
+  font-size: 12px;
+  padding: 0.5rem 0.75rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--os-rule);
+  border-radius: 0.375rem;
+  color: var(--os-light);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.os-input::placeholder {
+  color: var(--os-dim);
+}
+
+.os-input:focus {
+  border-color: var(--os-emerald);
+}
+
+.os-input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Buttons */
+.os-btn {
+  font-family: var(--os-font);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 18px;
+  border-radius: 0.375rem;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.os-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.os-btn-emerald {
+  color: var(--os-black);
+  background: var(--os-emerald);
+  border-color: var(--os-emerald);
+}
+
+.os-btn-emerald:hover:not(:disabled) {
+  background: #6ee7b7;
+  border-color: #6ee7b7;
+}
+
+.os-btn-dim {
+  color: var(--os-muted);
+  background: transparent;
+  border-color: var(--os-dim);
+}
+
+.os-btn-dim:hover:not(:disabled) {
+  color: var(--os-light);
+  border-color: var(--os-mid);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* ---------- Wallet Picker Modal ---------- */
+
+.os-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.os-modal {
+  background: var(--os-panel);
+  border: 1px solid var(--os-border);
+  border-radius: 0.75rem;
+  width: 100%;
+  max-width: 360px;
+  margin: 1rem;
+  overflow: hidden;
+}
+
+.os-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--os-rule);
+}
+
+.os-modal-title {
+  font-family: var(--os-font);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--os-white);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.os-modal-close {
+  background: none;
+  border: none;
+  color: var(--os-dim);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+.os-modal-close:hover {
+  color: var(--os-light);
+}
+
+.os-modal-body {
+  padding: 0.5rem;
+}
+
+.os-wallet-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  margin: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  color: var(--os-light);
+  font-family: var(--os-font);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.os-wallet-option:hover {
+  background: rgba(52, 211, 153, 0.06);
+  border-color: rgba(52, 211, 153, 0.2);
+}
+
+.os-wallet-option-arrow {
+  color: var(--os-dim);
+  font-size: 18px;
+  transition: color 0.15s ease;
+}
+.os-wallet-option:hover .os-wallet-option-arrow {
+  color: var(--os-emerald);
+}
+
+/* --- Modal spinner & success animation --- */
+.os-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--os-rule);
+  border-top-color: var(--os-emerald);
+  border-radius: 50%;
+  margin: 0 auto;
+  animation: os-spin 0.8s linear infinite;
+}
+@keyframes os-spin {
+  to { transform: rotate(360deg); }
+}
+.os-success-check {
+  animation: os-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+@keyframes os-pop {
+  0%   { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* --- Port recommendation banner --- */
+.os-port-recommendation {
+  padding: 0.625rem 0.875rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 0.375rem;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+/* =========================================================================
+   UTILITY CLASSES
+   ========================================================================= */
+
 .emerald { color: var(--os-emerald); }
 .cyan    { color: var(--os-cyan); }
 .orange  { color: var(--os-orange); }

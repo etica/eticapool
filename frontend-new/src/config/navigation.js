@@ -14,6 +14,8 @@ export function getNavDropdowns(poolName) {
         { title: 'Overview', url: '/' },
         { title: 'Miners', url: '/miners' },
         { title: 'Payments', url: '/payments' },
+        { title: 'My Miner', url: '/miner/:address', requiresWallet: true },
+        { title: 'Custom Settings', url: '/account', requiresWallet: true },
       ],
     },
     {

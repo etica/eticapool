@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { usePoolOverview } from '../hooks/usePoolOverview';
+import { usePoolStats24h } from '../hooks/usePoolStats24h';
 import TabNav from '../components/TabNav';
 import DataCard from '../components/DataCard';
 import DataRow from '../components/DataRow';
@@ -10,6 +11,7 @@ import PortBadge from '../components/PortBadge';
 import LiveDot from '../components/LiveDot';
 import StatusBadge from '../components/StatusBadge';
 import LoadingSkeleton from '../components/LoadingSkeleton';
+import PoolChart from '../components/PoolChart';
 import { formatNumber, formatHashrate, truncateAddress, rawToFormatted, formatPoolName } from '../lib/formatters';
 import { ETICASCAN_URL, buildStratumPorts } from '../config/constants';
 
@@ -314,9 +316,38 @@ function RecentTransactionsTab({ recentPayments }) {
 
 /* ---------- Main Dashboard ---------- */
 
+/** Transform linedata chart document into uPlot columnar data */
+function useChartData(chartDoc) {
+  return useMemo(() => {
+    if (!chartDoc || !chartDoc.timestamps || chartDoc.timestamps.length < 2) return null;
+    const ts = chartDoc.timestamps;
+    const hr = chartDoc.series.hashrate;
+    const mn = chartDoc.series.miners;
+    const n = ts.length;
+
+    let minH = Infinity, maxH = 0, sumH = 0;
+
+    for (let i = 0; i < n; i++) {
+      if (hr[i] > maxH) maxH = hr[i];
+      if (hr[i] < minH) minH = hr[i];
+      sumH += hr[i];
+    }
+
+    return {
+      data: [ts, hr, mn],
+      avg: sumH / n,
+      min: minH === Infinity ? 0 : minH,
+      max: maxH,
+      current: hr[n - 1],
+    };
+  }, [chartDoc]);
+}
+
 export default function Dashboard() {
   const { data, isLoading, isError } = usePoolOverview();
+  const { data: stats24h, isLoading: statsLoading } = usePoolStats24h();
   const [activeTab, setActiveTab] = useState('Mining Data');
+  const chartData = useChartData(stats24h);
 
   if (isLoading) {
     return (
@@ -404,6 +435,47 @@ export default function Dashboard() {
           <span className="os-metric-label">POOL FEE</span>
           <span className="os-metric-value" style={{ color: '#ffcead' }}>{config?.poolFee || 0}%</span>
         </div>
+      </div>
+
+      {/* Pool Hashrate Chart (24h) */}
+      <div style={{ padding: '0 1.5rem', marginBottom: '1.5rem' }}>
+        <PoolChart
+          data={chartData?.data || null}
+          title="Pool Hashrate — 24h"
+          height={280}
+          series={[
+            {
+              label: 'Hashrate',
+              color: '#34d399',
+              fill: 'rgba(52, 211, 153, 0.06)',
+              width: 2,
+              value: (u, v) => v == null ? '--' : formatHashrate(v),
+            },
+            {
+              label: 'Miners',
+              color: '#06b6d4',
+              width: 1.5,
+              scale: 'miners',
+              dash: [4, 4],
+              value: (u, v) => v == null ? '--' : Math.round(v).toString(),
+            },
+          ]}
+          scales={{
+            x: { time: true },
+            y: { auto: true },
+            miners: { auto: true },
+          }}
+          stats={chartData ? [
+            { label: 'Current', value: formatHashrate(chartData.current), color: '#34d399' },
+            { label: 'Average', value: formatHashrate(chartData.avg), color: '#9ca3af' },
+            { label: 'Peak', value: formatHashrate(chartData.max), color: '#f97316' },
+            { label: 'Low', value: formatHashrate(chartData.min), color: '#6b7280' },
+          ] : undefined}
+          legend={[
+            { label: 'Hashrate', color: '#34d399' },
+            { label: 'Miners', color: '#06b6d4' },
+          ]}
+        />
       </div>
 
       <TabNav tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />

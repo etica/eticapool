@@ -45,3 +45,11 @@ export function getNetwork() {
 export function getStats24h() {
   return fetchJSON('/api/v2/pool/stats/24h');
 }
+
+export function getMinerSharesChart(addr) {
+  return fetchJSON(`/api/v2/pool/miner/${addr}/shares/chart`);
+}
+
+export function getMinerRewardsChart(addr) {
+  return fetchJSON(`/api/v2/pool/miner/${addr}/rewards/chart`);
+}

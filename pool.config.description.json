@@ -26,7 +26,7 @@
       "gasPriceBoost":10,
       "poolTokenFee": 5,
     
-      "publicAddress": "0x4805D8e8A54B2D6C057c5133A2049d4D0Fc5a100",
+      "publicAddress": "0x0000000000000000000000000000000000000001",
       "privateKey":"enter privatekey",
 
       "networkName":"etica",
@@ -36,12 +36,14 @@
     "paymentsConfig":{
       "enablePPS":true,
       "maxGasPriceGwei": 5,
-      "minBalanceForTransfer": 1500000000000000000,  
+      "minBalanceForTransfer": 1500000000000000000,
+      "customMinPayoutFloor": 10000000000000000,
+      "customMinPayoutCeiling": 50000000000000000000,
       "rebroadcastPaymentWaitBlocks": 10,
       "minPaymentsInBatch": 1,
       "PoolSecurityBalance": 10000000000000000,
       "poolRewardsBonus": 20,
-      "publicAddress": "0x9A04C58f0d629db736e33CAAA059368be47b5646",
+      "publicAddress": "0x0000000000000000000000000000000000000002",
       "privateKey":"",
 
       "networkName":"etica",
@@ -72,7 +74,7 @@
       "gasPriceBoost":10,
       "poolTokenFee": 5,
 
-      "publicAddress": "0x4805D8e8A54B2D6C057c5133A2049d4D0Fc5a100",
+      "publicAddress": "0x0000000000000000000000000000000000000001",
       "privateKey":"",
       
       "networkName":"etica",
@@ -82,13 +84,15 @@
     "paymentsConfig":{
       "enablePPS":true,
       "maxGasPriceGwei": 5,
-      "minBalanceForTransfer": 1500000000000000000,  
+      "minBalanceForTransfer": 1500000000000000000,
+      "customMinPayoutFloor": 10000000000000000,
+      "customMinPayoutCeiling": 50000000000000000000,
       "rebroadcastPaymentWaitBlocks": 10,
       "minPaymentsInBatch": 1,
       "PoolSecurityBalance": 10000000000000000,
 
-      
-      "publicAddress": "0x9A04C58f0d629db736e33CAAA059368be47b5646",
+
+      "publicAddress": "0x0000000000000000000000000000000000000002",
       "privateKey":"",
 
       "networkName":"etica",

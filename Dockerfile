@@ -1,5 +1,5 @@
 # Stage 1: Build frontend (React + Vite)
-FROM node:18-bullseye AS frontend-builder
+FROM node:18.20-bullseye AS frontend-builder
 WORKDIR /app/frontend-new
 COPY frontend-new/package.json frontend-new/package-lock.json ./
 RUN npm ci
@@ -7,14 +7,14 @@ COPY frontend-new/ ./
 RUN npm run build
 
 # Stage 2: Build backend (Node 18 for native modules like randomx)
-FROM node:18-bullseye AS backend-builder
+FROM node:18.20-bullseye AS backend-builder
 WORKDIR /app
 RUN apt-get update && apt-get install -y build-essential cmake python3 git && rm -rf /var/lib/apt/lists/*
 COPY package.json package-lock.json ./
 RUN npm ci
 
 # Stage 3: Production
-FROM node:18-bullseye-slim
+FROM node:18.20-bullseye-slim
 WORKDIR /app
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 RUN groupadd -r pool && useradd -r -g pool -m pool

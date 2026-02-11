@@ -9,6 +9,7 @@ import Epochs from './pages/Blocks'
 import Payments from './pages/Payments'
 import ActivePools from './pages/ActivePools'
 import MintAddresses from './pages/MintAddresses'
+import Account from './pages/Account'
 
 // Template imports — lazy-loaded, dev-only
 const TemplateSelector = import.meta.env.DEV ? lazy(() => import('./templates/TemplateSelector')) : null;
@@ -53,6 +54,7 @@ export default function App() {
         <Route path="/payments" element={<Payments />} />
         <Route path="/pools" element={<ActivePools />} />
         <Route path="/mint-addresses" element={<MintAddresses />} />
+        <Route path="/account" element={<Account />} />
       </Route>
 
       {/* Template routes — dev only */}

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useMinerProfile } from '../hooks/useMinerProfile';
-import { useMinerShares } from '../hooks/useMinerShares';
+import { useMinerShares, useMinerSharesChart } from '../hooks/useMinerShares';
 import { useMinerPayments } from '../hooks/useMinerPayments';
-import { useMinerRewards } from '../hooks/useMinerRewards';
+import { useMinerRewards, useMinerRewardsChart } from '../hooks/useMinerRewards';
 import DataCard from '../components/DataCard';
 import DataRow from '../components/DataRow';
 import DataTable from '../components/DataTable';
@@ -13,6 +13,7 @@ import PortBadge from '../components/PortBadge';
 import StatusBadge from '../components/StatusBadge';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import StatsGrid from '../components/StatsGrid';
+import PoolChart from '../components/PoolChart';
 import {
   formatHashrate,
   timeAgo,
@@ -23,6 +24,215 @@ import {
 import { ETICASCAN_URL } from '../config/constants';
 
 const TABS = ['Overview', 'Shares', 'Payments', 'Rewards'];
+
+/* ---------- Graph Tab ---------- */
+
+function ChartLoadingPlaceholder({ label }) {
+  return (
+    <div className="os-block" style={{ minHeight: 280 }}>
+      <div className="flex flex-col items-center justify-center gap-3 py-16">
+        <div className="h-6 w-6 rounded-full border-2 border-emerald-400 border-t-transparent animate-spin" />
+        <span className="text-sm faded">Loading {label}...</span>
+      </div>
+    </div>
+  );
+}
+
+function MinerGraphTab({ sharesChartData, sharesLoading, rewardsChartData, rewardsLoading }) {
+  // Build uPlot-ready data from pre-computed linedata (parallel arrays)
+  const sharesChart = useMemo(() => {
+    if (!sharesChartData || !sharesChartData.timestamps || sharesChartData.timestamps.length < 2) return null;
+    const ts = sharesChartData.timestamps;
+    const diff = sharesChartData.series.difficulty;
+    const n = ts.length;
+
+    // Normalize timestamps to seconds
+    const timestamps = new Array(n);
+    for (let i = 0; i < n; i++) {
+      timestamps[i] = ts[i] < 1e12 ? ts[i] : Math.floor(ts[i] / 1000);
+    }
+
+    let min = Infinity, max = 0, sum = 0;
+    for (let i = 0; i < n; i++) {
+      const d = diff[i];
+      if (d > max) max = d;
+      if (d < min) min = d;
+      sum += d;
+    }
+
+    return {
+      data: [timestamps, diff],
+      current: diff[n - 1],
+      avg: sum / n,
+      min: min === Infinity ? 0 : min,
+      max,
+    };
+  }, [sharesChartData]);
+
+  // Build uPlot-ready data from pre-computed rewards linedata
+  const rewardsChart = useMemo(() => {
+    if (!rewardsChartData || !rewardsChartData.timestamps || rewardsChartData.timestamps.length < 2) return null;
+    const ts = rewardsChartData.timestamps;
+    const earnedArr = rewardsChartData.series.earned;
+    const poolPctArr = rewardsChartData.series.poolPercent;
+    const n = ts.length;
+
+    const timestamps = new Array(n);
+    for (let i = 0; i < n; i++) {
+      timestamps[i] = ts[i] < 1e12 ? ts[i] : Math.floor(ts[i] / 1000);
+    }
+
+    let sumETI = 0, maxETI = 0, sumPct = 0;
+    for (let i = 0; i < n; i++) {
+      sumETI += earnedArr[i];
+      if (earnedArr[i] > maxETI) maxETI = earnedArr[i];
+      sumPct += poolPctArr[i];
+    }
+
+    return {
+      data: [timestamps, earnedArr, poolPctArr],
+      totalETI: sumETI,
+      avgETI: sumETI / n,
+      maxETI,
+      avgPct: sumPct / n,
+    };
+  }, [rewardsChartData]);
+
+  // Compact formatter for Y axis labels (e.g. 400000 → "400K")
+  const fmtDiff = (u, v) => {
+    if (v == null) return '--';
+    if (v >= 1e6) return (v / 1e6).toFixed(1) + 'M';
+    if (v >= 1e3) return (v / 1e3).toFixed(0) + 'K';
+    return v.toFixed(0);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Share Difficulty Chart */}
+      {sharesLoading ? (
+        <ChartLoadingPlaceholder label="share difficulty chart" />
+      ) : (
+        <div className="os-block">
+          <SectionTitle color="emerald">Share Difficulty</SectionTitle>
+          <PoolChart
+            data={sharesChart?.data || null}
+            title="Share Difficulty — Recent"
+            height={260}
+            series={[
+              {
+                label: 'Difficulty',
+                color: '#34d399',
+                fill: 'rgba(52, 211, 153, 0.08)',
+                width: 2,
+                value: (u, v) => v == null ? '--' : formatNumber(Math.round(v)),
+              },
+            ]}
+            axes={[
+              {
+                stroke: 'rgba(255,255,255,0.15)',
+                grid: { stroke: 'rgba(255,255,255,0.04)', width: 1 },
+                ticks: { stroke: 'rgba(255,255,255,0.08)', width: 1 },
+                font: '11px "JetBrains Mono", monospace',
+                gap: 8,
+              },
+              {
+                stroke: '#34d399',
+                grid: { stroke: 'rgba(255,255,255,0.04)', width: 1 },
+                ticks: { stroke: 'rgba(255,255,255,0.08)', width: 1 },
+                font: '11px "JetBrains Mono", monospace',
+                gap: 8,
+                size: 56,
+                values: (u, vals) => vals.map(v => fmtDiff(u, v)),
+              },
+            ]}
+            stats={sharesChart ? [
+              { label: 'Current', value: formatNumber(Math.round(sharesChart.current)), color: '#34d399' },
+              { label: 'Average', value: formatNumber(Math.round(sharesChart.avg)), color: '#9ca3af' },
+              { label: 'Peak', value: formatNumber(Math.round(sharesChart.max)), color: '#f97316' },
+              { label: 'Low', value: formatNumber(Math.round(sharesChart.min)), color: '#6b7280' },
+            ] : undefined}
+            legend={[{ label: 'Share Difficulty', color: '#34d399' }]}
+          />
+        </div>
+      )}
+
+      {/* Rewards Chart */}
+      {rewardsLoading ? (
+        <ChartLoadingPlaceholder label="rewards chart" />
+      ) : (
+        <div className="os-block">
+          <SectionTitle color="orange">Earnings Per Epoch</SectionTitle>
+          <PoolChart
+            data={rewardsChart?.data || null}
+            title="PPLNS Rewards"
+            height={260}
+            series={[
+              {
+                label: 'ETI Earned',
+                color: '#f97316',
+                fill: 'rgba(249, 115, 22, 0.08)',
+                width: 2,
+                value: (u, v) => v == null ? '--' : v.toFixed(4) + ' ETI',
+              },
+              {
+                label: '% of Pool',
+                color: '#06b6d4',
+                width: 1.5,
+                scale: 'pct',
+                dash: [4, 4],
+                value: (u, v) => v == null ? '--' : v.toFixed(2) + '%',
+              },
+            ]}
+            scales={{
+              x: { time: true },
+              y: { auto: true },
+              pct: { auto: true },
+            }}
+            axes={[
+              {
+                stroke: 'rgba(255,255,255,0.15)',
+                grid: { stroke: 'rgba(255,255,255,0.04)', width: 1 },
+                ticks: { stroke: 'rgba(255,255,255,0.08)', width: 1 },
+                font: '11px "JetBrains Mono", monospace',
+                gap: 8,
+              },
+              {
+                stroke: '#f97316',
+                grid: { stroke: 'rgba(255,255,255,0.04)', width: 1 },
+                ticks: { stroke: 'rgba(255,255,255,0.08)', width: 1 },
+                font: '11px "JetBrains Mono", monospace',
+                gap: 8,
+                size: 70,
+                values: (u, vals) => vals.map(v => v == null ? '' : v.toFixed(2) + ' ETI'),
+              },
+              {
+                side: 1,
+                scale: 'pct',
+                stroke: '#06b6d4',
+                grid: { show: false },
+                ticks: { stroke: 'rgba(255,255,255,0.08)', width: 1 },
+                font: '11px "JetBrains Mono", monospace',
+                gap: 8,
+                size: 56,
+                values: (u, vals) => vals.map(v => v == null ? '' : v.toFixed(0) + '%'),
+              },
+            ]}
+            stats={rewardsChart ? [
+              { label: 'Total Earned', value: rewardsChart.totalETI.toFixed(4) + ' ETI', color: '#f97316' },
+              { label: 'Avg / Epoch', value: rewardsChart.avgETI.toFixed(4) + ' ETI', color: '#9ca3af' },
+              { label: 'Best Epoch', value: rewardsChart.maxETI.toFixed(4) + ' ETI', color: '#34d399' },
+              { label: 'Avg Pool %', value: rewardsChart.avgPct.toFixed(2) + '%', color: '#06b6d4' },
+            ] : undefined}
+            legend={[
+              { label: 'ETI Earned (left axis)', color: '#f97316' },
+              { label: '% of Pool (right axis)', color: '#06b6d4' },
+            ]}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function MinerProfile() {
   const { address: rawAddress, worker: routeWorker } = useParams();
@@ -47,6 +257,9 @@ export default function MinerProfile() {
   const { data: sharesData, isLoading: sharesLoading } = useMinerShares(activeTab === 'Shares' ? queryAddress : null);
   const { data: paymentsData, isLoading: paymentsLoading } = useMinerPayments(activeTab === 'Payments' ? queryAddress : null);
   const { data: rewardsData, isLoading: rewardsLoading } = useMinerRewards(activeTab === 'Rewards' ? queryAddress : null);
+  // Chart hooks — fetch pre-computed linedata for Graph tab only
+  const { data: sharesChartData, isLoading: sharesChartLoading } = useMinerSharesChart(queryAddress, activeTab === 'Graph');
+  const { data: rewardsChartData, isLoading: rewardsChartLoading } = useMinerRewardsChart(queryAddress, activeTab === 'Graph');
 
   const minerData = profileData?.minerData;
   // API returns challengeDetails as an array; take the first (current) entry
@@ -85,8 +298,8 @@ export default function MinerProfile() {
 
   return (
     <div className="os-page os-wrap">
-      {/* 1. Header */}
-      <div className="os-heading">
+      {/* 1. Header with Graph button top-right */}
+      <div className="os-heading" style={{ position: 'relative' }}>
         <div className="os-heading-title" title={baseAddress}>
           {truncateAddress(baseAddress, 10)}
         </div>
@@ -99,6 +312,13 @@ export default function MinerProfile() {
             <>Main Mining Account &mdash; {minerData?.workers?.length || 0} workers</>
           )}
         </div>
+        <button
+          className={`os-tab ${activeTab === 'Graph' ? 'active' : ''}`}
+          style={{ position: 'absolute', top: 0, right: 0 }}
+          onClick={() => setActiveTab(activeTab === 'Graph' ? 'Overview' : 'Graph')}
+        >
+          Graph
+        </button>
       </div>
 
       {/* Tab Navigation */}
@@ -291,6 +511,16 @@ export default function MinerProfile() {
         </>
       )}
 
+      {/* Graph Tab */}
+      {activeTab === 'Graph' && (
+        <MinerGraphTab
+          sharesChartData={sharesChartData}
+          sharesLoading={sharesChartLoading}
+          rewardsChartData={rewardsChartData}
+          rewardsLoading={rewardsChartLoading}
+        />
+      )}
+
       {/* Shares Tab */}
       {activeTab === 'Shares' && (
         <div className="os-block">
@@ -356,7 +586,7 @@ export default function MinerProfile() {
                       <span className="faded">--</span>
                     )}
                   </td>
-                  <td className="py-3 px-3"><StatusBadge status={payment.status} /></td>
+                  <td className="py-3 px-3"><StatusBadge status={payment.confirmed ? 'confirmed' : (payment.batchedPaymentUuid ? 'pending' : 'unprocessed')} /></td>
                 </tr>
               )}
             />
@@ -378,7 +608,6 @@ export default function MinerProfile() {
                 { label: 'Pool Shares', align: 'right' },
                 { label: 'My Shares', align: 'right' },
                 { label: '% of Pool', align: 'right' },
-                { label: 'Port' },
                 { label: 'Reward', align: 'right' },
               ]}
               data={rewardsData || []}
@@ -399,7 +628,6 @@ export default function MinerProfile() {
                     <td className="py-3 px-3 right">{r.poolshares}</td>
                     <td className="py-3 px-3 right">{r.shares}</td>
                     <td className="py-3 px-3 right emerald">{pct}</td>
-                    <td className="py-3 px-3"><PortBadge port={r.minerport} /></td>
                     <td className="py-3 px-3 right emerald">{reward}{bonus}</td>
                   </tr>
                 );

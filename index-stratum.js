@@ -1,20 +1,35 @@
+// Suppress mongodb 3.6 driver noise (not fixable without driver upgrade)
+const _origWarn = console.warn;
+console.warn = (...args) => { if (args[0] && typeof args[0] === 'string' && args[0].includes('Top-level use of w')) return; _origWarn.apply(console, args); };
+process.on('warning', (w) => { if (w.message && w.message.includes('MongoError')) return; console.warn(w); });
+
 import SegfaultHandler from 'segfault-handler';
 SegfaultHandler.registerHandler('crash.log');
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Promise rejection:', reason);
+});
 
-import FileUtils from './lib/util/file-utils.js'
+import { loadAndValidateConfig } from './lib/util/config-helper.js'
 import MongoInterface from './lib/mongo-interface.js'
 import WebServer from './lib/web-server.js'
-import PeerInterface from './lib/peer-interface.js'
 import RedisInterface from './lib/redis-interface.js'
 import RedisPubSub from './lib/util/redis-pubsub.js'
 import GeneralEventEmitterHandler from './lib/util/GeneralEventEmitterHandler.js'
 
 var pool_env = process.env.POOL_ENV || 'production';
 const configPath = process.env.POOL_CONFIG_PATH || '/pool.config.json';
-let poolConfigFull = FileUtils.readJsonFileSync(configPath);
-let poolConfig = poolConfigFull[pool_env];
+let poolConfig = loadAndValidateConfig(configPath, pool_env);
 
 console.log('Eticapool Stratum Service starting...');
+
+process.on('SIGTERM', () => {
+    console.log('Received SIGTERM, shutting down gracefully...');
+    setTimeout(() => process.exit(0), 3000);
+});
+process.on('SIGINT', () => {
+    console.log('Received SIGINT, shutting down gracefully...');
+    setTimeout(() => process.exit(0), 3000);
+});
 
 async function init() {
     let mongoInterface = new MongoInterface();
@@ -31,10 +46,6 @@ async function init() {
 
     let webServer = new WebServer();
     await webServer.initStratumOnly(poolConfig, mongoInterface, redisInterface);
-
-    // Start JSONRPC server on port 8081
-    let peerInterface = new PeerInterface(mongoInterface, poolConfig, redisInterface);
-    peerInterface.listenForJSONRPC();
 
     console.log('Stratum service ready');
 }

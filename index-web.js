@@ -1,21 +1,38 @@
+// Suppress mongodb 3.6 driver noise (not fixable without driver upgrade)
+const _origWarn = console.warn;
+console.warn = (...args) => { if (args[0] && typeof args[0] === 'string' && args[0].includes('Top-level use of w')) return; _origWarn.apply(console, args); };
+process.on('warning', (w) => { if (w.message && w.message.includes('MongoError')) return; console.warn(w); });
+
 import SegfaultHandler from 'segfault-handler';
 SegfaultHandler.registerHandler('crash.log');
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Promise rejection:', reason);
+});
 
-import FileUtils from './lib/util/file-utils.js'
+import { loadAndValidateConfig } from './lib/util/config-helper.js'
 import MongoInterface from './lib/mongo-interface.js'
 import WebServer from './lib/web-server.js'
 import DiagnosticsManager from './lib/diagnostics-manager.js'
 import RedisPubSub from './lib/util/redis-pubsub.js'
 import GeneralEventEmitterHandler from './lib/util/GeneralEventEmitterHandler.js'
+import ChartDataHelper from './lib/util/chart-data-helper.js'
 
 var pool_env = process.env.POOL_ENV || 'production';
 const configPath = process.env.POOL_CONFIG_PATH || '/pool.config.json';
-let poolConfigFull = FileUtils.readJsonFileSync(configPath);
-let poolConfig = poolConfigFull[pool_env];
+let poolConfig = loadAndValidateConfig(configPath, pool_env);
 
 var https_enabled = process.argv[2] === 'https';
 
 console.log('Eticapool Web/API Service starting...');
+
+process.on('SIGTERM', () => {
+    console.log('Received SIGTERM, shutting down gracefully...');
+    setTimeout(() => process.exit(0), 3000);
+});
+process.on('SIGINT', () => {
+    console.log('Received SIGINT, shutting down gracefully...');
+    setTimeout(() => process.exit(0), 3000);
+});
 
 async function init() {
     let mongoInterface = new MongoInterface();
@@ -29,6 +46,14 @@ async function init() {
         console.log('Redis Pub/Sub enabled for cross-process events');
     } catch (err) {
         console.log('Redis Pub/Sub not available, using local events only:', err.message);
+    }
+
+    // Ensure pre-computed chart linedata exists
+    try {
+        await ChartDataHelper.getInstance().ensureChart('pool_hashrate_24h', mongoInterface);
+        console.log('Chart linedata initialized');
+    } catch (err) {
+        console.error('Chart linedata initialization error (non-fatal):', err.message);
     }
 
     let diagnosticsManager = new DiagnosticsManager();
