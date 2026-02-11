@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useMinerProfile } from '../hooks/useMinerProfile';
-import { useMinerShares } from '../hooks/useMinerShares';
+import { useMinerShares, useMinerSharesChart } from '../hooks/useMinerShares';
 import { useMinerPayments } from '../hooks/useMinerPayments';
-import { useMinerRewards } from '../hooks/useMinerRewards';
+import { useMinerRewards, useMinerRewardsChart } from '../hooks/useMinerRewards';
 import DataCard from '../components/DataCard';
 import DataRow from '../components/DataRow';
 import DataTable from '../components/DataTable';
@@ -23,71 +23,80 @@ import {
 } from '../lib/formatters';
 import { ETICASCAN_URL } from '../config/constants';
 
-const TABS = ['Overview', 'Graph', 'Shares', 'Payments', 'Rewards'];
+const TABS = ['Overview', 'Shares', 'Payments', 'Rewards'];
 
 /* ---------- Graph Tab ---------- */
 
-function MinerGraphTab({ sharesData, sharesLoading, rewardsData, rewardsLoading }) {
-  // Transform shares into uPlot data: difficulty over time
-  const sharesChart = useMemo(() => {
-    if (!sharesData || sharesData.length < 2) return null;
-    const sorted = [...sharesData].reverse();
-    const n = sorted.length;
-    const timestamps = new Array(n);
-    const difficulties = new Array(n);
-    let min = Infinity, max = 0, sum = 0;
+function ChartLoadingPlaceholder({ label }) {
+  return (
+    <div className="os-block" style={{ minHeight: 280 }}>
+      <div className="flex flex-col items-center justify-center gap-3 py-16">
+        <div className="h-6 w-6 rounded-full border-2 border-emerald-400 border-t-transparent animate-spin" />
+        <span className="text-sm faded">Loading {label}...</span>
+      </div>
+    </div>
+  );
+}
 
+function MinerGraphTab({ sharesChartData, sharesLoading, rewardsChartData, rewardsLoading }) {
+  // Build uPlot-ready data from pre-computed linedata (parallel arrays)
+  const sharesChart = useMemo(() => {
+    if (!sharesChartData || !sharesChartData.timestamps || sharesChartData.timestamps.length < 2) return null;
+    const ts = sharesChartData.timestamps;
+    const diff = sharesChartData.series.difficulty;
+    const n = ts.length;
+
+    // Normalize timestamps to seconds
+    const timestamps = new Array(n);
     for (let i = 0; i < n; i++) {
-      const t = sorted[i].time;
-      timestamps[i] = t < 1e12 ? t : Math.floor(t / 1000);
-      difficulties[i] = Number(sorted[i].difficulty) || 0;
-      if (difficulties[i] > max) max = difficulties[i];
-      if (difficulties[i] < min) min = difficulties[i];
-      sum += difficulties[i];
+      timestamps[i] = ts[i] < 1e12 ? ts[i] : Math.floor(ts[i] / 1000);
+    }
+
+    let min = Infinity, max = 0, sum = 0;
+    for (let i = 0; i < n; i++) {
+      const d = diff[i];
+      if (d > max) max = d;
+      if (d < min) min = d;
+      sum += d;
     }
 
     return {
-      data: [timestamps, difficulties],
-      current: difficulties[n - 1],
+      data: [timestamps, diff],
+      current: diff[n - 1],
       avg: sum / n,
       min: min === Infinity ? 0 : min,
       max,
     };
-  }, [sharesData]);
+  }, [sharesChartData]);
 
-  // Transform rewards into uPlot data: ETI earned per epoch
+  // Build uPlot-ready data from pre-computed rewards linedata
   const rewardsChart = useMemo(() => {
-    if (!rewardsData || rewardsData.length < 2) return null;
-    const sorted = [...rewardsData].reverse();
-    const n = sorted.length;
-    const epochs = new Array(n);
-    const rewards = new Array(n);
-    const poolPct = new Array(n);
-    let sumETI = 0, maxETI = 0, sumPct = 0;
+    if (!rewardsChartData || !rewardsChartData.timestamps || rewardsChartData.timestamps.length < 2) return null;
+    const ts = rewardsChartData.timestamps;
+    const earnedArr = rewardsChartData.series.earned;
+    const poolPctArr = rewardsChartData.series.poolPercent;
+    const n = ts.length;
 
+    const timestamps = new Array(n);
     for (let i = 0; i < n; i++) {
-      const r = sorted[i];
-      const t = r.createdAt;
-      epochs[i] = t ? (t < 1e12 ? t : Math.floor(t / 1000)) : (Date.now() / 1000 - (n - i) * 600);
-      try {
-        rewards[i] = Number(BigInt(r.tokensAwarded || 0)) / 1e18;
-      } catch {
-        rewards[i] = 0;
-      }
-      poolPct[i] = r.poolshares > 0 ? (r.shares / r.poolshares) * 100 : 0;
-      sumETI += rewards[i];
-      if (rewards[i] > maxETI) maxETI = rewards[i];
-      sumPct += poolPct[i];
+      timestamps[i] = ts[i] < 1e12 ? ts[i] : Math.floor(ts[i] / 1000);
+    }
+
+    let sumETI = 0, maxETI = 0, sumPct = 0;
+    for (let i = 0; i < n; i++) {
+      sumETI += earnedArr[i];
+      if (earnedArr[i] > maxETI) maxETI = earnedArr[i];
+      sumPct += poolPctArr[i];
     }
 
     return {
-      data: [epochs, rewards, poolPct],
+      data: [timestamps, earnedArr, poolPctArr],
       totalETI: sumETI,
       avgETI: sumETI / n,
       maxETI,
       avgPct: sumPct / n,
     };
-  }, [rewardsData]);
+  }, [rewardsChartData]);
 
   // Compact formatter for Y axis labels (e.g. 400000 → "400K")
   const fmtDiff = (u, v) => {
@@ -100,11 +109,11 @@ function MinerGraphTab({ sharesData, sharesLoading, rewardsData, rewardsLoading 
   return (
     <div className="space-y-6">
       {/* Share Difficulty Chart */}
-      <div className="os-block">
-        <SectionTitle color="emerald">Share Difficulty</SectionTitle>
-        {sharesLoading ? (
-          <LoadingSkeleton type="card" />
-        ) : (
+      {sharesLoading ? (
+        <ChartLoadingPlaceholder label="share difficulty chart" />
+      ) : (
+        <div className="os-block">
+          <SectionTitle color="emerald">Share Difficulty</SectionTitle>
           <PoolChart
             data={sharesChart?.data || null}
             title="Share Difficulty — Recent"
@@ -144,15 +153,15 @@ function MinerGraphTab({ sharesData, sharesLoading, rewardsData, rewardsLoading 
             ] : undefined}
             legend={[{ label: 'Share Difficulty', color: '#34d399' }]}
           />
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Rewards Chart */}
-      <div className="os-block">
-        <SectionTitle color="orange">Earnings Per Epoch</SectionTitle>
-        {rewardsLoading ? (
-          <LoadingSkeleton type="card" />
-        ) : (
+      {rewardsLoading ? (
+        <ChartLoadingPlaceholder label="rewards chart" />
+      ) : (
+        <div className="os-block">
+          <SectionTitle color="orange">Earnings Per Epoch</SectionTitle>
           <PoolChart
             data={rewardsChart?.data || null}
             title="PPLNS Rewards"
@@ -219,8 +228,8 @@ function MinerGraphTab({ sharesData, sharesLoading, rewardsData, rewardsLoading 
               { label: '% of Pool (right axis)', color: '#06b6d4' },
             ]}
           />
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -245,11 +254,12 @@ export default function MinerProfile() {
   // For shares/payments/rewards, use full worker address when viewing a worker
   // (these collections store records by exact minerEthAddress including worker suffix)
   const queryAddress = isWorker ? `${baseAddress}.${workerName}`.toLowerCase() : baseAddress;
-  const needShares = activeTab === 'Shares' || activeTab === 'Graph';
-  const needRewards = activeTab === 'Rewards' || activeTab === 'Graph';
-  const { data: sharesData, isLoading: sharesLoading } = useMinerShares(needShares ? queryAddress : null);
+  const { data: sharesData, isLoading: sharesLoading } = useMinerShares(activeTab === 'Shares' ? queryAddress : null);
   const { data: paymentsData, isLoading: paymentsLoading } = useMinerPayments(activeTab === 'Payments' ? queryAddress : null);
-  const { data: rewardsData, isLoading: rewardsLoading } = useMinerRewards(needRewards ? queryAddress : null);
+  const { data: rewardsData, isLoading: rewardsLoading } = useMinerRewards(activeTab === 'Rewards' ? queryAddress : null);
+  // Chart hooks — fetch pre-computed linedata for Graph tab only
+  const { data: sharesChartData, isLoading: sharesChartLoading } = useMinerSharesChart(queryAddress, activeTab === 'Graph');
+  const { data: rewardsChartData, isLoading: rewardsChartLoading } = useMinerRewardsChart(queryAddress, activeTab === 'Graph');
 
   const minerData = profileData?.minerData;
   // API returns challengeDetails as an array; take the first (current) entry
@@ -288,8 +298,8 @@ export default function MinerProfile() {
 
   return (
     <div className="os-page os-wrap">
-      {/* 1. Header */}
-      <div className="os-heading">
+      {/* 1. Header with Graph button top-right */}
+      <div className="os-heading" style={{ position: 'relative' }}>
         <div className="os-heading-title" title={baseAddress}>
           {truncateAddress(baseAddress, 10)}
         </div>
@@ -302,6 +312,13 @@ export default function MinerProfile() {
             <>Main Mining Account &mdash; {minerData?.workers?.length || 0} workers</>
           )}
         </div>
+        <button
+          className={`os-tab ${activeTab === 'Graph' ? 'active' : ''}`}
+          style={{ position: 'absolute', top: 0, right: 0 }}
+          onClick={() => setActiveTab(activeTab === 'Graph' ? 'Overview' : 'Graph')}
+        >
+          Graph
+        </button>
       </div>
 
       {/* Tab Navigation */}
@@ -497,10 +514,10 @@ export default function MinerProfile() {
       {/* Graph Tab */}
       {activeTab === 'Graph' && (
         <MinerGraphTab
-          sharesData={sharesData}
-          sharesLoading={sharesLoading}
-          rewardsData={rewardsData}
-          rewardsLoading={rewardsLoading}
+          sharesChartData={sharesChartData}
+          sharesLoading={sharesChartLoading}
+          rewardsChartData={rewardsChartData}
+          rewardsLoading={rewardsChartLoading}
         />
       )}
 
