@@ -19,7 +19,7 @@
  *   --rpc-url           RPC endpoint (default: https://eticamainnet.eticascan.org)
  *   --mongodb-uri       MongoDB URI (default: mongodb://localhost:27017)
  *   --db-name           Target rebuild DB name (default: tokenpool_rebuild)
- *   --use-eticascan     Use eticascan API for TX detail lookups (faster than RPC, discovery always via RPC)
+ *   --use-eticascan     Use eticascan API for TX detail lookups (optional, RPC is default and more reliable)
  *   --eticascan-url     Eticascan API base URL (default: https://eticascan.org/apiv1)
  *   --swap              After rebuild, swap rebuild DB with production (interactive confirm)
  *   --production-db     Production DB name for swap (default: tokenpool_production)
@@ -437,10 +437,11 @@ async function recoverPayments(web3, opts, dbo) {
   let useEticascanForDetails = opts.useEticascan;
   let consecutiveEticascanFails = 0;
   let rpcFallbackCount = 0;
+  let failedTxHashes = [];
 
-  for (let i = 0; i < paymentTxHashes.length; i++) {
-    const txHash = paymentTxHashes[i];
-    process.stdout.write(`  Decoding TX ${i + 1}/${paymentTxHashes.length}: ${txHash.slice(0, 16)}...`);
+  // ─── Helper: decode a single TX hash, return true on success ───
+  async function decodeTx(txHash, label) {
+    process.stdout.write(`  ${label}: ${txHash.slice(0, 16)}...`);
 
     try {
       let txInput, txBlockNumber, txFrom, txTo, txStatus, txGas;
@@ -467,13 +468,17 @@ async function recoverPayments(web3, opts, dbo) {
           rpcFallbackCount++;
           process.stdout.write(' RPC fallback...');
           const tx = await web3.eth.getTransaction(txHash);
+          if (!tx) {
+            console.log(' SKIP (TX not found on-chain)');
+            return true; // not retryable — TX doesn't exist
+          }
           const receipt = await web3.eth.getTransactionReceipt(txHash);
           txInput = tx.input;
           txBlockNumber = tx.blockNumber;
           txFrom = tx.from;
           txTo = tx.to;
-          txStatus = receipt.status ? 'success' : 'reverted';
-          txGas = receipt.gasUsed;
+          txStatus = (receipt && receipt.status) ? 'success' : 'reverted';
+          txGas = receipt ? receipt.gasUsed : 0;
 
           // If eticascan fails 20+ times in a row, switch to RPC-only permanently
           if (consecutiveEticascanFails >= 20) {
@@ -493,29 +498,33 @@ async function recoverPayments(web3, opts, dbo) {
       } else {
         // RPC-only path
         const tx = await web3.eth.getTransaction(txHash);
+        if (!tx) {
+          console.log(' SKIP (TX not found on-chain)');
+          return true; // not retryable
+        }
         const receipt = await web3.eth.getTransactionReceipt(txHash);
         txInput = tx.input;
         txBlockNumber = tx.blockNumber;
         txFrom = tx.from;
         txTo = tx.to;
-        txStatus = receipt.status ? 'success' : 'reverted';
-        txGas = receipt.gasUsed;
+        txStatus = (receipt && receipt.status) ? 'success' : 'reverted';
+        txGas = receipt ? receipt.gasUsed : 0;
       }
 
       if (!txInput || txInput.length < 10) {
         console.log(' SKIP (no input data)');
-        continue;
+        return true;
       }
 
       if (opts.fromBlock > 0 && txBlockNumber < opts.fromBlock) {
         console.log(` SKIP (block ${txBlockNumber} < fromBlock ${opts.fromBlock})`);
-        continue;
+        return true;
       }
 
       const selector = txInput.slice(0, 10);
       if (selector !== multisendSig) {
         console.log(` SKIP (selector ${selector} != ${multisendSig})`);
-        continue;
+        return true;
       }
 
       const decoded = abiCoder.decodeParameters(
@@ -554,8 +563,19 @@ async function recoverPayments(web3, opts, dbo) {
           broadcastedAt: null
         });
       }
+
+      return true; // success
     } catch (err) {
       console.log(` ERROR: ${err.message}`);
+      return false; // failed — retryable
+    }
+  }
+
+  // ─── Main decoding loop ───
+  for (let i = 0; i < paymentTxHashes.length; i++) {
+    const ok = await decodeTx(paymentTxHashes[i], `Decoding TX ${i + 1}/${paymentTxHashes.length}`);
+    if (!ok) {
+      failedTxHashes.push(paymentTxHashes[i]);
     }
 
     // Adaptive delay: slower when eticascan is struggling, faster for RPC-only
@@ -564,8 +584,31 @@ async function recoverPayments(web3, opts, dbo) {
     await sleep(baseDelay + extraDelay);
   }
 
+  // ─── Retry failed TXs (RPC-only, longer delay) ───
+  if (failedTxHashes.length > 0) {
+    console.log(`\n  Retrying ${failedTxHashes.length} failed TXs (RPC-only, 1s delay)...`);
+    useEticascanForDetails = false; // force RPC for retries
+    const stillFailed = [];
+
+    for (let i = 0; i < failedTxHashes.length; i++) {
+      const ok = await decodeTx(failedTxHashes[i], `Retry ${i + 1}/${failedTxHashes.length}`);
+      if (!ok) {
+        stillFailed.push(failedTxHashes[i]);
+      }
+      await sleep(1000);
+    }
+
+    failedTxHashes = stillFailed;
+  }
+
   console.log(`\n  Total individual payments decoded: ${allPayments.length}`);
   console.log(`  Total transaction records: ${allTransactions.length}`);
+  if (failedTxHashes.length > 0) {
+    console.log(`  Failed (could not decode): ${failedTxHashes.length} TXs`);
+    for (const h of failedTxHashes) {
+      console.log(`    ${h}`);
+    }
+  }
   if (rpcFallbackCount > 0) {
     console.log(`  RPC fallback used for: ${rpcFallbackCount} TXs (eticascan was rate-limited)`);
   }
@@ -1270,7 +1313,7 @@ async function main() {
   console.log(`  Target DB:       ${opts.dbName} (side rebuild DB)`);
   console.log(`  Mode:            ${opts.dryRun ? 'DRY RUN' : 'LIVE WRITE'}`);
   console.log(`  Steps:           ${opts.steps ? opts.steps.map(s => `${s} (${stepNames[s] || '?'})`).join(', ') : 'all (1, 2, 3)'}`);
-  console.log(`  Data source:     RPC (${opts.rpcUrl})${opts.useEticascan ? ' + Eticascan API (' + opts.eticascanUrl + ') for TX details' : ''}`);
+  console.log(`  Data source:     RPC (${opts.rpcUrl})${opts.useEticascan ? ' + Eticascan API (' + opts.eticascanUrl + ') for TX details' : ' (RPC-only, use --use-eticascan to add eticascan API)'}`);
 
   // Connect to Web3 (always needed for rebuild — RPC scanning for full history)
   let web3 = null;
