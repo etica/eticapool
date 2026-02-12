@@ -438,6 +438,38 @@ async function recoverPayments(web3, opts, dbo) {
   let consecutiveEticascanFails = 0;
   let rpcFallbackCount = 0;
   let failedTxHashes = [];
+  let notFoundCount = 0;
+
+  // ─── Helper: fetch TX data via RPC (getTransaction + getTransactionReceipt) ───
+  // Some RPC nodes return null for getTransaction but have getTransactionReceipt.
+  // We try both and extract input data from whichever works.
+  async function fetchTxViaRPC(txHash) {
+    const tx = await web3.eth.getTransaction(txHash);
+    if (tx) {
+      const receipt = await web3.eth.getTransactionReceipt(txHash);
+      return {
+        input: tx.input,
+        blockNumber: tx.blockNumber,
+        from: tx.from,
+        to: tx.to,
+        status: (receipt && receipt.status) ? 'success' : 'reverted',
+        gas: receipt ? receipt.gasUsed : 0
+      };
+    }
+    // getTransaction returned null — try receipt as diagnostic
+    const receipt = await web3.eth.getTransactionReceipt(txHash);
+    if (receipt) {
+      // Receipt exists but TX doesn't — pruned node. We have blockNumber but no input data.
+      // We need the input to decode multisend() — without it we can't recover this TX via RPC.
+      if (notFoundCount === 0) {
+        console.log(`\n  WARNING: getTransaction() returns null but getTransactionReceipt() works.`);
+        console.log(`  This RPC node may be pruned and not serve full TX data.`);
+        console.log(`  Falling back to eticascan API for TX input data.\n`);
+      }
+      return null; // signal to caller: needs eticascan
+    }
+    return null; // truly not found
+  }
 
   // ─── Helper: decode a single TX hash, return true on success ───
   async function decodeTx(txHash, label) {
@@ -447,45 +479,42 @@ async function recoverPayments(web3, opts, dbo) {
       let txInput, txBlockNumber, txFrom, txTo, txStatus, txGas;
 
       if (useEticascanForDetails) {
-        // Fast path: fetch TX details from eticascan API (with retry + backoff)
+        // Fast path: fetch TX details from eticascan API
+        // On rate limit: wait longer and keep retrying (5 attempts: 5s, 10s, 20s, 30s, 30s)
         let txResp = null;
-        const MAX_RETRIES = 2;
+        const MAX_RETRIES = 5;
         for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
           txResp = await eticascanFetch(opts.eticascanUrl, `/tx/${txHash}`);
           if (txResp && txResp.querysuccess && txResp.result) break;
-          // null = rate limited / HTML response. Back off before retrying.
+          // null = rate limited / HTML response. Wait and retry.
           if (attempt < MAX_RETRIES) {
-            const backoff = (attempt + 1) * 2000; // 2s, 4s
-            process.stdout.write(` retry ${attempt + 1}...`);
+            const backoff = Math.min((attempt + 1) * 5000, 30000); // 5s, 10s, 15s, 20s, 25s
+            process.stdout.write(` rate-limited, waiting ${backoff / 1000}s...`);
             await sleep(backoff);
           }
           txResp = null;
         }
 
         if (!txResp) {
-          // Eticascan is failing for this TX → fall back to RPC
+          // Eticascan still failing after all retries → fall back to RPC for this TX
           consecutiveEticascanFails++;
           rpcFallbackCount++;
           process.stdout.write(' RPC fallback...');
-          const tx = await web3.eth.getTransaction(txHash);
-          if (!tx) {
-            console.log(' SKIP (TX not found on-chain)');
-            return true; // not retryable — TX doesn't exist
+          const rpcResult = await fetchTxViaRPC(txHash);
+          if (!rpcResult) {
+            console.log(' SKIP (TX not found on RPC or eticascan)');
+            return true;
           }
-          const receipt = await web3.eth.getTransactionReceipt(txHash);
-          txInput = tx.input;
-          txBlockNumber = tx.blockNumber;
-          txFrom = tx.from;
-          txTo = tx.to;
-          txStatus = (receipt && receipt.status) ? 'success' : 'reverted';
-          txGas = receipt ? receipt.gasUsed : 0;
-
-          // If eticascan fails 20+ times in a row, switch to RPC-only permanently
-          if (consecutiveEticascanFails >= 20) {
-            console.log('\n  WARNING: Eticascan failing consistently — switching to RPC-only mode');
-            useEticascanForDetails = false;
-          }
+          txInput = rpcResult.input;
+          txBlockNumber = rpcResult.blockNumber;
+          txFrom = rpcResult.from;
+          txTo = rpcResult.to;
+          txStatus = rpcResult.status;
+          txGas = rpcResult.gas;
         } else {
+          if (consecutiveEticascanFails > 0) {
+            console.log(`  (eticascan recovered after ${consecutiveEticascanFails} failures)`);
+          }
           consecutiveEticascanFails = 0; // reset on success
           const tx = txResp.result;
           txInput = tx.input;
@@ -496,19 +525,35 @@ async function recoverPayments(web3, opts, dbo) {
           txGas = tx.gas;
         }
       } else {
-        // RPC-only path
-        const tx = await web3.eth.getTransaction(txHash);
-        if (!tx) {
-          console.log(' SKIP (TX not found on-chain)');
-          return true; // not retryable
+        // RPC-only path (with eticascan fallback if RPC node is pruned)
+        const rpcResult = await fetchTxViaRPC(txHash);
+        if (rpcResult) {
+          txInput = rpcResult.input;
+          txBlockNumber = rpcResult.blockNumber;
+          txFrom = rpcResult.from;
+          txTo = rpcResult.to;
+          txStatus = rpcResult.status;
+          txGas = rpcResult.gas;
+        } else {
+          // RPC can't serve this TX — try eticascan as fallback
+          notFoundCount++;
+          const txResp = await eticascanFetch(opts.eticascanUrl, `/tx/${txHash}`);
+          if (txResp && txResp.querysuccess && txResp.result) {
+            const etx = txResp.result;
+            txInput = etx.input;
+            txBlockNumber = etx.blockNumber;
+            txFrom = etx.from;
+            txTo = etx.to;
+            txStatus = etx.status === 1 ? 'success' : 'reverted';
+            txGas = etx.gas;
+            process.stdout.write(' (via eticascan)');
+          } else {
+            console.log(' SKIP (TX not found on RPC or eticascan)');
+            return true;
+          }
+          // Add delay after eticascan fallback to avoid rate limiting
+          await sleep(500);
         }
-        const receipt = await web3.eth.getTransactionReceipt(txHash);
-        txInput = tx.input;
-        txBlockNumber = tx.blockNumber;
-        txFrom = tx.from;
-        txTo = tx.to;
-        txStatus = (receipt && receipt.status) ? 'success' : 'reverted';
-        txGas = receipt ? receipt.gasUsed : 0;
       }
 
       if (!txInput || txInput.length < 10) {
@@ -578,9 +623,9 @@ async function recoverPayments(web3, opts, dbo) {
       failedTxHashes.push(paymentTxHashes[i]);
     }
 
-    // Adaptive delay: slower when eticascan is struggling, faster for RPC-only
-    const baseDelay = useEticascanForDetails ? 500 : 300;
-    const extraDelay = consecutiveEticascanFails > 5 ? 2000 : 0;
+    // Adaptive delay: longer when using eticascan, extra cooldown after rate limiting
+    const baseDelay = useEticascanForDetails ? 800 : 300;
+    const extraDelay = consecutiveEticascanFails > 0 ? 3000 : 0;
     await sleep(baseDelay + extraDelay);
   }
 
@@ -608,6 +653,9 @@ async function recoverPayments(web3, opts, dbo) {
     for (const h of failedTxHashes) {
       console.log(`    ${h}`);
     }
+  }
+  if (notFoundCount > 0) {
+    console.log(`  RPC returned null for: ${notFoundCount} TXs (used eticascan fallback)`);
   }
   if (rpcFallbackCount > 0) {
     console.log(`  RPC fallback used for: ${rpcFallbackCount} TXs (eticascan was rate-limited)`);
