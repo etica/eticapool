@@ -20,7 +20,8 @@
  *   3. Use the printed --from-block value with recover-from-blockchain.js
  */
 
-import { MongoClient } from 'mongodb';
+import pkg from 'mongodb';
+const { MongoClient } = pkg;
 
 const args = process.argv.slice(2);
 let mongodbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
