@@ -252,8 +252,7 @@ async function recoverPoolMints(web3, opts, dbo) {
           transactionhash: event.transactionHash,
           from: event.returnValues.from,
           blockreward: event.returnValues.blockreward,
-          epochCount: epochCount,
-          blockNumber: event.blockNumber
+          epochCount: epochCount
         };
 
         if (mintFrom === opts.poolAddress) {
@@ -493,9 +492,8 @@ async function recoverPayments(web3, opts, dbo) {
       console.log(` ${txStatus} | UUID=${paymentId.slice(0, 16)}... | ${dests.length} payments`);
 
       allTransactions.push({
+        block: txBlockNumber,
         txType: 'batched_payment',
-        status: txStatus,
-        txHash: txHash,
         txData: {
           uuid: paymentId,
           payments: dests.map((dest, idx) => ({
@@ -503,23 +501,19 @@ async function recoverPayments(web3, opts, dbo) {
             amountToPay: values[idx].toString()
           }))
         },
-        blockNumber: txBlockNumber,
-        from: txFrom,
-        to: txTo,
-        gasUsed: txGas,
-        recoveredFromBlockchain: true
+        txHash: txHash,
+        status: txStatus
       });
 
       for (let j = 0; j < dests.length; j++) {
         allPayments.push({
           minerEthAddress: dests[j].toLowerCase(),
-          amountToPay: values[j].toString(),
+          amountToPay: Number(values[j]),
           block: txBlockNumber,
           batchedPaymentUuid: paymentId,
           txHash: txHash,
           confirmed: txStatus === 'success',
-          broadcastedAt: null,
-          recoveredFromBlockchain: true
+          broadcastedAt: null
         });
       }
     } catch (err) {
@@ -612,48 +606,48 @@ async function recomputeMinerBalances(allPayments, opts, dbo) {
     let updated = 0, created = 0, unchanged = 0;
 
     for (const [addr, data] of miners) {
-      const totalPaidStr = data.totalPaid.toString();
+      const totalPaidNum = Number(data.totalPaid);
       const existing = await dbo.collection('minerData').findOne({ minerEthAddress: addr });
 
       if (existing) {
-        const currentAlltime = BigInt(existing.alltimeTokenBalance || '0');
-        const blockchainTotal = data.totalPaid;
+        const currentAlltime = Number(existing.alltimeTokenBalance || 0);
+        const currentAwarded = Number(existing.tokensAwarded || 0);
+        const currentReceived = Number(existing.tokensReceived || 0);
 
-        if (blockchainTotal > currentAlltime) {
+        if (totalPaidNum > currentAlltime) {
+          // Blockchain shows more paid than backup — update to blockchain truth
           await dbo.collection('minerData').updateOne(
             { minerEthAddress: addr },
             { $set: {
-              alltimeTokenBalance: Number(blockchainTotal),
-              tokensAwarded: Number(blockchainTotal),
-              tokensReceived: totalPaidStr,
-              recoveryNote: `Blockchain recovery: alltimeTokenBalance updated from ${currentAlltime} to ${blockchainTotal}`
+              alltimeTokenBalance: totalPaidNum,
+              tokensAwarded: totalPaidNum,
+              tokensReceived: totalPaidNum
             }}
           );
           updated++;
+        } else if (totalPaidNum > currentReceived) {
+          // Backup alltimeTokenBalance is fine, just update tokensReceived
+          await dbo.collection('minerData').updateOne(
+            { minerEthAddress: addr },
+            { $set: { tokensReceived: totalPaidNum } }
+          );
+          updated++;
         } else {
-          const currentReceived = BigInt(existing.tokensReceived || '0');
-          if (blockchainTotal > currentReceived) {
-            await dbo.collection('minerData').updateOne(
-              { minerEthAddress: addr },
-              { $set: { tokensReceived: totalPaidStr } }
-            );
-            updated++;
-          } else {
-            unchanged++;
-          }
+          unchanged++;
         }
       } else {
+        // Miner not in backup — create with original field structure
         await dbo.collection('minerData').insertOne({
           minerEthAddress: addr,
-          minerEthAddressBase: addr,
-          alltimeTokenBalance: Number(data.totalPaid),
-          tokensAwarded: Number(data.totalPaid),
-          tokensReceived: totalPaidStr,
+          shareCredits: 0,
           tokenBalance: 0,
-          hashRate: 0,
+          alltimeTokenBalance: totalPaidNum,
+          tokensAwarded: totalPaidNum,
+          tokensReceived: totalPaidNum,
+          validSubmittedSolutionsCount: 0,
           lastSubmittedSolutionTime: 0,
-          sharecount: 0,
-          recoveredFromBlockchain: true
+          avgHashrate: 0,
+          minerport: 8081
         });
         created++;
       }
