@@ -27,6 +27,8 @@
  *   --verify-mint <tx>  Verify a single pool mint by TX hash (spot-check mode)
  *   --verify-mint-block <n>  Verify pool mints in a specific block number
  *   --verify-payment <tx>  Verify a payment TX: decode all miners + amounts (spot-check mode)
+ *   --steps <1,2,3>        Run only specific steps (default: all). 1=mints, 2=payments, 3=balances
+ *                           Example: --steps 2,3  (skip mints, only recover payments + recompute balances)
  *
  * Workflow:
  *   1. Restore last year's backup into tokenpool_rebuild (manual: mongorestore --db tokenpool_rebuild)
@@ -125,7 +127,8 @@ function parseArgs() {
     copyLiveShares: false,
     verifyMint: null,
     verifyMintBlock: null,
-    verifyPayment: null
+    verifyPayment: null,
+    steps: null  // null = all steps; or comma-separated: "1", "2", "3", "1,2", "2,3"
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -148,6 +151,7 @@ function parseArgs() {
       case '--verify-mint': opts.verifyMint = args[++i]; break;
       case '--verify-mint-block': opts.verifyMintBlock = parseInt(args[++i]); break;
       case '--verify-payment': opts.verifyPayment = args[++i]; break;
+      case '--steps': opts.steps = args[++i].split(',').map(s => parseInt(s.trim())); break;
       default:
         console.error(`Unknown option: ${args[i]}`);
         process.exit(1);
@@ -157,12 +161,14 @@ function parseArgs() {
   const isVerifyMode = opts.verifyMint || opts.verifyMintBlock || opts.verifyPayment;
 
   if (!opts.swap && !isVerifyMode) {
-    if (!opts.poolAddress) {
+    const needsPool = !opts.steps || opts.steps.includes(1);
+    const needsPayment = !opts.steps || opts.steps.includes(2);
+    if (needsPool && !opts.poolAddress) {
       console.error('ERROR: --pool-address is required (pool minting address)');
       console.error('  This is the address that mines/mints blocks (mintingConfig.publicAddress)');
       process.exit(1);
     }
-    if (!opts.paymentAddress) {
+    if (needsPayment && !opts.paymentAddress) {
       console.error('ERROR: --payment-address is required (pool payment address)');
       console.error('  This is the address that sends batched payments (paymentsConfig.publicAddress)');
       process.exit(1);
@@ -186,6 +192,8 @@ function confirm(question) {
 }
 
 // ─── Eticascan API helper ───
+// Returns null on non-JSON responses (rate limiting, server errors) instead of throwing.
+// Throws only on network-level errors (DNS, connection refused, timeout).
 function eticascanFetch(baseUrl, endpoint) {
   const url = `${baseUrl}${endpoint}`;
   return new Promise((resolve, reject) => {
@@ -194,10 +202,16 @@ function eticascanFetch(baseUrl, endpoint) {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
+        // Non-2xx status → return null (let caller fall back to RPC)
+        if (res.statusCode < 200 || res.statusCode >= 300) {
+          resolve(null);
+          return;
+        }
         try {
           resolve(JSON.parse(data));
         } catch (e) {
-          reject(new Error(`Failed to parse response from ${url}: ${e.message}`));
+          // HTML error page or other non-JSON → return null (rate limited / server error)
+          resolve(null);
         }
       });
     }).on('error', reject);
@@ -420,7 +434,9 @@ async function recoverPayments(web3, opts, dbo) {
   // ─── Decode each payment TX (via eticascan API for speed, RPC fallback) ───
   let allPayments = [];
   let allTransactions = [];
-  const useEticascanForDetails = opts.useEticascan;
+  let useEticascanForDetails = opts.useEticascan;
+  let consecutiveEticascanFails = 0;
+  let rpcFallbackCount = 0;
 
   for (let i = 0; i < paymentTxHashes.length; i++) {
     const txHash = paymentTxHashes[i];
@@ -430,11 +446,26 @@ async function recoverPayments(web3, opts, dbo) {
       let txInput, txBlockNumber, txFrom, txTo, txStatus, txGas;
 
       if (useEticascanForDetails) {
-        // Fast path: fetch TX details from eticascan API
-        const txResp = await eticascanFetch(opts.eticascanUrl, `/tx/${txHash}`);
-        if (!txResp || !txResp.querysuccess || !txResp.result) {
-          // Fallback to RPC if eticascan fails for this TX
-          console.log(' eticascan miss, trying RPC...');
+        // Fast path: fetch TX details from eticascan API (with retry + backoff)
+        let txResp = null;
+        const MAX_RETRIES = 2;
+        for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+          txResp = await eticascanFetch(opts.eticascanUrl, `/tx/${txHash}`);
+          if (txResp && txResp.querysuccess && txResp.result) break;
+          // null = rate limited / HTML response. Back off before retrying.
+          if (attempt < MAX_RETRIES) {
+            const backoff = (attempt + 1) * 2000; // 2s, 4s
+            process.stdout.write(` retry ${attempt + 1}...`);
+            await sleep(backoff);
+          }
+          txResp = null;
+        }
+
+        if (!txResp) {
+          // Eticascan is failing for this TX → fall back to RPC
+          consecutiveEticascanFails++;
+          rpcFallbackCount++;
+          process.stdout.write(' RPC fallback...');
           const tx = await web3.eth.getTransaction(txHash);
           const receipt = await web3.eth.getTransactionReceipt(txHash);
           txInput = tx.input;
@@ -443,7 +474,14 @@ async function recoverPayments(web3, opts, dbo) {
           txTo = tx.to;
           txStatus = receipt.status ? 'success' : 'reverted';
           txGas = receipt.gasUsed;
+
+          // If eticascan fails 20+ times in a row, switch to RPC-only permanently
+          if (consecutiveEticascanFails >= 20) {
+            console.log('\n  WARNING: Eticascan failing consistently — switching to RPC-only mode');
+            useEticascanForDetails = false;
+          }
         } else {
+          consecutiveEticascanFails = 0; // reset on success
           const tx = txResp.result;
           txInput = tx.input;
           txBlockNumber = tx.blockNumber;
@@ -520,11 +558,17 @@ async function recoverPayments(web3, opts, dbo) {
       console.log(` ERROR: ${err.message}`);
     }
 
-    await sleep(useEticascanForDetails ? 200 : 300);
+    // Adaptive delay: slower when eticascan is struggling, faster for RPC-only
+    const baseDelay = useEticascanForDetails ? 500 : 300;
+    const extraDelay = consecutiveEticascanFails > 5 ? 2000 : 0;
+    await sleep(baseDelay + extraDelay);
   }
 
   console.log(`\n  Total individual payments decoded: ${allPayments.length}`);
   console.log(`  Total transaction records: ${allTransactions.length}`);
+  if (rpcFallbackCount > 0) {
+    console.log(`  RPC fallback used for: ${rpcFallbackCount} TXs (eticascan was rate-limited)`);
+  }
 
   if (!opts.dryRun && allPayments.length > 0) {
     console.log('  Writing transactions to database...');
@@ -1218,12 +1262,14 @@ async function main() {
   }
 
   // Rebuild mode
+  const stepNames = { 1: 'pool_mints', 2: 'balance_payments', 3: 'minerData balances' };
   console.log(`  Network:         ${opts.network}`);
-  console.log(`  Pool address:    ${opts.poolAddress}`);
-  console.log(`  Payment address: ${opts.paymentAddress}`);
+  if (opts.poolAddress) console.log(`  Pool address:    ${opts.poolAddress}`);
+  if (opts.paymentAddress) console.log(`  Payment address: ${opts.paymentAddress}`);
   console.log(`  MongoDB:         ${opts.mongodbUri}`);
   console.log(`  Target DB:       ${opts.dbName} (side rebuild DB)`);
   console.log(`  Mode:            ${opts.dryRun ? 'DRY RUN' : 'LIVE WRITE'}`);
+  console.log(`  Steps:           ${opts.steps ? opts.steps.map(s => `${s} (${stepNames[s] || '?'})`).join(', ') : 'all (1, 2, 3)'}`);
   console.log(`  Data source:     RPC (${opts.rpcUrl})${opts.useEticascan ? ' + Eticascan API (' + opts.eticascanUrl + ') for TX details' : ''}`);
 
   // Connect to Web3 (always needed for rebuild — RPC scanning for full history)
@@ -1282,10 +1328,34 @@ async function main() {
     console.log('  [DRY RUN] Skipping MongoDB connection');
   }
 
+  const runStep = (n) => !opts.steps || opts.steps.includes(n);
+
   try {
-    const poolMints = await recoverPoolMints(web3, opts, dbo);
-    const { allPayments, allTransactions } = await recoverPayments(web3, opts, dbo);
-    const minerTotals = await recomputeMinerBalances(allPayments, opts, dbo);
+    let poolMints = [];
+    let allPayments = [];
+    let allTransactions = [];
+    let minerTotals = {};
+
+    if (runStep(1)) {
+      poolMints = await recoverPoolMints(web3, opts, dbo);
+    } else {
+      console.log('\n  Skipping Step 1 (pool_mints) — not in --steps');
+    }
+
+    if (runStep(2)) {
+      const result = await recoverPayments(web3, opts, dbo);
+      allPayments = result.allPayments;
+      allTransactions = result.allTransactions;
+    } else {
+      console.log('  Skipping Step 2 (balance_payments) — not in --steps');
+    }
+
+    if (runStep(3)) {
+      minerTotals = await recomputeMinerBalances(allPayments, opts, dbo);
+    } else {
+      console.log('  Skipping Step 3 (minerData balances) — not in --steps');
+    }
+
     generateReport(poolMints, allPayments, allTransactions, minerTotals, opts);
   } catch (err) {
     console.error('\nFATAL ERROR:', err);
