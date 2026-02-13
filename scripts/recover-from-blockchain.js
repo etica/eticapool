@@ -290,35 +290,48 @@ async function recoverPoolMints(web3, opts, dbo) {
   console.log(`  Total ETI mints found: ${allEtiMints.length}`);
 
   if (!opts.dryRun && allPoolMints.length > 0) {
-    console.log('  Writing pool_mints to database...');
+    // Create unique indexes for bulk deduplication
+    await dbo.collection('pool_mints').createIndex({ transactionhash: 1 }, { unique: true, background: true }).catch(() => {});
+    await dbo.collection('all_eti_mints').createIndex({ transactionhash: 1 }, { unique: true, background: true }).catch(() => {});
+
+    console.log(`  Writing ${allPoolMints.length} pool_mints to database (bulk)...`);
     let inserted = 0, skipped = 0;
-    for (const mint of allPoolMints) {
-      const existing = await dbo.collection('pool_mints').findOne({ transactionhash: mint.transactionhash });
-      if (!existing) {
-        await dbo.collection('pool_mints').insertOne(mint);
-        inserted++;
-      } else {
-        skipped++;
+    const BATCH = 1000;
+    for (let i = 0; i < allPoolMints.length; i += BATCH) {
+      const batch = allPoolMints.slice(i, i + BATCH);
+      try {
+        const result = await dbo.collection('pool_mints').insertMany(batch, { ordered: false });
+        inserted += result.insertedCount;
+      } catch (err) {
+        if (err.code === 11000 || (err.result && err.result.insertedCount !== undefined)) {
+          const batchInserted = err.result ? err.result.insertedCount : 0;
+          inserted += batchInserted;
+          skipped += batch.length - batchInserted;
+        } else {
+          console.log(`\n  ERROR: ${err.message}`);
+        }
       }
-      if ((inserted + skipped) % 500 === 0) {
-        process.stdout.write(`\r  pool_mints progress: ${inserted + skipped}/${allPoolMints.length} (${inserted} new, ${skipped} existing)`);
-      }
+      process.stdout.write(`\r  pool_mints progress: ${Math.min(i + BATCH, allPoolMints.length)}/${allPoolMints.length} (${inserted} new, ${skipped} existing)`);
     }
     console.log(`\n  pool_mints: ${inserted} inserted, ${skipped} skipped (already exist)`);
 
-    console.log('  Writing all_eti_mints to database...');
+    console.log(`  Writing ${allEtiMints.length} all_eti_mints to database (bulk)...`);
     inserted = 0; skipped = 0;
-    for (const mint of allEtiMints) {
-      const existing = await dbo.collection('all_eti_mints').findOne({ transactionhash: mint.transactionhash });
-      if (!existing) {
-        await dbo.collection('all_eti_mints').insertOne(mint);
-        inserted++;
-      } else {
-        skipped++;
+    for (let i = 0; i < allEtiMints.length; i += BATCH) {
+      const batch = allEtiMints.slice(i, i + BATCH);
+      try {
+        const result = await dbo.collection('all_eti_mints').insertMany(batch, { ordered: false });
+        inserted += result.insertedCount;
+      } catch (err) {
+        if (err.code === 11000 || (err.result && err.result.insertedCount !== undefined)) {
+          const batchInserted = err.result ? err.result.insertedCount : 0;
+          inserted += batchInserted;
+          skipped += batch.length - batchInserted;
+        } else {
+          console.log(`\n  ERROR: ${err.message}`);
+        }
       }
-      if ((inserted + skipped) % 500 === 0) {
-        process.stdout.write(`\r  all_eti_mints progress: ${inserted + skipped}/${allEtiMints.length} (${inserted} new, ${skipped} existing)`);
-      }
+      process.stdout.write(`\r  all_eti_mints progress: ${Math.min(i + BATCH, allEtiMints.length)}/${allEtiMints.length} (${inserted} new, ${skipped} existing)`);
     }
     console.log(`\n  all_eti_mints: ${inserted} inserted, ${skipped} skipped (already exist)`);
   } else if (opts.dryRun) {
@@ -662,37 +675,64 @@ async function recoverPayments(web3, opts, dbo) {
   }
 
   if (!opts.dryRun && allPayments.length > 0) {
-    console.log('  Writing transactions to database...');
-    let inserted = 0, skipped = 0;
-    for (const tx of allTransactions) {
-      const existing = await dbo.collection('transactions').findOne({ txHash: tx.txHash });
-      if (!existing) {
-        await dbo.collection('transactions').insertOne(tx);
-        inserted++;
-      } else {
-        skipped++;
-      }
-    }
-    console.log(`  transactions: ${inserted} inserted, ${skipped} skipped`);
+    // Create unique indexes for upsert deduplication
+    console.log('  Creating indexes for deduplication...');
+    await dbo.collection('transactions').createIndex({ txHash: 1 }, { unique: true, background: true }).catch(() => {});
+    // No unique index on balance_payments — same miner can have multiple
+    // payments with different amounts in the same batch (legitimate).
 
-    console.log('  Writing balance_payments to database...');
-    inserted = 0; skipped = 0;
-    for (const payment of allPayments) {
-      const existing = await dbo.collection('balance_payments').findOne({
-        batchedPaymentUuid: payment.batchedPaymentUuid,
-        minerEthAddress: payment.minerEthAddress
-      });
-      if (!existing) {
-        await dbo.collection('balance_payments').insertOne(payment);
-        inserted++;
-      } else {
-        skipped++;
+    // Bulk write transactions (batches of 500, ordered:false skips duplicates)
+    console.log(`  Writing ${allTransactions.length} transactions to database (bulk)...`);
+    let txInserted = 0, txSkipped = 0;
+    const TX_BATCH = 500;
+    for (let i = 0; i < allTransactions.length; i += TX_BATCH) {
+      const batch = allTransactions.slice(i, i + TX_BATCH);
+      try {
+        const result = await dbo.collection('transactions').insertMany(batch, { ordered: false });
+        txInserted += result.insertedCount;
+      } catch (err) {
+        // Duplicate key errors are expected — count them
+        if (err.code === 11000 || (err.result && err.result.insertedCount !== undefined)) {
+          const batchInserted = err.result ? err.result.insertedCount : 0;
+          txInserted += batchInserted;
+          txSkipped += batch.length - batchInserted;
+        } else {
+          console.log(`\n  ERROR in batch: ${err.message}`);
+        }
       }
-      if ((inserted + skipped) % 500 === 0) {
-        process.stdout.write(`\r  balance_payments progress: ${inserted + skipped}/${allPayments.length} (${inserted} new, ${skipped} existing)`);
-      }
+      process.stdout.write(`\r  transactions progress: ${Math.min(i + TX_BATCH, allTransactions.length)}/${allTransactions.length} (${txInserted} new, ${txSkipped} existing)`);
     }
-    console.log(`\n  balance_payments: ${inserted} inserted, ${skipped} skipped`);
+    console.log(`\n  transactions: ${txInserted} inserted, ${txSkipped} skipped`);
+
+    // Bulk write balance_payments (batches of 1000, no dedup — same miner can
+    // appear multiple times per batch with different amounts)
+    // First drop recovery-inserted records so we start clean (backup records stay
+    // if they don't overlap; re-running is safe since we re-insert everything)
+    const recoveredBlocks = allPayments.length > 0;
+    if (recoveredBlocks) {
+      const minBlock = Math.min(...allPayments.map(p => p.block));
+      const maxBlock = Math.max(...allPayments.map(p => p.block));
+      console.log(`  Clearing existing balance_payments in block range ${minBlock}-${maxBlock}...`);
+      const delResult = await dbo.collection('balance_payments').deleteMany({
+        block: { $gte: minBlock, $lte: maxBlock }
+      });
+      console.log(`  Removed ${delResult.deletedCount} existing records in range`);
+    }
+
+    console.log(`  Writing ${allPayments.length} balance_payments to database (bulk)...`);
+    let payInserted = 0;
+    const PAY_BATCH = 1000;
+    for (let i = 0; i < allPayments.length; i += PAY_BATCH) {
+      const batch = allPayments.slice(i, i + PAY_BATCH);
+      try {
+        const result = await dbo.collection('balance_payments').insertMany(batch, { ordered: false });
+        payInserted += result.insertedCount;
+      } catch (err) {
+        console.log(`\n  ERROR in batch: ${err.message}`);
+      }
+      process.stdout.write(`\r  balance_payments progress: ${Math.min(i + PAY_BATCH, allPayments.length)}/${allPayments.length} (${payInserted} inserted)`);
+    }
+    console.log(`\n  balance_payments: ${payInserted} inserted`);
   } else if (opts.dryRun) {
     console.log(`  [DRY RUN] Would insert ${allTransactions.length} transactions, ${allPayments.length} balance_payments`);
   }
