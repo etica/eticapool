@@ -152,20 +152,16 @@ async function main() {
   }
 
   // ═══════════════════════════════════════════════════
-  // STEP 4: Replace operational multi-doc collections
+  // STEP 4a: Replace ephemeral collections (only current state matters)
   // ═══════════════════════════════════════════════════
-  console.log('\n─── Step 4: Replace operational collections ───');
-  const operationalCollections = [
-    'ppnls_rewards',
-    'totaldiff_challengenumber',
-    'miner_pendingshares',
-    'miner_challengediff',
-    'stats_payment',
-    'poolStatsRecords',
-    'networkStatsRecords'
+  console.log('\n─── Step 4a: Replace ephemeral collections ───');
+  const replaceCollections = [
+    'totaldiff_challengenumber',   // per-challenge, dead after processed
+    'miner_pendingshares',         // current pending shares only
+    'miner_challengediff'          // per-challenge status tracker
   ];
 
-  for (const collName of operationalCollections) {
+  for (const collName of replaceCollections) {
     const liveCount = await liveDbo.collection(collName).find({}).count();
     const rebuildCount = await rebuildDbo.collection(collName).find({}).count();
 
@@ -177,7 +173,6 @@ async function main() {
     if (!opts.dryRun) {
       await rebuildDbo.collection(collName).deleteMany({});
 
-      // Insert in batches for large collections
       const BATCH = 5000;
       let inserted = 0;
       const cursor = liveDbo.collection(collName).find({});
@@ -202,6 +197,68 @@ async function main() {
       console.log(`  ${collName}: replaced ${rebuildCount} → ${inserted} docs`);
     } else {
       console.log(`  ${collName}: [DRY RUN] would replace ${rebuildCount} → ${liveCount} docs`);
+    }
+  }
+
+  // ═══════════════════════════════════════════════════
+  // STEP 4b: Append historical collections (keep rebuild + add live pool's new records)
+  // ═══════════════════════════════════════════════════
+  console.log('\n─── Step 4b: Append historical/analytics collections ───');
+  const appendCollections = [
+    'ppnls_rewards',        // miner reward history for UI
+    'stats_payment',        // hourly payment snapshots
+    'poolStatsRecords',     // hashrate chart history
+    'networkStatsRecords'   // network stats history
+  ];
+
+  for (const collName of appendCollections) {
+    const liveCount = await liveDbo.collection(collName).find({}).count();
+    const rebuildCount = await rebuildDbo.collection(collName).find({}).count();
+
+    if (liveCount === 0) {
+      console.log(`  ${collName}: SKIP (empty in live DB)`);
+      continue;
+    }
+
+    // Find the newest _id in rebuild to only append newer records from live
+    const newestInRebuild = await rebuildDbo.collection(collName)
+      .find({}).sort({ _id: -1 }).limit(1).toArray();
+    const newestId = newestInRebuild.length > 0 ? newestInRebuild[0]._id : null;
+
+    // Get only live records newer than the rebuild's newest
+    const liveQuery = newestId ? { _id: { $gt: newestId } } : {};
+    const newLiveCount = await liveDbo.collection(collName).find(liveQuery).count();
+
+    if (!opts.dryRun) {
+      if (newLiveCount === 0) {
+        console.log(`  ${collName}: no new records to append (rebuild: ${rebuildCount}, live: ${liveCount})`);
+        continue;
+      }
+
+      const BATCH = 5000;
+      let inserted = 0;
+      const cursor = liveDbo.collection(collName).find(liveQuery);
+      let batch = [];
+
+      while (await cursor.hasNext()) {
+        const doc = await cursor.next();
+        const { _id, ...rest } = doc;
+        batch.push(rest);
+
+        if (batch.length >= BATCH) {
+          const result = await rebuildDbo.collection(collName).insertMany(batch, { ordered: false });
+          inserted += result.insertedCount;
+          batch = [];
+        }
+      }
+      if (batch.length > 0) {
+        const result = await rebuildDbo.collection(collName).insertMany(batch, { ordered: false });
+        inserted += result.insertedCount;
+      }
+
+      console.log(`  ${collName}: kept ${rebuildCount} + appended ${inserted} new = ${rebuildCount + inserted} total`);
+    } else {
+      console.log(`  ${collName}: [DRY RUN] would keep ${rebuildCount} + append ${newLiveCount} new from live`);
     }
   }
 
